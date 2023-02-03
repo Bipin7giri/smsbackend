@@ -1,0 +1,176 @@
+import { comparePassword, generateHashPassword } from "../helper/hashpassword";
+import { genterateToken, getCurrentUser } from "../helper/jwt";
+import { RegisterSchema } from "../schema/registerSchema";
+import { Express, Request, Response } from "express";
+// import { UserPatchSchema } from "../schema/userschema/userpatch.schema";
+const cloudinary = require("cloudinary");
+import { AppDataSource } from "../DB/data-source";
+import { User } from "../entity/User";
+import { Role } from "../entity/Role";
+
+
+type CurrentUser = {
+id:number
+};
+
+export async function register(
+  req: Request,
+  res: Response,
+  next: any
+): Promise<void> {
+  try {
+    const validate = await RegisterSchema.validateAsync(req.body);
+
+    try {
+      const hashedPassword: any = await generateHashPassword(
+        validate?.password
+      );
+      // const roles = new Role();
+      const repo = AppDataSource.getRepository(Role)
+      const roles:any = await repo.findOne({where:{
+        id:2,
+      }});
+      const user = new User();
+      user.email = validate.email;
+      user.password = hashedPassword
+      user.roleId = roles
+      const userRepo = AppDataSource.getRepository(User);
+      const saveUser = await userRepo.save(user);
+      res.status(202).send({ message: "successfully registred" });
+    } catch (err:any) {
+      res.status(404).send({ error: true, message: err.message });
+    }
+  } catch (err: any) {
+    res.status(404).send({ error: true, message: err });
+  }
+}
+
+export async function login(
+  req: Request,
+  res: Response,
+  next: any
+): Promise<void> {
+  try {
+    const validate = await RegisterSchema.validateAsync(req.body);
+    try {
+      const repo = AppDataSource.getRepository(User);
+      const user = await repo.findOne({
+        relations:{
+          roleId:true
+        },
+          where:{
+           email:validate.email
+          }
+      });
+      console.table(user)
+      if (user) {
+        const checkPassword = await comparePassword(
+          user.password,
+          validate.password,
+        );
+        if (checkPassword === true) {
+          const accessToken: any = await genterateToken(user);
+          res.status(200).json({
+            access_token: accessToken,
+            message: "Login sucessfull !!",
+          });
+        } else {
+          res.status(404).json({
+            message: "Invalid password !!",
+          });
+        }
+      } else {
+        res.status(404).json({
+          message: "No email found",
+        });
+      }
+    } catch (err: any) {
+      // res.status(422).send({ error: true, message: err.message });;
+    }
+  } catch (err: any) {
+    res.status(422).send({ error: true, message: err.message });
+  }
+}
+
+// export async function update(req: any, res: Response):Promise<void> {
+//   try {
+//     const token = req?.headers["authorization"]?.split(" ")[1];
+//     const currentUser = getCurrentUser(token || "");
+
+//     const validate = await UserPatchSchema.validateAsync(req.body);
+
+//     if (req?.file) {
+//       const imageUrl = await cloudinary.uploader.upload(req?.file?.path);
+//       const user = await prisma.user.update({
+//         where: {
+//           id: currentUser?.id,
+//         },
+//         data: {
+//           name: validate.name,
+//           phone_Int: validate.phoneNumber,
+//           address: validate.address,
+//           avatar: imageUrl?.secure_url,
+//         },
+//       });
+//       res.json(user);
+//     } else {
+//       const user = await prisma.user.update({
+//         where: {
+//           id: currentUser?.id,
+//         },
+//         data: validate,
+//       });
+//       res.json(user);
+//     }
+
+//     if (!currentUser) throw new Error("Something went worng!!");
+//   } catch (err: any) {
+//     res.status(422).send({ error: true, message: err.message });;
+//   }
+// }
+
+export async function getUser(req: Request, res: Response):Promise<void> {
+  try {
+    const token:string = req?.headers["authorization"]?.split(" ")[1]||"";
+    const currentUser:CurrentUser = getCurrentUser(token || "");
+    const repo = AppDataSource.getRepository(User);
+    
+    const user  = await repo.findOneOrFail({where:{
+      id:currentUser.id
+    }});
+    // user?.password = null;
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).send("No use found");
+    }
+  } catch (err:any) {
+    res.status(404).send({ error: true, message: err.message });;
+  }
+}
+
+// export async function countAllusers():Promise<number> {
+//   return await prisma.user.count({where:{
+//     deleted:false
+//   }})
+
+// }
+
+// export async function getAllUsers(req:Request,res:Response):Promise<void> {
+//   try{
+//     const totalUser =  await countAllusers();
+//     const skip:any = req.query?.skip||0
+//     const take:any = req.query?.take||totalUser+1
+//     console.log(totalUser)
+//     const data = await prisma.user.findMany({
+//       skip:  parseInt(skip),
+//       take: parseInt(take),
+//     });
+//     res.status(200).json(data)
+//   }catch(err:any){
+//     res.json(err.message)
+//   }
+
+// }
+
+
