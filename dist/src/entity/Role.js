@@ -27,6 +27,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Role = void 0;
 var typeorm_1 = require("typeorm");
 var SoftDelete_1 = require("./SoftDelete");
+var User_1 = require("./User");
 var Role = /** @class */ (function (_super) {
     __extends(Role, _super);
     function Role() {
@@ -44,6 +45,10 @@ var Role = /** @class */ (function (_super) {
         (0, typeorm_1.Column)("text", { array: true }),
         __metadata("design:type", Array)
     ], Role.prototype, "roles", void 0);
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return User_1.User; }, function (user) { return user.roleId; }),
+        __metadata("design:type", Array)
+    ], Role.prototype, "userId", void 0);
     Role = __decorate([
         (0, typeorm_1.Entity)()
     ], Role);

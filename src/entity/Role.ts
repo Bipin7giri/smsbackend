@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column,UpdateDateColumn, CreateDateColumn, DeleteDateColumn } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column,UpdateDateColumn, CreateDateColumn, DeleteDateColumn, OneToMany } from "typeorm"
 import { SoftDelete } from "./SoftDelete";
+import { User } from "./User";
 
 @Entity()
 export class Role extends SoftDelete {
@@ -13,5 +14,6 @@ export class Role extends SoftDelete {
     @Column("text", { array: true })
     roles: string[];
 
-    
+    @OneToMany(() => User,(user)=>user.roleId)
+    userId: User[]
 }

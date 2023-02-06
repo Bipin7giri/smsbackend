@@ -1,19 +1,25 @@
-// import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, OneToOne } from "typeorm"
-// import { SoftDelete } from "./SoftDelete"
-// import { User } from "./User"
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, OneToOne, ManyToOne, OneToMany } from "typeorm"
+import { Department } from "./Department"
+import { SoftDelete } from "./SoftDelete"
+import { User } from "./User"
 
 
-// @Entity()
-// export class Semester extends SoftDelete {
+@Entity()
+export class Semester extends SoftDelete {
 
-//     @PrimaryGeneratedColumn()
-//     id?: number
+    @PrimaryGeneratedColumn()
+    id: number
 
-//     @Column()
-//     name?: string
+    @Column({nullable:true})
+    name?: string
+     
+    @ManyToOne(() => User, (user) => user.semester_id)
+    @JoinColumn({name:'student_id'})
+    studentId: User
+        
+    
+    @ManyToOne(() => Department, (dep) => dep.semesterId)
+    @JoinColumn({name:'department_id'})
+    departmentId: Department
 
-//     @OneToOne(() => User)
-//     @JoinColumn({name: 'student_id'})
-//     studentId: User
-
-// }
+}

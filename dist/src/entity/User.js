@@ -26,7 +26,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 var typeorm_1 = require("typeorm");
+var Department_1 = require("./Department");
 var Role_1 = require("./Role");
+var Semester_1 = require("./Semester");
 var SoftDelete_1 = require("./SoftDelete");
 var User = /** @class */ (function (_super) {
     __extends(User, _super);
@@ -62,10 +64,18 @@ var User = /** @class */ (function (_super) {
         __metadata("design:type", String)
     ], User.prototype, "address", void 0);
     __decorate([
-        (0, typeorm_1.OneToOne)(function (_a) { return Role_1.Role; }),
+        (0, typeorm_1.ManyToOne)(function () { return Role_1.Role; }, function (role) { return role.userId; }),
         (0, typeorm_1.JoinColumn)({ name: 'role_id' }),
         __metadata("design:type", Role_1.Role)
     ], User.prototype, "roleId", void 0);
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return Semester_1.Semester; }, function (sem) { return sem.studentId; }),
+        __metadata("design:type", Array)
+    ], User.prototype, "semester_id", void 0);
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return Department_1.Department; }, function (dep) { return dep.hod; }),
+        __metadata("design:type", Array)
+    ], User.prototype, "hod", void 0);
     User = __decorate([
         (0, typeorm_1.Entity)()
     ], User);

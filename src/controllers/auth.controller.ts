@@ -21,7 +21,7 @@ export async function register(
   try {
     const validate = await RegisterSchema.validateAsync(req.body);
 
-    try {
+    // try {
       const hashedPassword: any = await generateHashPassword(
         validate?.password
       );
@@ -36,12 +36,17 @@ export async function register(
       user.roleId = roles
       const userRepo = AppDataSource.getRepository(User);
       const saveUser = await userRepo.save(user);
-      res.status(202).send({ message: "successfully registred" });
-    } catch (err:any) {
-      res.status(404).send({ error: true, message: err.message });
-    }
+      console.log(saveUser)
+      if(saveUser){
+        res.status(202).send({ message: "successfully registred" });
+      }
+    // } catch (err:any) {
+    //   res.status(402).send({ error: true, message: err.message });
+    //   throw err
+    // }
   } catch (err: any) {
-    res.status(404).send({ error: true, message: err });
+    throw err
+    res.status(404).send({ error: true, message: err.message });
   }
 }
 
@@ -134,7 +139,6 @@ export async function getUser(req: Request, res: Response):Promise<void> {
     const token:string = req?.headers["authorization"]?.split(" ")[1]||"";
     const currentUser:CurrentUser = getCurrentUser(token || "");
     const repo = AppDataSource.getRepository(User);
-    
     const user  = await repo.findOneOrFail({where:{
       id:currentUser.id
     }});

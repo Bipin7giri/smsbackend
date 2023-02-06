@@ -116,15 +116,41 @@ export async function TeacherAuthorization(
   const user = JSON.parse(
     Buffer.from(token.split(".")[1], "base64").toString()
   );
+  let counter:number = 0;
   for (let index = 0; index < user.roles.length; index++) {
+    counter=counter+1;
     if (user.roles[index] ===  'teacher') {
       next()
       return
-     } else {
-        res.status(401).json({
-         message: "unauthorized access you are not student!! sorry baby",
-       });
-       return
      }
+  }
+  if(counter === user.roles.length){
+          res.status(401).json({
+         message: "unauthorized access you are not Teacher!! sorry baby",
+       });
+  }
+}
+
+export async function HODAuthorization(
+  req: Request,
+  res: Response,
+  next: any,
+): Promise<void> {
+  var token: any = req?.headers["authorization"]?.split(" ")[1];
+  const user = JSON.parse(
+    Buffer.from(token.split(".")[1], "base64").toString()
+  );
+  let counter:number = 0;
+  for (let index = 0; index < user.roles.length; index++) {
+    counter=counter+1;
+    if (user.roles[index] ===  'hod') {
+      next()
+      return
+     }
+  }
+  if(counter === user.roles.length){
+          res.status(401).json({
+         message: "unauthorized access you are not HOD!! sorry baby",
+       });
   }
 }

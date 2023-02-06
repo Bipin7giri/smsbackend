@@ -1,5 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, ManyToOne, OneToMany } from "typeorm"
+import { Department } from "./Department"
 import { Role } from "./Role"
+import { Semester } from "./Semester"
 import { SoftDelete } from "./SoftDelete"
 import { TimeStamp } from "./TimeStamp"
 
@@ -29,7 +31,18 @@ export class User extends SoftDelete {
     @Column({nullable:true})
     address?:string
 
-    @OneToOne(({}) => Role)
-    @JoinColumn({name: 'role_id'})
+    // @OneToOne(({}) => Role)
+    // @JoinColumn({name: 'role_id'})
+    // roleId: Role
+
+    @ManyToOne(() => Role, (role) => role.userId)
+    @JoinColumn({name:'role_id'})
     roleId: Role
+
+    @OneToMany(() => Semester,(sem)=>sem.studentId)
+    semester_id: Semester[]
+
+    @OneToMany(() => Department,(dep)=>dep.hod)
+    hod: Department[]
 }
+

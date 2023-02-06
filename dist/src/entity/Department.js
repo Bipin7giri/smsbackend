@@ -26,6 +26,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Department = void 0;
 var typeorm_1 = require("typeorm");
+var Semester_1 = require("./Semester");
 var SoftDelete_1 = require("./SoftDelete");
 var User_1 = require("./User");
 var Department = /** @class */ (function (_super) {
@@ -42,8 +43,16 @@ var Department = /** @class */ (function (_super) {
         __metadata("design:type", String)
     ], Department.prototype, "name", void 0);
     __decorate([
-        (0, typeorm_1.OneToOne)(function () { return User_1.User; }),
-        (0, typeorm_1.JoinColumn)({ name: 'hod' }),
+        (0, typeorm_1.Column)("text", { array: true }),
+        __metadata("design:type", Array)
+    ], Department.prototype, "teachers", void 0);
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return Semester_1.Semester; }, function (sem) { return sem.departmentId; }),
+        __metadata("design:type", Array)
+    ], Department.prototype, "semesterId", void 0);
+    __decorate([
+        (0, typeorm_1.ManyToOne)(function () { return User_1.User; }, function (user) { return user.hod; }),
+        (0, typeorm_1.JoinColumn)({ name: 'hod_id' }),
         __metadata("design:type", User_1.User)
     ], Department.prototype, "hod", void 0);
     Department = __decorate([

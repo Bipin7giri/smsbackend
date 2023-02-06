@@ -1,6 +1,6 @@
 import { register,login,getUser } from "../controllers/auth.controller";
 import * as express from 'express'
-import { Authorization, tokenValidation } from "../helper/jwt";
+import { tokenValidation } from "../helper/jwt";
 const   router = express.Router();
 const multer = require("multer");
 const upload = multer({ dest: 'uploads/' });

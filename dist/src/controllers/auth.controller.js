@@ -47,25 +47,22 @@ var User_1 = require("../entity/User");
 var Role_1 = require("../entity/Role");
 function register(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
-        var validate, hashedPassword, repo, roles, user, userRepo, saveUser, err_1, err_2;
+        var validate, hashedPassword, repo, roles, user, userRepo, saveUser, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 8, , 9]);
+                    _a.trys.push([0, 5, , 6]);
                     return [4 /*yield*/, registerSchema_1.RegisterSchema.validateAsync(req.body)];
                 case 1:
                     validate = _a.sent();
-                    _a.label = 2;
-                case 2:
-                    _a.trys.push([2, 6, , 7]);
                     return [4 /*yield*/, (0, hashpassword_1.generateHashPassword)(validate === null || validate === void 0 ? void 0 : validate.password)];
-                case 3:
+                case 2:
                     hashedPassword = _a.sent();
                     repo = data_source_1.AppDataSource.getRepository(Role_1.Role);
                     return [4 /*yield*/, repo.findOne({ where: {
                                 id: 2,
                             } })];
-                case 4:
+                case 3:
                     roles = _a.sent();
                     user = new User_1.User();
                     user.email = validate.email;
@@ -73,20 +70,17 @@ function register(req, res, next) {
                     user.roleId = roles;
                     userRepo = data_source_1.AppDataSource.getRepository(User_1.User);
                     return [4 /*yield*/, userRepo.save(user)];
-                case 5:
+                case 4:
                     saveUser = _a.sent();
-                    res.status(202).send({ message: "successfully registred" });
-                    return [3 /*break*/, 7];
-                case 6:
+                    console.log(saveUser);
+                    if (saveUser) {
+                        res.status(202).send({ message: "successfully registred" });
+                    }
+                    return [3 /*break*/, 6];
+                case 5:
                     err_1 = _a.sent();
-                    res.status(404).send({ error: true, message: err_1.message });
-                    return [3 /*break*/, 7];
-                case 7: return [3 /*break*/, 9];
-                case 8:
-                    err_2 = _a.sent();
-                    res.status(404).send({ error: true, message: err_2 });
-                    return [3 /*break*/, 9];
-                case 9: return [2 /*return*/];
+                    throw err_1;
+                case 6: return [2 /*return*/];
             }
         });
     });
@@ -94,7 +88,7 @@ function register(req, res, next) {
 exports.register = register;
 function login(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
-        var validate, repo, user, checkPassword, accessToken, err_3, err_4;
+        var validate, repo, user, checkPassword, accessToken, err_2, err_3;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -143,12 +137,12 @@ function login(req, res, next) {
                     _a.label = 9;
                 case 9: return [3 /*break*/, 11];
                 case 10:
-                    err_3 = _a.sent();
+                    err_2 = _a.sent();
                     return [3 /*break*/, 11];
                 case 11: return [3 /*break*/, 13];
                 case 12:
-                    err_4 = _a.sent();
-                    res.status(422).send({ error: true, message: err_4.message });
+                    err_3 = _a.sent();
+                    res.status(422).send({ error: true, message: err_3.message });
                     return [3 /*break*/, 13];
                 case 13: return [2 /*return*/];
             }
@@ -192,7 +186,7 @@ exports.login = login;
 function getUser(req, res) {
     var _a;
     return __awaiter(this, void 0, void 0, function () {
-        var token, currentUser, repo, user, err_5;
+        var token, currentUser, repo, user, err_4;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -214,8 +208,8 @@ function getUser(req, res) {
                     }
                     return [3 /*break*/, 3];
                 case 2:
-                    err_5 = _b.sent();
-                    res.status(404).send({ error: true, message: err_5.message });
+                    err_4 = _b.sent();
+                    res.status(404).send({ error: true, message: err_4.message });
                     ;
                     return [3 /*break*/, 3];
                 case 3: return [2 /*return*/];

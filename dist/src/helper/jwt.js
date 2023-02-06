@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TeacherAuthorization = exports.StudentAuthorization = exports.AdminAuthorization = exports.getCurrentUser = exports.tokenValidation = exports.genterateToken = void 0;
+exports.HODAuthorization = exports.TeacherAuthorization = exports.StudentAuthorization = exports.AdminAuthorization = exports.getCurrentUser = exports.tokenValidation = exports.genterateToken = void 0;
 var jwt = require("jsonwebtoken");
 function genterateToken(user, expire) {
     return __awaiter(this, void 0, void 0, function () {
@@ -148,25 +148,51 @@ exports.StudentAuthorization = StudentAuthorization;
 function TeacherAuthorization(req, res, next) {
     var _a;
     return __awaiter(this, void 0, void 0, function () {
-        var token, user, index;
+        var token, user, counter, index;
         return __generator(this, function (_b) {
             token = (_a = req === null || req === void 0 ? void 0 : req.headers["authorization"]) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
             user = JSON.parse(Buffer.from(token.split(".")[1], "base64").toString());
+            counter = 0;
             for (index = 0; index < user.roles.length; index++) {
+                counter = counter + 1;
                 if (user.roles[index] === 'teacher') {
                     next();
                     return [2 /*return*/];
                 }
-                else {
-                    res.status(401).json({
-                        message: "unauthorized access you are not student!! sorry baby",
-                    });
-                    return [2 /*return*/];
-                }
+            }
+            if (counter === user.roles.length) {
+                res.status(401).json({
+                    message: "unauthorized access you are not Teacher!! sorry baby",
+                });
             }
             return [2 /*return*/];
         });
     });
 }
 exports.TeacherAuthorization = TeacherAuthorization;
+function HODAuthorization(req, res, next) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function () {
+        var token, user, counter, index;
+        return __generator(this, function (_b) {
+            token = (_a = req === null || req === void 0 ? void 0 : req.headers["authorization"]) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
+            user = JSON.parse(Buffer.from(token.split(".")[1], "base64").toString());
+            counter = 0;
+            for (index = 0; index < user.roles.length; index++) {
+                counter = counter + 1;
+                if (user.roles[index] === 'hod') {
+                    next();
+                    return [2 /*return*/];
+                }
+            }
+            if (counter === user.roles.length) {
+                res.status(401).json({
+                    message: "unauthorized access you are not HOD!! sorry baby",
+                });
+            }
+            return [2 /*return*/];
+        });
+    });
+}
+exports.HODAuthorization = HODAuthorization;
 //# sourceMappingURL=jwt.js.map

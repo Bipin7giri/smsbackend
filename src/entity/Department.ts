@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, OneToOne } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, OneToOne, OneToMany, ManyToOne } from "typeorm"
+import { Semester } from "./Semester"
 import { SoftDelete } from "./SoftDelete"
 import { User } from "./User"
 
@@ -11,9 +12,16 @@ export class Department extends SoftDelete {
 
     @Column()
     name?: string
+    
+    @Column("text", { array: true })
+    teachers: string[];
 
-    @OneToOne(() => User)
-    @JoinColumn({name: 'hod'})
-    hod!: User
+
+    @OneToMany(() => Semester,(sem)=>sem.departmentId)
+    semesterId: Department[]
+
+    @ManyToOne(() => User, (user) => user.hod)
+    @JoinColumn({name:'hod_id'})
+    hod: User
 
 }
