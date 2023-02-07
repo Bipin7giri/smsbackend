@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, ManyToOne, OneToMany } from "typeorm"
+import { Class } from "./Classes"
 import { Department } from "./Department"
 import { Role } from "./Role"
 import { Semester } from "./Semester"
@@ -39,8 +40,8 @@ export class User extends SoftDelete {
     @JoinColumn({name:'role_id'})
     roleId: Role
 
-    @OneToMany(() => Semester,(sem)=>sem.studentId)
-    semester_id: Semester[]
+    @OneToMany(() => Class,(c)=>c.studentId)
+    classes: Class[]
 
     @OneToMany(() => Department,(dep)=>dep.hod)
     hod: Department[]

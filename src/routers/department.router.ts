@@ -3,7 +3,7 @@ import * as express from 'express'
 import { AdminAuthorization, HODAuthorization, tokenValidation } from "../helper/jwt";
 const   router = express.Router();
 router.post('/department', tokenValidation,AdminAuthorization, create);
-  router.get('/department',tokenValidation,HODAuthorization,get)
+  router.get('/hod/department',tokenValidation,HODAuthorization,get)
   // router.patch('/users/me', tokenValidation,upload.single("avatar"), update)
 //   router.get('/users/me',tokenValidation,getUser)
   // router.get('/users/all',tokenValidation,Authorization, getAllUsers)

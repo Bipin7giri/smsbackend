@@ -1,9 +1,9 @@
-import { create, get } from "../controllers/semester.controller";
+import { create } from "../controllers/class.controller";
 import * as express from 'express'
 import { AdminAuthorization, HODAuthorization, tokenValidation } from "../helper/jwt";
 const   router = express.Router();
-router.post('/hod/semester', tokenValidation,HODAuthorization, create);
-router.get('/hod/semester', tokenValidation,HODAuthorization, get);
+router.post('/hod/class', tokenValidation,HODAuthorization, create);
+// router.get('/hod/class', tokenValidation,HODAuthorization, get);
 
 //   router.post('/login',login)
   // router.patch('/users/me', tokenValidation,upload.single("avatar"), update)

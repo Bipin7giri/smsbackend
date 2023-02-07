@@ -26,9 +26,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Semester = void 0;
 var typeorm_1 = require("typeorm");
+var Classes_1 = require("./Classes");
 var Department_1 = require("./Department");
 var SoftDelete_1 = require("./SoftDelete");
-var User_1 = require("./User");
+var Subject_1 = require("./Subject");
 var Semester = /** @class */ (function (_super) {
     __extends(Semester, _super);
     function Semester() {
@@ -43,10 +44,13 @@ var Semester = /** @class */ (function (_super) {
         __metadata("design:type", String)
     ], Semester.prototype, "name", void 0);
     __decorate([
-        (0, typeorm_1.ManyToOne)(function () { return User_1.User; }, function (user) { return user.semester_id; }),
-        (0, typeorm_1.JoinColumn)({ name: 'student_id' }),
-        __metadata("design:type", User_1.User)
-    ], Semester.prototype, "studentId", void 0);
+        (0, typeorm_1.OneToMany)(function () { return Subject_1.Subjects; }, function (sub) { return sub.semesterId; }),
+        __metadata("design:type", Array)
+    ], Semester.prototype, "subjects", void 0);
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return Classes_1.Class; }, function (c) { return c.semesterId; }),
+        __metadata("design:type", Array)
+    ], Semester.prototype, "classes", void 0);
     __decorate([
         (0, typeorm_1.ManyToOne)(function () { return Department_1.Department; }, function (dep) { return dep.semesterId; }),
         (0, typeorm_1.JoinColumn)({ name: 'department_id' }),
