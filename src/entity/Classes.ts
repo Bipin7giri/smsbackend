@@ -21,7 +21,7 @@ export class Class extends SoftDelete {
 
     @ManyToOne(() => Subjects, (sub) => sub.classId)
     @JoinColumn({name:'subject_id'})
-    subjectId: Subject
+    subjectId: Subjects
 
 
     @ManyToOne(() => Semester, (sem) => sem.classes)

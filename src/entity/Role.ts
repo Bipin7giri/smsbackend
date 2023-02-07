@@ -9,7 +9,7 @@ export class Role extends SoftDelete {
     id: number
 
     @Column()
-    name: string
+    name?: string
 
     @Column("text", { array: true })
     roles: string[];

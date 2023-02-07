@@ -37,7 +37,7 @@ var SoftDelete = /** @class */ (function (_super) {
         __metadata("design:type", String)
     ], SoftDelete.prototype, "deletedBy", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ nullable: true }),
+        (0, typeorm_1.Column)({ nullable: true, default: false }),
         __metadata("design:type", Boolean)
     ], SoftDelete.prototype, "deleted", void 0);
     __decorate([

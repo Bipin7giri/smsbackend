@@ -5,3 +5,9 @@ export const  SubjectAndClassShcema = Joi.object({
     semesterId:Joi.number().required(),
     studentId:Joi.array().required(),
 })
+
+export const  SubjectPathSchema = Joi.object({
+    subject_name: Joi.string(),
+    teacherId:Joi.number(),
+    semesterId:Joi.number()
+})

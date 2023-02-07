@@ -7,7 +7,7 @@ export class SoftDelete extends TimeStamp {
     @Column({nullable:true})
     deletedBy?:string
 
-    @Column({nullable:true})
+    @Column({nullable:true,default:false})
     deleted?: boolean
 
     @DeleteDateColumn({name:'deleted_at',nullable:true})
