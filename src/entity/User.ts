@@ -25,6 +25,9 @@ export class User extends SoftDelete {
     @Column({name:'phone_number',nullable:true})
     phoneNumber?: string
   
+
+    @Column({nullable:true})
+    avatar?: string 
     
     @Column()
     password: string 

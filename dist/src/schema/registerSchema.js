@@ -15,6 +15,7 @@ exports.UserUpdateSchema = Joi.object({
     lastName: Joi.string(),
     phoneNumber: Joi.string(),
     address: Joi.string(),
+    avatar: Joi.string()
 });
 exports.AddTeacherSchema = Joi.object({
     password: Joi.string()

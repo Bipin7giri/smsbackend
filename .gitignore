@@ -5,3 +5,5 @@ dist
 tmp/
 temp/
 .env
+uploads
+dist

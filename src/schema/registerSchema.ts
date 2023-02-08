@@ -14,6 +14,7 @@ export const  UserUpdateSchema = Joi.object({
     lastName:Joi.string(),
     phoneNumber:Joi.string(),
     address:Joi.string(),
+    avatar:Joi.string()
 })
 
 export const  AddTeacherSchema = Joi.object({
@@ -21,6 +22,7 @@ export const  AddTeacherSchema = Joi.object({
         .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
     name: Joi.string().required(),
     subjectName:Joi.string().required(),
+  
     
 })
   

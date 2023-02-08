@@ -59,9 +59,11 @@ function register(req, res, next) {
                 case 2:
                     hashedPassword = _a.sent();
                     repo = data_source_1.AppDataSource.getRepository(Role_1.Role);
-                    return [4 /*yield*/, repo.findOne({ where: {
+                    return [4 /*yield*/, repo.findOne({
+                            where: {
                                 id: 2,
-                            } })];
+                            },
+                        })];
                 case 3:
                     roles = _a.sent();
                     user = new User_1.User();
@@ -102,11 +104,11 @@ function login(req, res, next) {
                     repo = data_source_1.AppDataSource.getRepository(User_1.User);
                     return [4 /*yield*/, repo.findOne({
                             relations: {
-                                roleId: true
+                                roleId: true,
                             },
                             where: {
-                                email: validate.email
-                            }
+                                email: validate.email,
+                            },
                         })];
                 case 3:
                     user = _a.sent();
@@ -194,9 +196,11 @@ function getUser(req, res) {
                     token = ((_a = req === null || req === void 0 ? void 0 : req.headers["authorization"]) === null || _a === void 0 ? void 0 : _a.split(" ")[1]) || "";
                     currentUser = (0, jwt_1.getCurrentUser)(token || "");
                     repo = data_source_1.AppDataSource.getRepository(User_1.User);
-                    return [4 /*yield*/, repo.findOneOrFail({ where: {
-                                id: currentUser.id
-                            } })];
+                    return [4 /*yield*/, repo.findOneOrFail({
+                            where: {
+                                id: currentUser.id,
+                            },
+                        })];
                 case 1:
                     user = _b.sent();
                     // user?.password = null;
@@ -210,7 +214,6 @@ function getUser(req, res) {
                 case 2:
                     err_4 = _b.sent();
                     res.status(404).send({ error: true, message: err_4.message });
-                    ;
                     return [3 /*break*/, 3];
                 case 3: return [2 /*return*/];
             }
@@ -219,38 +222,45 @@ function getUser(req, res) {
 }
 exports.getUser = getUser;
 function updateUser(req, res) {
-    var _a;
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function () {
-        var validate, _b, token, currentUser, repo, user, err_5;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
+        var validate, _c, token, currentUser, repo, imageUrl, user, err_5;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
                 case 0:
-                    _c.trys.push([0, 4, , 5]);
+                    _d.trys.push([0, 6, , 7]);
                     return [4 /*yield*/, registerSchema_1.UserUpdateSchema.validateAsync(req.body)];
                 case 1:
-                    validate = _c.sent();
-                    _b = validate;
+                    validate = _d.sent();
+                    console.log(req.body);
+                    _c = validate;
                     return [4 /*yield*/, (0, hashpassword_1.generateHashPassword)(validate.password)];
                 case 2:
-                    _b.password = _c.sent();
+                    _c.password = _d.sent();
                     token = ((_a = req === null || req === void 0 ? void 0 : req.headers["authorization"]) === null || _a === void 0 ? void 0 : _a.split(" ")[1]) || "";
                     currentUser = (0, jwt_1.getCurrentUser)(token || "");
                     repo = data_source_1.AppDataSource.getRepository(User_1.User);
-                    return [4 /*yield*/, repo.update(currentUser.id, validate)];
+                    if (!(req === null || req === void 0 ? void 0 : req.file)) return [3 /*break*/, 4];
+                    return [4 /*yield*/, cloudinary.uploader.upload((_b = req === null || req === void 0 ? void 0 : req.file) === null || _b === void 0 ? void 0 : _b.path)];
                 case 3:
-                    user = _c.sent();
+                    imageUrl = _d.sent();
+                    validate.avatar = imageUrl === null || imageUrl === void 0 ? void 0 : imageUrl.secure_url;
+                    _d.label = 4;
+                case 4: return [4 /*yield*/, repo.update(currentUser.id, validate)];
+                case 5:
+                    user = _d.sent();
                     if (user) {
                         res.json("user successfully updated");
                     }
                     else {
                         res.status(404).send("No use found");
                     }
-                    return [3 /*break*/, 5];
-                case 4:
-                    err_5 = _c.sent();
+                    return [3 /*break*/, 7];
+                case 6:
+                    err_5 = _d.sent();
                     res.status(404).send({ error: true, message: err_5.message });
-                    return [3 /*break*/, 5];
-                case 5: return [2 /*return*/];
+                    return [3 /*break*/, 7];
+                case 7: return [2 /*return*/];
             }
         });
     });

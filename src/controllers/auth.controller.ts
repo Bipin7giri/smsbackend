@@ -1,6 +1,6 @@
 import { comparePassword, generateHashPassword } from "../helper/hashpassword";
 import { genterateToken, getCurrentUser } from "../helper/jwt";
-import {RegisterSchema, UserUpdateSchema} from "../schema/registerSchema";
+import { RegisterSchema, UserUpdateSchema } from "../schema/registerSchema";
 import { Express, Request, Response } from "express";
 // import { UserPatchSchema } from "../schema/userschema/userpatch.schema";
 const cloudinary = require("cloudinary");
@@ -8,9 +8,8 @@ import { AppDataSource } from "../DB/data-source";
 import { User } from "../entity/User";
 import { Role } from "../entity/Role";
 
-
 type CurrentUser = {
-id:number
+  id: number;
 };
 
 export async function register(
@@ -22,30 +21,30 @@ export async function register(
     const validate = await RegisterSchema.validateAsync(req.body);
 
     // try {
-      const hashedPassword: any = await generateHashPassword(
-        validate?.password
-      );
-      // const roles = new Role();
-      const repo = AppDataSource.getRepository(Role)
-      const roles:any = await repo.findOne({where:{
-        id:2,
-      }});
-      const user = new User();
-      user.email = validate.email;
-      user.password = hashedPassword
-      user.roleId = roles
-      const userRepo = AppDataSource.getRepository(User);
-      const saveUser = await userRepo.save(user);
-      console.log(saveUser)
-      if(saveUser){
-        res.status(202).send({ message: "successfully registred" });
-      }
+    const hashedPassword: any = await generateHashPassword(validate?.password);
+    // const roles = new Role();
+    const repo = AppDataSource.getRepository(Role);
+    const roles: any = await repo.findOne({
+      where: {
+        id: 2,
+      },
+    });
+    const user = new User();
+    user.email = validate.email;
+    user.password = hashedPassword;
+    user.roleId = roles;
+    const userRepo = AppDataSource.getRepository(User);
+    const saveUser = await userRepo.save(user);
+    console.log(saveUser);
+    if (saveUser) {
+      res.status(202).send({ message: "successfully registred" });
+    }
     // } catch (err:any) {
     //   res.status(402).send({ error: true, message: err.message });
     //   throw err
     // }
   } catch (err: any) {
-    throw err
+    throw err;
     res.status(404).send({ error: true, message: err.message });
   }
 }
@@ -60,18 +59,18 @@ export async function login(
     try {
       const repo = AppDataSource.getRepository(User);
       const user = await repo.findOne({
-        relations:{
-          roleId:true
+        relations: {
+          roleId: true,
         },
-          where:{
-           email:validate.email
-          }
+        where: {
+          email: validate.email,
+        },
       });
-      console.table(user)
+      console.table(user);
       if (user) {
         const checkPassword = await comparePassword(
           user.password,
-          validate.password,
+          validate.password
         );
         if (checkPassword === true) {
           const accessToken: any = await genterateToken(user);
@@ -96,7 +95,6 @@ export async function login(
     res.status(422).send({ error: true, message: err.message });
   }
 }
-
 
 // export async function update(req: any, res: Response):Promise<void> {
 //   try {
@@ -135,43 +133,48 @@ export async function login(
 //   }
 // }
 
-export async function getUser(req: Request, res: Response):Promise<void> {
+export async function getUser(req: Request, res: Response): Promise<void> {
   try {
-    const token:string = req?.headers["authorization"]?.split(" ")[1]||"";
-    const currentUser:CurrentUser = getCurrentUser(token || "");
+    const token: string = req?.headers["authorization"]?.split(" ")[1] || "";
+    const currentUser: CurrentUser = getCurrentUser(token || "");
     const repo = AppDataSource.getRepository(User);
-    const user  = await repo.findOneOrFail({where:{
-      id:currentUser.id
-    }});
+    const user = await repo.findOneOrFail({
+      where: {
+        id: currentUser.id,
+      },
+    });
     // user?.password = null;
     if (user) {
       res.json(user);
     } else {
       res.status(404).send("No use found");
     }
-  } catch (err:any) {
-    res.status(404).send({ error: true, message: err.message });;
+  } catch (err: any) {
+    res.status(404).send({ error: true, message: err.message });
   }
 }
 
-
-
-
-
-export async function updateUser(req: Request, res: Response):Promise<void> {
+export async function updateUser(req: any, res: Response): Promise<void> {
   try {
     const validate = await UserUpdateSchema.validateAsync(req.body);
-    validate.password = await generateHashPassword(validate.password)
-    const token:string = req?.headers["authorization"]?.split(" ")[1]||"";
-    const currentUser:CurrentUser = getCurrentUser(token || "");
+    console.log(req.body);
+
+    validate.password = await generateHashPassword(validate.password);
+    const token: string = req?.headers["authorization"]?.split(" ")[1] || "";
+    const currentUser: CurrentUser = getCurrentUser(token || "");
     const repo = AppDataSource.getRepository(User);
-    const user  = await repo.update( currentUser.id,validate);
+
+    if (req?.file) {
+      const imageUrl = await cloudinary.uploader.upload(req?.file?.path);
+      validate.avatar = imageUrl?.secure_url;
+    }
+    const user = await repo.update(currentUser.id, validate);
     if (user) {
       res.json("user successfully updated");
     } else {
       res.status(404).send("No use found");
     }
-  } catch (err:any) {
+  } catch (err: any) {
     res.status(404).send({ error: true, message: err.message });
   }
 }
@@ -198,5 +201,3 @@ export async function updateUser(req: Request, res: Response):Promise<void> {
 //   }
 
 // }
-
-
