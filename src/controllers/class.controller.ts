@@ -92,3 +92,29 @@ export const get = async (req: Request, res: Response): Promise<void> => {
     res.status(404).send({ error: true, message: err.message });;
   }
 };
+
+
+export const  removeStudent = async (req:Request,res:Response): Promise<void>=>{
+  try {
+    const token:string = req?.headers["authorization"]?.split(" ")[1]||"";
+    const currentUser:any = getCurrentUser(token || "");
+    const repo = AppDataSource.getRepository(Subjects);
+    const subject = await repo.find({
+      where:{
+        teacherId:{
+          id:currentUser.id
+        }
+      } ,
+      relations:['classId','classId.studentId'],
+    })
+    console.table(subject)
+    // user?.password = null;
+    if (subject) {
+      res.json(subject);
+    } else {
+      res.status(404).send("No subject found");
+    }
+  } catch (err:any) {
+    res.status(404).send({ error: true, message: err.message });;
+  }
+}
