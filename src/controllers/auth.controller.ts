@@ -1,6 +1,6 @@
 import { comparePassword, generateHashPassword } from "../helper/hashpassword";
 import { genterateToken, getCurrentUser } from "../helper/jwt";
-import { RegisterSchema } from "../schema/registerSchema";
+import {RegisterSchema, UserUpdateSchema} from "../schema/registerSchema";
 import { Express, Request, Response } from "express";
 // import { UserPatchSchema } from "../schema/userschema/userpatch.schema";
 const cloudinary = require("cloudinary");
@@ -97,6 +97,7 @@ export async function login(
   }
 }
 
+
 // export async function update(req: any, res: Response):Promise<void> {
 //   try {
 //     const token = req?.headers["authorization"]?.split(" ")[1];
@@ -153,6 +154,27 @@ export async function getUser(req: Request, res: Response):Promise<void> {
   }
 }
 
+
+
+
+
+export async function updateUser(req: Request, res: Response):Promise<void> {
+  try {
+    const validate = await UserUpdateSchema.validateAsync(req.body);
+    validate.password = await generateHashPassword(validate.password)
+    const token:string = req?.headers["authorization"]?.split(" ")[1]||"";
+    const currentUser:CurrentUser = getCurrentUser(token || "");
+    const repo = AppDataSource.getRepository(User);
+    const user  = await repo.update( currentUser.id,validate);
+    if (user) {
+      res.json("user successfully updated");
+    } else {
+      res.status(404).send("No use found");
+    }
+  } catch (err:any) {
+    res.status(404).send({ error: true, message: err.message });
+  }
+}
 // export async function countAllusers():Promise<number> {
 //   return await prisma.user.count({where:{
 //     deleted:false

@@ -40,7 +40,7 @@ exports.HODAuthorization = exports.TeacherAuthorization = exports.StudentAuthori
 var jwt = require("jsonwebtoken");
 function genterateToken(user, expire) {
     return __awaiter(this, void 0, void 0, function () {
-        var token, err_1;
+        var err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -54,9 +54,7 @@ function genterateToken(user, expire) {
                         }, "json_web_token_pw", {
                             expiresIn: "10h",
                         })];
-                case 1:
-                    token = _a.sent();
-                    return [2 /*return*/, token];
+                case 1: return [2 /*return*/, _a.sent()];
                 case 2:
                     err_1 = _a.sent();
                     console.log(err_1);

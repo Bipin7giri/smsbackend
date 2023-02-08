@@ -2,13 +2,11 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 export async function generateHashPassword(password: any): Promise<string> {
   const saltRounds = 10;
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
-  return hashedPassword;
+  return await bcrypt.hash(password, saltRounds);
 }
 export async function comparePassword(
-  dbpassword: string,
-  reqpassword: string
+  dbPassword: string,
+  reqPassword: string
 ): Promise<Boolean> {
-  const status: boolean = await bcrypt.compare(reqpassword, dbpassword);
-  return status;
+  return await bcrypt.compare(reqPassword, dbPassword);
 }

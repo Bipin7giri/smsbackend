@@ -41,29 +41,24 @@ var bcrypt = require("bcrypt");
 var saltRounds = 10;
 function generateHashPassword(password) {
     return __awaiter(this, void 0, void 0, function () {
-        var saltRounds, hashedPassword;
+        var saltRounds;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     saltRounds = 10;
                     return [4 /*yield*/, bcrypt.hash(password, saltRounds)];
-                case 1:
-                    hashedPassword = _a.sent();
-                    return [2 /*return*/, hashedPassword];
+                case 1: return [2 /*return*/, _a.sent()];
             }
         });
     });
 }
 exports.generateHashPassword = generateHashPassword;
-function comparePassword(dbpassword, reqpassword) {
+function comparePassword(dbPassword, reqPassword) {
     return __awaiter(this, void 0, void 0, function () {
-        var status;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, bcrypt.compare(reqpassword, dbpassword)];
-                case 1:
-                    status = _a.sent();
-                    return [2 /*return*/, status];
+                case 0: return [4 /*yield*/, bcrypt.compare(reqPassword, dbPassword)];
+                case 1: return [2 /*return*/, _a.sent()];
             }
         });
     });

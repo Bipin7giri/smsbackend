@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUser = exports.login = exports.register = void 0;
+exports.updateUser = exports.getUser = exports.login = exports.register = void 0;
 var hashpassword_1 = require("../helper/hashpassword");
 var jwt_1 = require("../helper/jwt");
 var registerSchema_1 = require("../schema/registerSchema");
@@ -218,6 +218,44 @@ function getUser(req, res) {
     });
 }
 exports.getUser = getUser;
+function updateUser(req, res) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function () {
+        var validate, _b, token, currentUser, repo, user, err_5;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    _c.trys.push([0, 4, , 5]);
+                    return [4 /*yield*/, registerSchema_1.UserUpdateSchema.validateAsync(req.body)];
+                case 1:
+                    validate = _c.sent();
+                    _b = validate;
+                    return [4 /*yield*/, (0, hashpassword_1.generateHashPassword)(validate.password)];
+                case 2:
+                    _b.password = _c.sent();
+                    token = ((_a = req === null || req === void 0 ? void 0 : req.headers["authorization"]) === null || _a === void 0 ? void 0 : _a.split(" ")[1]) || "";
+                    currentUser = (0, jwt_1.getCurrentUser)(token || "");
+                    repo = data_source_1.AppDataSource.getRepository(User_1.User);
+                    return [4 /*yield*/, repo.update(currentUser.id, validate)];
+                case 3:
+                    user = _c.sent();
+                    if (user) {
+                        res.json("user successfully updated");
+                    }
+                    else {
+                        res.status(404).send("No use found");
+                    }
+                    return [3 /*break*/, 5];
+                case 4:
+                    err_5 = _c.sent();
+                    res.status(404).send({ error: true, message: err_5.message });
+                    return [3 /*break*/, 5];
+                case 5: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.updateUser = updateUser;
 // export async function countAllusers():Promise<number> {
 //   return await prisma.user.count({where:{
 //     deleted:false

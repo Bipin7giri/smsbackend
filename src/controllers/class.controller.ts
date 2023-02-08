@@ -1,13 +1,9 @@
 import { Express, Request, Response } from "express";
-import { Subject } from "typeorm/persistence/Subject";
 import { AppDataSource } from "../DB/data-source";
 import { Class } from "../entity/Classes";
-import { Department } from "../entity/Department";
-import { Semester } from "../entity/Semester";
 import { Subjects } from "../entity/Subject";
 import { getCurrentUser } from "../helper/jwt";
 import { ClassPatchSchema, ClassSchema } from "../schema/classSchema";
-import { SemesterSchema } from "../schema/semesterSchema";
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {

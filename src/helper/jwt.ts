@@ -1,23 +1,22 @@
 const jwt = require("jsonwebtoken");
-import { Express, Request, Response } from "express";
+import {Request, Response} from "express";
 
 
 export async function genterateToken(user: any, expire?: any): Promise<any> {
   try{
     console.log(user)
-    const token = await jwt.sign(
-      {
-        // email: user.email,
-        id: user.id,
-        roles: user.roleId.roles,
-        email:user.email
-      },
-      "json_web_token_pw",
-      {
-        expiresIn: "10h",
-      }
+      return await jwt.sign(
+        {
+            // email: user.email,
+            id: user.id,
+            roles: user.roleId.roles,
+            email: user.email
+        },
+        "json_web_token_pw",
+        {
+            expiresIn: "10h",
+        }
     );
-    return token;
   }catch(err:any){
   console.log(err)
   }
@@ -26,9 +25,9 @@ export async function genterateToken(user: any, expire?: any): Promise<any> {
 
 export function tokenValidation(req: Request, res: Response, next: any) {
   const authHeader = req.headers["authorization"];
-  var token = req?.headers["authorization"]?.split(" ")[1];
+    let token = req?.headers["authorization"]?.split(" ")[1];
 
-  if (!authHeader) {
+    if (!authHeader) {
     return res.status(404).json({
       message: "No access_token found",
     });
@@ -63,8 +62,8 @@ export async function AdminAuthorization(
   res: Response,
   next: any,
 ): Promise<void> {
-  var token: any = req?.headers["authorization"]?.split(" ")[1];
-  const user = JSON.parse(
+    let token: any = req?.headers["authorization"]?.split(" ")[1];
+    const user = JSON.parse(
     Buffer.from(token.split(".")[1], "base64").toString()
   );
   for (let index = 0; index < user.roles.length; index++) {
@@ -88,8 +87,8 @@ export async function StudentAuthorization(
   res: Response,
   next: any,
 ): Promise<void> {
-  var token: any = req?.headers["authorization"]?.split(" ")[1];
-  const user = JSON.parse(
+    let token: any = req?.headers["authorization"]?.split(" ")[1];
+    const user = JSON.parse(
     Buffer.from(token.split(".")[1], "base64").toString()
   );
   for (let index = 0; index < user.roles.length; index++) {
@@ -112,8 +111,8 @@ export async function TeacherAuthorization(
   res: Response,
   next: any,
 ): Promise<void> {
-  var token: any = req?.headers["authorization"]?.split(" ")[1];
-  const user = JSON.parse(
+    let token: any = req?.headers["authorization"]?.split(" ")[1];
+    const user = JSON.parse(
     Buffer.from(token.split(".")[1], "base64").toString()
   );
   let counter:number = 0;
@@ -136,8 +135,8 @@ export async function HODAuthorization(
   res: Response,
   next: any,
 ): Promise<void> {
-  var token: any = req?.headers["authorization"]?.split(" ")[1];
-  const user = JSON.parse(
+    let token: any = req?.headers["authorization"]?.split(" ")[1];
+    const user = JSON.parse(
     Buffer.from(token.split(".")[1], "base64").toString()
   );
   let counter:number = 0;

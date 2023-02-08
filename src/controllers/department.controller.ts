@@ -1,12 +1,9 @@
 import { Express, Request, Response } from "express";
 import { AppDataSource } from "../DB/data-source";
 import { Department } from "../entity/Department";
-import { Role } from "../entity/Role";
-import { User } from "../entity/User";
-import { generateHashPassword } from "../helper/hashpassword";
 import { getCurrentUser } from "../helper/jwt";
 import { DepartmentSchema } from "../schema/departmentSchema";
-import { RegisterSchema } from "../schema/registerSchema";
+
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -39,7 +36,6 @@ export const get = async (req: Request, res: Response): Promise<void> => {
         },
       },
     });
-    // user?.password = null;
     if (department) {
       res.json(department);
     } else {
