@@ -1,8 +1,7 @@
 import { comparePassword, generateHashPassword } from "../helper/hashpassword";
-import { genterateToken, getCurrentUser } from "../helper/jwt";
+import { generateToken, getCurrentUser } from "../helper/jwt";
 import { RegisterSchema, UserUpdateSchema } from "../schema/registerSchema";
 import { Express, Request, Response } from "express";
-// import { UserPatchSchema } from "../schema/userschema/userpatch.schema";
 const cloudinary = require("cloudinary");
 import { AppDataSource } from "../DB/data-source";
 import { User } from "../entity/User";
@@ -26,7 +25,7 @@ export async function register(
     const repo = AppDataSource.getRepository(Role);
     const roles: any = await repo.findOne({
       where: {
-        id: 2,
+        name:'student'
       },
     });
     const user = new User();
@@ -37,7 +36,7 @@ export async function register(
     const saveUser = await userRepo.save(user);
     console.log(saveUser);
     if (saveUser) {
-      res.status(202).send({ message: "successfully registred" });
+      res.status(202).send({ message: "successfully registered" });
     }
     // } catch (err:any) {
     //   res.status(402).send({ error: true, message: err.message });
@@ -72,11 +71,11 @@ export async function login(
           user.password,
           validate.password
         );
-        if (checkPassword === true) {
-          const accessToken: any = await genterateToken(user);
+        if (checkPassword) {
+          const accessToken: any = await generateToken(user);
           res.status(200).json({
             access_token: accessToken,
-            message: "Login sucessfull !!",
+            message: "Login successful !!",
           });
         } else {
           res.status(404).json({
@@ -127,7 +126,7 @@ export async function login(
 //       res.json(user);
 //     }
 
-//     if (!currentUser) throw new Error("Something went worng!!");
+//     if (!currentUser) throw new Error("Something went wrong!!");
 //   } catch (err: any) {
 //     res.status(422).send({ error: true, message: err.message });;
 //   }
@@ -157,17 +156,17 @@ export async function getUser(req: Request, res: Response): Promise<void> {
 export async function updateUser(req: any, res: Response): Promise<void> {
   try {
     const validate = await UserUpdateSchema.validateAsync(req.body);
-    console.log(req.body);
 
     validate.password = await generateHashPassword(validate.password);
     const token: string = req?.headers["authorization"]?.split(" ")[1] || "";
     const currentUser: CurrentUser = getCurrentUser(token || "");
     const repo = AppDataSource.getRepository(User);
-
+console.log(req.file)
     if (req?.file) {
       const imageUrl = await cloudinary.uploader.upload(req?.file?.path);
       validate.avatar = imageUrl?.secure_url;
     }
+    console.log(validate)
     const user = await repo.update(currentUser.id, validate);
     if (user) {
       res.json("user successfully updated");

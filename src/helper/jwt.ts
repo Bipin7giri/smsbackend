@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 import {Request, Response} from "express";
 
 
-export async function genterateToken(user: any, expire?: any): Promise<any> {
+export async function generateToken(user: any, expire?: any): Promise<any> {
   try{
     console.log(user)
       return await jwt.sign(
@@ -49,10 +49,9 @@ export function tokenValidation(req: Request, res: Response, next: any) {
 
 export function getCurrentUser(token: string): any {
   // function parseJwt (token) {
-  const user = JSON.parse(
-    Buffer.from(token.split(".")[1], "base64").toString()
+    return JSON.parse(
+      Buffer.from(token.split(".")[1], "base64").toString()
   );
-  return user;
 
   // }
 }

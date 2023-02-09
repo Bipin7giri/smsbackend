@@ -14,14 +14,11 @@ import { SemesterSchema } from "../schema/semesterSchema";
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const validate = await SemesterSchema.validateAsync(req.body);
-    // const semester = new Semester();
     const repo = AppDataSource.getRepository(Semester);
-    // for(let i =0; i<validate.studentId.length; i++){
         await repo.insert({
             name:validate.name,
             departmentId:validate.departmentId
         })
-    // }
       res.status(202).json({ message:'created semester' });
   } catch (err: any) {
     res.status(422).json(err);
@@ -33,13 +30,15 @@ export const get = async (req: Request, res: Response): Promise<void> => {
   try {
     const token:string = req?.headers["authorization"]?.split(" ")[1]||"";
     const currentUser:any = getCurrentUser(token || "");
-    const repo = AppDataSource.getRepository(Department);
+    const repo = AppDataSource.getRepository(Semester);
     const semester  = await repo.find({
-      relations: ['semesterId','hod','semesterId.subjects.classId.studentId','semesterId.subjects.classId.studentId'],
+      relations: ['subjects','subjects.teacherId'],
       where: {
-          hod: {
-              id:currentUser.id
-          },
+        departmentId:{
+          hod:{
+            id:currentUser.id
+          }
+        }
       },
   });
     // user?.password = null;
