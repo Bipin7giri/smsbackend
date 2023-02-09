@@ -23,6 +23,8 @@ export const connectDb = ()=>{
            teacher.roles = ['teacher']
            accountant.name = 'accountant'
            accountant.roles = ['accountant']
+               teacher.name = 'teacher'
+               teacher.roles = ['teacher']
         
             let roles =    await AppDataSource.manager.save(admin)
             await AppDataSource.manager.save(student)

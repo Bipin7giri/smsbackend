@@ -6,11 +6,6 @@ const multer = require("multer");
 const upload = multer({ dest: 'uploads/' });
   router.post('/register',register);
   router.post('/login',login)
-  // router.patch('/users/me', tokenValidation, updateUser)
   router.get('/users/me',tokenValidation,getUser)
 router.patch('/users/me', tokenValidation,upload.single("avatar"), updateUser)
-
-  // router.get('/users/all',tokenValidation,Authorization, getAllUsers)
-// router.put("/edithod/:user_name",editHOD)
-// module.exports = router
 export default router;

@@ -59,7 +59,7 @@ export const addStudent = async (req: Request, res: Response): Promise<void> => 
         subjectId: validate.subjectId,
       });
     }
-  
+
     res.status(202).json({ message: "created semester" });
   } catch (err: any) {
     res.status(422).json(err);
@@ -72,17 +72,16 @@ export const get = async (req: Request, res: Response): Promise<void> => {
   try {
     const token:string = req?.headers["authorization"]?.split(" ")[1]||"";
     const currentUser:any = getCurrentUser(token || "");
-    const repo = AppDataSource.getRepository(Subjects);
+    const repo = AppDataSource.getRepository(Class);
       const subject = await repo.find({
         where:{
-          teacherId:{
-            id:currentUser.id
+          subjectId:{
+            teacherId:currentUser.id
           }
         } ,
-       relations:['classId','classId.studentId'],
+        relations:['studentId'],
        })
        console.table(subject)
-    // user?.password = null;
     if (subject) {
       res.json(subject);
     } else {

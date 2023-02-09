@@ -64,6 +64,8 @@ var connectDb = function () {
                     teacher.roles = ['teacher'];
                     accountant.name = 'accountant';
                     accountant.roles = ['accountant'];
+                    teacher.name = 'teacher';
+                    teacher.roles = ['teacher'];
                     return [4 /*yield*/, data_source_1.AppDataSource.manager.save(admin)];
                 case 2:
                     roles = _a.sent();

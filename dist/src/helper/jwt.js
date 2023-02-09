@@ -36,9 +36,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HODAuthorization = exports.TeacherAuthorization = exports.StudentAuthorization = exports.AdminAuthorization = exports.getCurrentUser = exports.tokenValidation = exports.genterateToken = void 0;
+exports.HODAuthorization = exports.TeacherAuthorization = exports.StudentAuthorization = exports.AdminAuthorization = exports.getCurrentUser = exports.tokenValidation = exports.generateToken = void 0;
 var jwt = require("jsonwebtoken");
-function genterateToken(user, expire) {
+function generateToken(user, expire) {
     return __awaiter(this, void 0, void 0, function () {
         var err_1;
         return __generator(this, function (_a) {
@@ -64,7 +64,7 @@ function genterateToken(user, expire) {
         });
     });
 }
-exports.genterateToken = genterateToken;
+exports.generateToken = generateToken;
 function tokenValidation(req, res, next) {
     var _a;
     var authHeader = req.headers["authorization"];
@@ -90,8 +90,7 @@ function tokenValidation(req, res, next) {
 exports.tokenValidation = tokenValidation;
 function getCurrentUser(token) {
     // function parseJwt (token) {
-    var user = JSON.parse(Buffer.from(token.split(".")[1], "base64").toString());
-    return user;
+    return JSON.parse(Buffer.from(token.split(".")[1], "base64").toString());
     // }
 }
 exports.getCurrentUser = getCurrentUser;
