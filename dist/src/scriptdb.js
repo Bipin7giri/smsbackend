@@ -57,6 +57,7 @@ var connectDb = function () {
                     student = new Role_1.Role();
                     teacher = new Role_1.Role();
                     accountant = new Role_1.Role();
+<<<<<<< HEAD
                     admin.name = "admin";
                     admin.roles = ["admin", "teacher", "accountant", "student"];
                     student.name = "student";
@@ -67,6 +68,18 @@ var connectDb = function () {
                     accountant.roles = ["accountant"];
                     teacher.name = "teacher";
                     teacher.roles = ["teacher"];
+=======
+                    admin.name = 'admin';
+                    admin.roles = ['admin', 'teacher', 'accountant', 'student'];
+                    student.name = 'student';
+                    student.roles = ['student'];
+                    teacher.name = 'teacher';
+                    teacher.roles = ['teacher'];
+                    accountant.name = 'accountant';
+                    accountant.roles = ['accountant'];
+                    teacher.name = 'teacher';
+                    teacher.roles = ['teacher'];
+>>>>>>> adf8dd1da14e25f6837d44b3c8d5c38fa6c9212c
                     return [4 /*yield*/, data_source_1.AppDataSource.manager.save(admin)];
                 case 2:
                     roles = _a.sent();

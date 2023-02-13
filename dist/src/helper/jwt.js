@@ -38,7 +38,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HODAuthorization = exports.TeacherAuthorization = exports.StudentAuthorization = exports.AdminAuthorization = exports.getCurrentUser = exports.tokenValidation = exports.generateToken = void 0;
 var jwt = require("jsonwebtoken");
+<<<<<<< HEAD
 var RoleEnum_1 = require("../ENUMS/RoleEnum");
+=======
+>>>>>>> adf8dd1da14e25f6837d44b3c8d5c38fa6c9212c
 function generateToken(user, expire) {
     return __awaiter(this, void 0, void 0, function () {
         var err_1;
