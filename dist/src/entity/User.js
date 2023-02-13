@@ -40,11 +40,11 @@ var User = /** @class */ (function (_super) {
         __metadata("design:type", Number)
     ], User.prototype, "id", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ nullable: true }),
+        (0, typeorm_1.Column)({ name: "first_name", nullable: true }),
         __metadata("design:type", String)
     ], User.prototype, "firstName", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ nullable: true }),
+        (0, typeorm_1.Column)({ name: "last_name", nullable: true }),
         __metadata("design:type", String)
     ], User.prototype, "lastName", void 0);
     __decorate([
@@ -52,7 +52,7 @@ var User = /** @class */ (function (_super) {
         __metadata("design:type", String)
     ], User.prototype, "email", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ name: 'phone_number', nullable: true }),
+        (0, typeorm_1.Column)({ name: "phone_number", nullable: true }),
         __metadata("design:type", String)
     ], User.prototype, "phoneNumber", void 0);
     __decorate([
@@ -69,7 +69,7 @@ var User = /** @class */ (function (_super) {
     ], User.prototype, "address", void 0);
     __decorate([
         (0, typeorm_1.ManyToOne)(function () { return Role_1.Role; }, function (role) { return role.userId; }),
-        (0, typeorm_1.JoinColumn)({ name: 'role_id' }),
+        (0, typeorm_1.JoinColumn)({ name: "role_id" }),
         __metadata("design:type", Role_1.Role)
     ], User.prototype, "roleId", void 0);
     __decorate([

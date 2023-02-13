@@ -1,38 +1,42 @@
 const jwt = require("jsonwebtoken");
-import {Request, Response} from "express";
-
+import { Request, Response } from "express";
+import { copyFileSync } from "fs";
+import { roles } from "../ENUMS/RoleEnum";
 
 export async function generateToken(user: any, expire?: any): Promise<any> {
-  try{
-    console.log(user)
-      return await jwt.sign(
-        {
-            // email: user.email,
-            id: user.id,
-            roles: user.roleId.roles,
-            email: user.email
-        },
-        "json_web_token_pw",
-        {
-            expiresIn: "10h",
-        }
+  try {
+    console.log(user);
+    return await jwt.sign(
+      {
+        // email: user.email,
+        id: user.id,
+        roles: user.roleId.roles,
+        email: user.email,
+      },
+      "json_web_token_pw",
+      {
+        expiresIn: "10h",
+      }
     );
-  }catch(err:any){
-  console.log(err)
+  } catch (err: any) {
+    console.log(err);
   }
-
 }
 
 export function tokenValidation(req: Request, res: Response, next: any) {
-  const authHeader = req.headers["authorization"];
-    let token = req?.headers["authorization"]?.split(" ")[1];
-
-    if (!authHeader) {
-    return res.status(404).json({
+  let authHeader = req.headers["authorization"];
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    // Remove "Bearer " from the authHeader
+    authHeader = authHeader.slice(7, authHeader.length);
+    console.log(authHeader);
+  }
+  console.log(authHeader);
+  if (!authHeader) {
+    return res.status(401).json({
       message: "No access_token found",
     });
   }
-  jwt.verify(token, "json_web_token_pw", (err: any, user: any) => {
+  jwt.verify(authHeader, "json_web_token_pw", (err: any, user: any) => {
     try {
       if (err)
         return res.status(401).json({
@@ -41,7 +45,6 @@ export function tokenValidation(req: Request, res: Response, next: any) {
 
       next();
     } catch (err) {
-
       res.send(err);
     }
   });
@@ -49,9 +52,7 @@ export function tokenValidation(req: Request, res: Response, next: any) {
 
 export function getCurrentUser(token: string): any {
   // function parseJwt (token) {
-    return JSON.parse(
-      Buffer.from(token.split(".")[1], "base64").toString()
-  );
+  return JSON.parse(Buffer.from(token.split(".")[1], "base64").toString());
 
   // }
 }
@@ -59,96 +60,111 @@ export function getCurrentUser(token: string): any {
 export async function AdminAuthorization(
   req: Request,
   res: Response,
-  next: any,
+  next: any
 ): Promise<void> {
-    let token: any = req?.headers["authorization"]?.split(" ")[1];
-    const user = JSON.parse(
-    Buffer.from(token.split(".")[1], "base64").toString()
+  let authHeader: any = req.headers["authorization"];
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    // Remove "Bearer " from the authHeader
+    authHeader = authHeader.slice(7, authHeader.length);
+    console.log(authHeader);
+  }
+  const user = JSON.parse(
+    Buffer.from(authHeader.split(".")[1], "base64").toString()
   );
   for (let index = 0; index < user.roles.length; index++) {
-    if (user.roles[index] ===  'admin') {
-      next()
-      return
-     } else {
-        res.status(401).json({
-         message: "unauthorized access you are not admin!! sorry baby",
-       });
-       return
-     }
+    if (user.roles[index] === roles.ADMIN) {
+      next();
+      return;
+    } else {
+      res.status(401).json({
+        message: "unauthorized access you are not admin!! sorry baby",
+      });
+      return;
+    }
   }
-
 }
-
-
 
 export async function StudentAuthorization(
   req: Request,
   res: Response,
-  next: any,
+  next: any
 ): Promise<void> {
-    let token: any = req?.headers["authorization"]?.split(" ")[1];
-    const user = JSON.parse(
-    Buffer.from(token.split(".")[1], "base64").toString()
+  let authHeader: any = req.headers["authorization"];
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    // Remove "Bearer " from the authHeader
+    authHeader = authHeader.slice(7, authHeader.length);
+    console.log(authHeader);
+  }
+  const user = JSON.parse(
+    Buffer.from(authHeader.split(".")[1], "base64").toString()
   );
   for (let index = 0; index < user.roles.length; index++) {
-    if (user.roles[index] ===  'student') {
-      next()
-      return
-     } else {
-        res.status(401).json({
-         message: "unauthorized access you are not student!! sorry baby",
-       });
-       return
-     }
+    if (user.roles[index] === roles.STUDENT) {
+      next();
+      return;
+    } else {
+      res.status(401).json({
+        message: "unauthorized access you are not student!! sorry baby",
+      });
+      return;
+    }
   }
-
 }
-
 
 export async function TeacherAuthorization(
   req: Request,
   res: Response,
-  next: any,
+  next: any
 ): Promise<void> {
-    let token: any = req?.headers["authorization"]?.split(" ")[1];
-    const user = JSON.parse(
-    Buffer.from(token.split(".")[1], "base64").toString()
-  );
-  let counter:number = 0;
-  for (let index = 0; index < user.roles.length; index++) {
-    counter=counter+1;
-    if (user.roles[index] ===  'teacher') {
-      next()
-      return
-     }
+  let authHeader: any = req.headers["authorization"];
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    // Remove "Bearer " from the authHeader
+    authHeader = authHeader.slice(7, authHeader.length);
+    console.log(authHeader);
   }
-  if(counter === user.roles.length){
-          res.status(401).json({
-         message: "unauthorized access you are not Teacher!! sorry baby",
-       });
+  const user = JSON.parse(
+    Buffer.from(authHeader.split(".")[1], "base64").toString()
+  );
+  let counter: number = 0;
+  for (let index = 0; index < user.roles.length; index++) {
+    counter = counter + 1;
+    if (user.roles[index] === "teacher") {
+      next();
+      return;
+    }
+  }
+  if (counter === user.roles.length) {
+    res.status(401).json({
+      message: "unauthorized access you are not Teacher!! sorry baby",
+    });
   }
 }
 
 export async function HODAuthorization(
   req: Request,
   res: Response,
-  next: any,
+  next: any
 ): Promise<void> {
-    let token: any = req?.headers["authorization"]?.split(" ")[1];
-    const user = JSON.parse(
-    Buffer.from(token.split(".")[1], "base64").toString()
-  );
-  let counter:number = 0;
-  for (let index = 0; index < user.roles.length; index++) {
-    counter=counter+1;
-    if (user.roles[index] ===  'hod') {
-      next()
-      return
-     }
+  let authHeader: any = req.headers["authorization"];
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    // Remove "Bearer " from the authHeader
+    authHeader = authHeader.slice(7, authHeader.length);
+    console.log(authHeader);
   }
-  if(counter === user.roles.length){
-          res.status(401).json({
-         message: "unauthorized access you are not HOD!! sorry baby",
-       });
+  const user = JSON.parse(
+    Buffer.from(authHeader.split(".")[1], "base64").toString()
+  );
+  let counter: number = 0;
+  for (let index = 0; index < user.roles.length; index++) {
+    counter = counter + 1;
+    if (user.roles[index] === "hod") {
+      next();
+      return;
+    }
+  }
+  if (counter === user.roles.length) {
+    res.status(401).json({
+      message: "unauthorized access you are not HOD!! sorry baby",
+    });
   }
 }

@@ -92,6 +92,8 @@ export const addTeacher = async (req: Request, res: Response): Promise<void> => 
 };
 
 
+
+
 export const updateDepartment = async (req: Request, res: Response): Promise<void> => {
   try {
     // after exam
@@ -116,4 +118,21 @@ export const updateDepartment = async (req: Request, res: Response): Promise<voi
   }
 };
 
+export const getAllDepartment = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const token: string = req?.headers["authorization"]?.split(" ")[1] || "";
+    const currentUser: any = getCurrentUser(token || "");
+    const repo = AppDataSource.getRepository(Department);
+    const department = await repo.find({
+      relations: ["semesterId"],
+    });
+    if (department) {
+      res.json(department);
+    } else {
+      res.status(404).send("No department found");
+    }
+  } catch (err: any) {
+    res.status(404).send({ error: true, message: err.message });
+  }
+};
 

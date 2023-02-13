@@ -41,7 +41,8 @@ var data_source_1 = require("./DB/data-source");
 var Role_1 = require("./entity/Role");
 var User_1 = require("./entity/User");
 var connectDb = function () {
-    data_source_1.AppDataSource.initialize().then(function () { return __awaiter(void 0, void 0, void 0, function () {
+    data_source_1.AppDataSource.initialize()
+        .then(function () { return __awaiter(void 0, void 0, void 0, function () {
         var repo, countIfuser, admin, student, teacher, accountant, roles, user, adminCreated;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -56,16 +57,16 @@ var connectDb = function () {
                     student = new Role_1.Role();
                     teacher = new Role_1.Role();
                     accountant = new Role_1.Role();
-                    admin.name = 'admin';
-                    admin.roles = ['admin', 'teacher', 'accountant', 'student'];
-                    student.name = 'student';
-                    student.roles = ['student'];
-                    teacher.name = 'teacher';
-                    teacher.roles = ['teacher'];
-                    accountant.name = 'accountant';
-                    accountant.roles = ['accountant'];
-                    teacher.name = 'teacher';
-                    teacher.roles = ['teacher'];
+                    admin.name = "admin";
+                    admin.roles = ["admin", "teacher", "accountant", "student"];
+                    student.name = "student";
+                    student.roles = ["student"];
+                    teacher.name = "teacher";
+                    teacher.roles = ["teacher"];
+                    accountant.name = "accountant";
+                    accountant.roles = ["accountant"];
+                    teacher.name = "teacher";
+                    teacher.roles = ["teacher"];
                     return [4 /*yield*/, data_source_1.AppDataSource.manager.save(admin)];
                 case 2:
                     roles = _a.sent();
@@ -81,8 +82,9 @@ var connectDb = function () {
                     user = new User_1.User();
                     user.firstName = "admin";
                     user.lastName = "admin";
-                    user.email = 'admin@example.com';
-                    user.password = '$2a$12$DzW7DBrHUTYFRie7ycF8ouIubkmsrKzNcZs2bZ6mtWpY4FDYoTwhm';
+                    user.email = "admin@example.com";
+                    user.password =
+                        "$2a$12$DzW7DBrHUTYFRie7ycF8ouIubkmsrKzNcZs2bZ6mtWpY4FDYoTwhm";
                     user.roleId = roles;
                     return [4 /*yield*/, data_source_1.AppDataSource.manager.save(user)];
                 case 6:
@@ -104,7 +106,8 @@ var connectDb = function () {
                     return [2 /*return*/];
             }
         });
-    }); }).catch(function (error) { return console.log(error); });
+    }); })
+        .catch(function (error) { return console.log(error); });
 };
 exports.connectDb = connectDb;
 //# sourceMappingURL=scriptdb.js.map

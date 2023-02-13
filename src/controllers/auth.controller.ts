@@ -25,7 +25,42 @@ export async function register(
     const repo = AppDataSource.getRepository(Role);
     const roles: any = await repo.findOne({
       where: {
-        name:'student'
+        name: "student",
+      },
+    });
+    const user = new User();
+    user.email = validate.email;
+    user.password = hashedPassword;
+    user.roleId = roles;
+    const userRepo = AppDataSource.getRepository(User);
+    const saveUser = await userRepo.save(user);
+    console.log(saveUser);
+    if (saveUser) {
+      res.status(202).send({ message: "successfully registered" });
+    }
+    // } catch (err:any) {
+    //   res.status(402).send({ error: true, message: err.message });
+    //   throw err
+    // }
+  } catch (err: any) {
+    res.status(404).send({ error: true, message: err.message });
+  }
+}
+
+export async function StudentRegister(
+  req: Request,
+  res: Response,
+  next: any
+): Promise<void> {
+  try {
+    const validate = await RegisterSchema.validateAsync(req.body);
+    // try {
+    const hashedPassword: any = await generateHashPassword(validate?.password);
+    // const roles = new Role();
+    const repo = AppDataSource.getRepository(Role);
+    const roles: any = await repo.findOne({
+      where: {
+        name: "student",
       },
     });
     const user = new User();
@@ -67,7 +102,7 @@ export async function login(
       });
       console.table(user);
       if (user) {
-        const checkPassword = await comparePassword(
+        const checkPassword: Boolean = await comparePassword(
           user.password,
           validate.password
         );
@@ -161,12 +196,12 @@ export async function updateUser(req: any, res: Response): Promise<void> {
     const token: string = req?.headers["authorization"]?.split(" ")[1] || "";
     const currentUser: CurrentUser = getCurrentUser(token || "");
     const repo = AppDataSource.getRepository(User);
-console.log(req.file)
+    console.log(req.file);
     if (req?.file) {
       const imageUrl = await cloudinary.uploader.upload(req?.file?.path);
       validate.avatar = imageUrl?.secure_url;
     }
-    console.log(validate)
+    console.log(validate);
     const user = await repo.update(currentUser.id, validate);
     if (user) {
       res.json("user successfully updated");

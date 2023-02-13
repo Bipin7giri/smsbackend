@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HODAuthorization = exports.TeacherAuthorization = exports.StudentAuthorization = exports.AdminAuthorization = exports.getCurrentUser = exports.tokenValidation = exports.generateToken = void 0;
 var jwt = require("jsonwebtoken");
+var RoleEnum_1 = require("../ENUMS/RoleEnum");
 function generateToken(user, expire) {
     return __awaiter(this, void 0, void 0, function () {
         var err_1;
@@ -50,7 +51,7 @@ function generateToken(user, expire) {
                             // email: user.email,
                             id: user.id,
                             roles: user.roleId.roles,
-                            email: user.email
+                            email: user.email,
                         }, "json_web_token_pw", {
                             expiresIn: "10h",
                         })];
@@ -66,15 +67,19 @@ function generateToken(user, expire) {
 }
 exports.generateToken = generateToken;
 function tokenValidation(req, res, next) {
-    var _a;
     var authHeader = req.headers["authorization"];
-    var token = (_a = req === null || req === void 0 ? void 0 : req.headers["authorization"]) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+        // Remove "Bearer " from the authHeader
+        authHeader = authHeader.slice(7, authHeader.length);
+        console.log(authHeader);
+    }
+    console.log(authHeader);
     if (!authHeader) {
-        return res.status(404).json({
+        return res.status(401).json({
             message: "No access_token found",
         });
     }
-    jwt.verify(token, "json_web_token_pw", function (err, user) {
+    jwt.verify(authHeader, "json_web_token_pw", function (err, user) {
         try {
             if (err)
                 return res.status(401).json({
@@ -95,14 +100,18 @@ function getCurrentUser(token) {
 }
 exports.getCurrentUser = getCurrentUser;
 function AdminAuthorization(req, res, next) {
-    var _a;
     return __awaiter(this, void 0, void 0, function () {
-        var token, user, index;
-        return __generator(this, function (_b) {
-            token = (_a = req === null || req === void 0 ? void 0 : req.headers["authorization"]) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
-            user = JSON.parse(Buffer.from(token.split(".")[1], "base64").toString());
+        var authHeader, user, index;
+        return __generator(this, function (_a) {
+            authHeader = req.headers["authorization"];
+            if (authHeader && authHeader.startsWith("Bearer ")) {
+                // Remove "Bearer " from the authHeader
+                authHeader = authHeader.slice(7, authHeader.length);
+                console.log(authHeader);
+            }
+            user = JSON.parse(Buffer.from(authHeader.split(".")[1], "base64").toString());
             for (index = 0; index < user.roles.length; index++) {
-                if (user.roles[index] === 'admin') {
+                if (user.roles[index] === RoleEnum_1.roles.ADMIN) {
                     next();
                     return [2 /*return*/];
                 }
@@ -119,14 +128,18 @@ function AdminAuthorization(req, res, next) {
 }
 exports.AdminAuthorization = AdminAuthorization;
 function StudentAuthorization(req, res, next) {
-    var _a;
     return __awaiter(this, void 0, void 0, function () {
-        var token, user, index;
-        return __generator(this, function (_b) {
-            token = (_a = req === null || req === void 0 ? void 0 : req.headers["authorization"]) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
-            user = JSON.parse(Buffer.from(token.split(".")[1], "base64").toString());
+        var authHeader, user, index;
+        return __generator(this, function (_a) {
+            authHeader = req.headers["authorization"];
+            if (authHeader && authHeader.startsWith("Bearer ")) {
+                // Remove "Bearer " from the authHeader
+                authHeader = authHeader.slice(7, authHeader.length);
+                console.log(authHeader);
+            }
+            user = JSON.parse(Buffer.from(authHeader.split(".")[1], "base64").toString());
             for (index = 0; index < user.roles.length; index++) {
-                if (user.roles[index] === 'student') {
+                if (user.roles[index] === RoleEnum_1.roles.STUDENT) {
                     next();
                     return [2 /*return*/];
                 }
@@ -143,16 +156,20 @@ function StudentAuthorization(req, res, next) {
 }
 exports.StudentAuthorization = StudentAuthorization;
 function TeacherAuthorization(req, res, next) {
-    var _a;
     return __awaiter(this, void 0, void 0, function () {
-        var token, user, counter, index;
-        return __generator(this, function (_b) {
-            token = (_a = req === null || req === void 0 ? void 0 : req.headers["authorization"]) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
-            user = JSON.parse(Buffer.from(token.split(".")[1], "base64").toString());
+        var authHeader, user, counter, index;
+        return __generator(this, function (_a) {
+            authHeader = req.headers["authorization"];
+            if (authHeader && authHeader.startsWith("Bearer ")) {
+                // Remove "Bearer " from the authHeader
+                authHeader = authHeader.slice(7, authHeader.length);
+                console.log(authHeader);
+            }
+            user = JSON.parse(Buffer.from(authHeader.split(".")[1], "base64").toString());
             counter = 0;
             for (index = 0; index < user.roles.length; index++) {
                 counter = counter + 1;
-                if (user.roles[index] === 'teacher') {
+                if (user.roles[index] === "teacher") {
                     next();
                     return [2 /*return*/];
                 }
@@ -168,16 +185,20 @@ function TeacherAuthorization(req, res, next) {
 }
 exports.TeacherAuthorization = TeacherAuthorization;
 function HODAuthorization(req, res, next) {
-    var _a;
     return __awaiter(this, void 0, void 0, function () {
-        var token, user, counter, index;
-        return __generator(this, function (_b) {
-            token = (_a = req === null || req === void 0 ? void 0 : req.headers["authorization"]) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
-            user = JSON.parse(Buffer.from(token.split(".")[1], "base64").toString());
+        var authHeader, user, counter, index;
+        return __generator(this, function (_a) {
+            authHeader = req.headers["authorization"];
+            if (authHeader && authHeader.startsWith("Bearer ")) {
+                // Remove "Bearer " from the authHeader
+                authHeader = authHeader.slice(7, authHeader.length);
+                console.log(authHeader);
+            }
+            user = JSON.parse(Buffer.from(authHeader.split(".")[1], "base64").toString());
             counter = 0;
             for (index = 0; index < user.roles.length; index++) {
                 counter = counter + 1;
-                if (user.roles[index] === 'hod') {
+                if (user.roles[index] === "hod") {
                     next();
                     return [2 /*return*/];
                 }

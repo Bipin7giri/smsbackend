@@ -1,1 +1,1 @@
-{"version":3,"file":"bearetoken.js","sourceRoot":"","sources":["../../../src/helper/bearetoken.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAAA,SAAsB,gBAAgB,CAAC,CAAQ;;;;YACzC,KAAK,GAAQ,CAAC,CAAC,KAAK,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC;YACjC,sBAAO,KAAK,EAAC;;;CAEd;AAJD,4CAIC"}
+{"version":3,"file":"bearetoken.js","sourceRoot":"","sources":["../../../src/helper/bearetoken.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAAA,SAAsB,gBAAgB,CAAC,CAAQ;;;YAC7C,sBAAO,CAAC,CAAC,KAAK,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,EAAC;;;CAExB;AAHD,4CAGC"}

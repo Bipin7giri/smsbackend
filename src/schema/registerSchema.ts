@@ -6,6 +6,13 @@ export const  RegisterSchema = Joi.object({
     email: Joi.string().required()
 })
 
+export const  StudentRegisterSchema = Joi.object({
+    password: Joi.string()
+        .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
+    departmentId:Joi.string().required(),
+    full_name: Joi.string().required()
+})
+
 
 export const  UserUpdateSchema = Joi.object({
     password: Joi.string()

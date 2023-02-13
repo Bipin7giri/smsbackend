@@ -39,10 +39,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sliceBearerToken = void 0;
 function sliceBearerToken(t) {
     return __awaiter(this, void 0, void 0, function () {
-        var token;
         return __generator(this, function (_a) {
-            token = t.split(" ")[1];
-            return [2 /*return*/, token];
+            return [2 /*return*/, t.split(" ")[1]];
         });
     });
 }

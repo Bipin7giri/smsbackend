@@ -1,24 +1,90 @@
-import * as express from 'express';
-import * as dotenv from 'dotenv';
-import { Request,Response,Express } from 'express';
-import { connectDb } from './src/scriptdb';
+import * as express from "express";
+import * as dotenv from "dotenv";
+import { Request, Response, Express } from "express";
+import { connectDb } from "./src/scriptdb";
 import api from "./src/api/api";
 dotenv.config();
 const bodyParser = require("body-parser");
 const cloudinary = require("cloudinary");
-
+// const ri = require('./src/routers')
 cloudinary.config({
   cloud_name: "dr54a7gze",
   api_key: "868275163814591",
   api_secret: "U0-E-H34SF1Dl1vpyroUU361AUQ",
 });
+
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
+
 const app: Express = express();
 app.use(bodyParser.json());
 const port = process.env.PORT;
 app.use("/api", api);
-connectDb()
-app.get('/', (req: Request, res: Response) => {
-  res.send('Express + TypeScript Server');
+connectDb();
+
+// const options = {
+//   definition: {
+//     openapi: "3.0.0",
+
+//     info: {
+//       title: "LogRocket Express API with Swagger",
+//       version: "0.1.0",
+//       description:
+//         "This is a simple CRUD API application made with Express and documented with Swagger",
+//     },
+//     servers: [
+//       {
+//         url: "http://localhost:" + port,
+//       },
+//     ],
+//   },
+//   securityDefinitions: {
+//     AuthToken: {
+//       type: "apiKey",
+//       name: "auth-token",
+//       in: "header",
+//       description: "The token for authentication",
+//     },
+//   },
+//   security: [
+//     {
+//       AuthToken: [],
+//     },
+//   ],
+//   apis: ["./src/routers/*.ts"],
+// };
+
+const swaggerDefinition = {
+  info: {
+    title: "MySQL Registration Swagger API",
+    version: "1.0.0",
+    description: "Endpoints to test the user registration routes",
+  },
+  host: "localhost:5000",
+  basePath: "/api",
+  securityDefinitions: {
+    bearerAuth: {
+      type: "apiKey",
+      name: "authorization",
+      scheme: "bearer",
+      in: "header",
+    },
+  },
+  security: [{ bearerAuth: [] }],
+};
+
+const options = {
+  // import swaggerDefinitions
+  swaggerDefinition,
+  // path to the API docs
+  apis: ["./src/routers/*.ts"],
+};
+
+const specs = swaggerJsdoc(options);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+
+app.get("/", (req: Request, res: Response) => {
+  res.send("School management system");
 });
 
 app.listen(port, () => {
