@@ -63,7 +63,9 @@ const swaggerDefinition = {
   },
   schemes: ["https"],
   host: project === "DEV" ? "localhost:5000" : "sms-twox.onrender.com",
-
+  components: {
+    schemas: {},
+  },
   basePath: "/api",
   securityDefinitions: {
     bearerAuth: {

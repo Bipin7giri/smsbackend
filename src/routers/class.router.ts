@@ -1,8 +1,5 @@
 /**
  * @swagger
- * tags:
- *   name: Roles
- *   description: The books managing API
  * /teacher/class/:
  *   get:
  *     summary: Get a Class
