@@ -22,43 +22,13 @@ var port = process.env.PORT;
 var project = (_a = process.env) === null || _a === void 0 ? void 0 : _a.PROJECT;
 app.use("/api", api_1.default);
 (0, scriptdb_1.connectDb)();
-// const options = {
-//   definition: {
-//     openapi: "3.0.0",
-//     info: {
-//       title: "LogRocket Express API with Swagger",
-//       version: "0.1.0",
-//       description:
-//         "This is a simple CRUD API application made with Express and documented with Swagger",
-//     },
-//     servers: [
-//       {
-//         url: "http://localhost:" + port,
-//       },
-//     ],
-//   },
-//   securityDefinitions: {
-//     AuthToken: {
-//       type: "apiKey",
-//       name: "auth-token",
-//       in: "header",
-//       description: "The token for authentication",
-//     },
-//   },
-//   security: [
-//     {
-//       AuthToken: [],
-//     },
-//   ],
-//   apis: ["./src/routers/*.ts"],
-// };
 var swaggerDefinition = {
     info: {
         title: "School Management System",
         version: "1.0.0",
         description: "Endpoints to test the user registration routes",
     },
-    schemes: ["https"],
+    schemes: project === "DEV" ? ["http"] : ["https"],
     host: project === "DEV" ? "localhost:5000" : "sms-twox.onrender.com",
     components: {
         schemas: {},

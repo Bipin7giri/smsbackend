@@ -23,6 +23,20 @@
  *       500:
  *         description: Internal Server Error
  */
+
+/**
+ * @swagger
+ * /auth/users/me:
+ *   get:
+ *     summary: Get user info
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: The get all students.
+ *       500:
+ *         description: Some server error
+ */
+
 import {
   register,
   login,

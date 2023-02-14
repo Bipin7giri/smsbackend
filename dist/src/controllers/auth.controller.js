@@ -229,15 +229,18 @@ exports.login = login;
 //   }
 // }
 function getUser(req, res) {
-    var _a;
     return __awaiter(this, void 0, void 0, function () {
-        var token, currentUser, repo, user, err_5;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var authHeader, currentUser, repo, user, err_5;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
                 case 0:
-                    _b.trys.push([0, 2, , 3]);
-                    token = ((_a = req === null || req === void 0 ? void 0 : req.headers["authorization"]) === null || _a === void 0 ? void 0 : _a.split(" ")[1]) || "";
-                    currentUser = (0, jwt_1.getCurrentUser)(token || "");
+                    _a.trys.push([0, 2, , 3]);
+                    authHeader = req.headers["authorization"];
+                    if (authHeader && authHeader.startsWith("Bearer ")) {
+                        // Remove "Bearer " from the authHeader
+                        authHeader = authHeader.slice(7, authHeader.length);
+                    }
+                    currentUser = (0, jwt_1.getCurrentUser)(authHeader || "");
                     repo = data_source_1.AppDataSource.getRepository(User_1.User);
                     return [4 /*yield*/, repo.findOneOrFail({
                             where: {
@@ -245,7 +248,7 @@ function getUser(req, res) {
                             },
                         })];
                 case 1:
-                    user = _b.sent();
+                    user = _a.sent();
                     // user?.password = null;
                     if (user) {
                         res.json(user);
@@ -255,7 +258,7 @@ function getUser(req, res) {
                     }
                     return [3 /*break*/, 3];
                 case 2:
-                    err_5 = _b.sent();
+                    err_5 = _a.sent();
                     res.status(404).send({ error: true, message: err_5.message });
                     return [3 /*break*/, 3];
                 case 3: return [2 /*return*/];

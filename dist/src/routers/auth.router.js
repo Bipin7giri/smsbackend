@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @swagger
  * /auth/login:
@@ -24,6 +23,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
  *         description: Bad Request
  *       500:
  *         description: Internal Server Error
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * @swagger
+ * /auth/users/me:
+ *   get:
+ *     summary: Get user info
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: The get all students.
+ *       500:
+ *         description: Some server error
  */
 var auth_controller_1 = require("../controllers/auth.controller");
 var express = require("express");

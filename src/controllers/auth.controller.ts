@@ -169,8 +169,12 @@ export async function login(
 
 export async function getUser(req: Request, res: Response): Promise<void> {
   try {
-    const token: string = req?.headers["authorization"]?.split(" ")[1] || "";
-    const currentUser: CurrentUser = getCurrentUser(token || "");
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: CurrentUser = getCurrentUser(authHeader || "");
     const repo = AppDataSource.getRepository(User);
     const user = await repo.findOneOrFail({
       where: {
