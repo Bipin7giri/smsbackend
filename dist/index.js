@@ -1,4 +1,5 @@
 "use strict";
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var dotenv = require("dotenv");
@@ -18,6 +19,7 @@ var swaggerUi = require("swagger-ui-express");
 var app = express();
 app.use(bodyParser.json());
 var port = process.env.PORT;
+var project = (_a = process.env) === null || _a === void 0 ? void 0 : _a.PROJECT;
 app.use("/api", api_1.default);
 (0, scriptdb_1.connectDb)();
 // const options = {
@@ -52,11 +54,12 @@ app.use("/api", api_1.default);
 // };
 var swaggerDefinition = {
     info: {
-        title: "MySQL Registration Swagger API",
+        title: "School Management System",
         version: "1.0.0",
         description: "Endpoints to test the user registration routes",
     },
-    host: "localhost:5000",
+    schemes: ["https"],
+    host: project === "DEV" ? "localhost:5000" : "sms-twox.onrender.com",
     basePath: "/api",
     securityDefinitions: {
         bearerAuth: {
@@ -75,10 +78,10 @@ var options = {
     apis: ["./src/routers/*.ts"],
 };
 var specs = swaggerJsdoc(options);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
-app.get("/", function (req, res) {
-    res.send("School management system");
-});
+app.use("/", swaggerUi.serve, swaggerUi.setup(specs));
+// app.get("/", (req: Request, res: Response) => {
+//   res.send("School management system");
+// });
 app.listen(port, function () {
     console.log("\u26A1\uFE0F[server]: Server is running at http://localhost:".concat(port));
 });

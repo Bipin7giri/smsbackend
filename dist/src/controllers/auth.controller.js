@@ -60,11 +60,7 @@ function register(req, res, next) {
                     repo = data_source_1.AppDataSource.getRepository(Role_1.Role);
                     return [4 /*yield*/, repo.findOne({
                             where: {
-<<<<<<< HEAD
                                 name: "student",
-=======
-                                name: 'student'
->>>>>>> adf8dd1da14e25f6837d44b3c8d5c38fa6c9212c
                             },
                         })];
                 case 3:

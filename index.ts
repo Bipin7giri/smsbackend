@@ -19,6 +19,7 @@ const swaggerUi = require("swagger-ui-express");
 const app: Express = express();
 app.use(bodyParser.json());
 const port = process.env.PORT;
+const project = process.env?.PROJECT;
 app.use("/api", api);
 connectDb();
 
@@ -56,11 +57,13 @@ connectDb();
 
 const swaggerDefinition = {
   info: {
-    title: "MySQL Registration Swagger API",
+    title: "School Management System",
     version: "1.0.0",
     description: "Endpoints to test the user registration routes",
   },
-  host: "localhost:5000",
+  schemes: ["https"],
+  host: project === "DEV" ? "localhost:5000" : "sms-twox.onrender.com",
+
   basePath: "/api",
   securityDefinitions: {
     bearerAuth: {
@@ -81,11 +84,11 @@ const options = {
 };
 
 const specs = swaggerJsdoc(options);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+app.use("/", swaggerUi.serve, swaggerUi.setup(specs));
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("School management system");
-});
+// app.get("/", (req: Request, res: Response) => {
+//   res.send("School management system");
+// });
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
