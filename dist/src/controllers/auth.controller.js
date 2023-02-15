@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUser = exports.getUser = exports.login = exports.StudentRegister = exports.register = void 0;
+exports.resetPassword = exports.forgetPassword = exports.updateUser = exports.getUser = exports.login = exports.StudentRegister = exports.register = void 0;
 var hashpassword_1 = require("../helper/hashpassword");
 var jwt_1 = require("../helper/jwt");
 var registerSchema_1 = require("../schema/registerSchema");
@@ -44,6 +44,9 @@ var cloudinary = require("cloudinary");
 var data_source_1 = require("../DB/data-source");
 var User_1 = require("../entity/User");
 var Role_1 = require("../entity/Role");
+var generateRandomOTP_1 = require("../helper/generateRandomOTP");
+var nodeMailer_1 = require("../helper/nodeMailer");
+var nodemailer = require("nodemailer");
 function register(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
         var validate, hashedPassword, repo, roles, user, userRepo, saveUser, err_1;
@@ -334,4 +337,111 @@ exports.updateUser = updateUser;
 //     res.json(err.message)
 //   }
 // }
+function forgetPassword(req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        var validate, repo, randomOTP, user, mailData, err_7;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 3, , 4]);
+                    return [4 /*yield*/, registerSchema_1.ForgetPassword.validateAsync(req.body)];
+                case 1:
+                    validate = _a.sent();
+                    repo = data_source_1.AppDataSource.getRepository(User_1.User);
+                    randomOTP = (0, generateRandomOTP_1.generateOTP)();
+                    return [4 /*yield*/, repo.update({ email: validate.email }, {
+                            forgetPassword: randomOTP,
+                        })];
+                case 2:
+                    user = _a.sent();
+                    mailData = {
+                        from: "giribipin04@gmail.com",
+                        to: validate.email,
+                        subject: "Sending Email using Node.js",
+                        text: "That was easy!",
+                        html: "<b>Hey there! </b>   <b>We received a request to reset the password for your account with email address: bipingiri27@gmail.com </b>    <b>To reset your account please use provided OTP below.</b> <b> </b>          <br>  Your OTP for reset password OTP is: ".concat(randomOTP, "<br/>"),
+                    };
+                    nodeMailer_1.transporter.sendMail(mailData, function (err, info) {
+                        if (err)
+                            console.log(err);
+                        else
+                            res.status(200).json({
+                                message: "check your email",
+                            });
+                    });
+                    return [3 /*break*/, 4];
+                case 3:
+                    err_7 = _a.sent();
+                    res.status(404).send({ error: true, message: err_7.message });
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.forgetPassword = forgetPassword;
+function resetPassword(req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        var validate_1, repo_1, hashPassword, verifyOTP, user, err_8;
+        var _this = this;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 7, , 8]);
+                    return [4 /*yield*/, registerSchema_1.ResetPassword.validateAsync(req.body)];
+                case 1:
+                    validate_1 = _a.sent();
+                    repo_1 = data_source_1.AppDataSource.getRepository(User_1.User);
+                    return [4 /*yield*/, (0, hashpassword_1.generateHashPassword)(validate_1.password)];
+                case 2:
+                    hashPassword = _a.sent();
+                    return [4 /*yield*/, repo_1.findOne({
+                            where: {
+                                forgetPassword: validate_1.otp,
+                            },
+                        })];
+                case 3:
+                    verifyOTP = _a.sent();
+                    console.log(verifyOTP);
+                    if (!verifyOTP) return [3 /*break*/, 5];
+                    return [4 /*yield*/, repo_1
+                            .update({ forgetPassword: validate_1.otp }, {
+                            password: hashPassword,
+                        })
+                            .then(function () { return __awaiter(_this, void 0, void 0, function () {
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4 /*yield*/, repo_1.update({
+                                            forgetPassword: validate_1.otp,
+                                        }, {
+                                            forgetPassword: "",
+                                        })];
+                                    case 1:
+                                        _a.sent();
+                                        return [2 /*return*/];
+                                }
+                            });
+                        }); })];
+                case 4:
+                    user = _a.sent();
+                    res.status(202).json({
+                        message: "Successfully Reset password",
+                    });
+                    return [3 /*break*/, 6];
+                case 5:
+                    res.status(401).json({
+                        message: "invalid opt",
+                    });
+                    _a.label = 6;
+                case 6: return [3 /*break*/, 8];
+                case 7:
+                    err_8 = _a.sent();
+                    res.status(404).send({ error: true, message: err_8.message });
+                    return [3 /*break*/, 8];
+                case 8: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.resetPassword = resetPassword;
 //# sourceMappingURL=auth.controller.js.map

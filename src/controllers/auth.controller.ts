@@ -1,12 +1,19 @@
 import { comparePassword, generateHashPassword } from "../helper/hashpassword";
 import { generateToken, getCurrentUser } from "../helper/jwt";
-import { RegisterSchema, UserUpdateSchema } from "../schema/registerSchema";
+import {
+  ForgetPassword,
+  RegisterSchema,
+  ResetPassword,
+  UserUpdateSchema,
+} from "../schema/registerSchema";
 import { Express, Request, Response } from "express";
 const cloudinary = require("cloudinary");
 import { AppDataSource } from "../DB/data-source";
 import { User } from "../entity/User";
 import { Role } from "../entity/Role";
-
+import { generateOTP } from "../helper/generateRandomOTP";
+import { transporter } from "../helper/nodeMailer";
+let nodemailer = require("nodemailer");
 type CurrentUser = {
   id: number;
 };
@@ -239,3 +246,76 @@ export async function updateUser(req: any, res: Response): Promise<void> {
 //   }
 
 // }
+
+export async function forgetPassword(req: any, res: Response): Promise<void> {
+  try {
+    const validate = await ForgetPassword.validateAsync(req.body);
+    const repo = AppDataSource.getRepository(User);
+    const randomOTP = generateOTP();
+    const user = await repo.update(
+      { email: validate.email },
+      {
+        forgetPassword: randomOTP,
+      }
+    );
+
+    const mailData = {
+      from: "giribipin04@gmail.com", // sender address
+      to: validate.email, // list of receivers
+      subject: "Sending Email using Node.js",
+      text: "That was easy!",
+      html: `<b>Hey there! </b>   <b>We received a request to reset the password for your account with email address: bipingiri27@gmail.com </b>    <b>To reset your account please use provided OTP below.</b> <b> </b>          <br>  Your OTP for reset password OTP is: ${randomOTP}<br/>`,
+    };
+    transporter.sendMail(mailData, function (err: any, info: any) {
+      if (err) console.log(err);
+      else
+        res.status(200).json({
+          message: "check your email",
+        });
+    });
+  } catch (err: any) {
+    res.status(404).send({ error: true, message: err.message });
+  }
+}
+
+export async function resetPassword(req: any, res: Response): Promise<void> {
+  try {
+    const validate = await ResetPassword.validateAsync(req.body);
+    const repo = AppDataSource.getRepository(User);
+    const hashPassword: any = await generateHashPassword(validate.password);
+    const verifyOTP = await repo.findOne({
+      where: {
+        forgetPassword: validate.otp,
+      },
+    });
+    console.log(verifyOTP);
+    if (verifyOTP) {
+      const user = await repo
+        .update(
+          { forgetPassword: validate.otp },
+          {
+            password: hashPassword,
+          }
+        )
+        .then(async () => {
+          await repo.update(
+            {
+              forgetPassword: validate.otp,
+            },
+            {
+              forgetPassword: "",
+            }
+          );
+        });
+      res.status(202).json({
+        message: "Successfully Reset password",
+      });
+    } else {
+      res.status(401).json({
+        message: "invalid opt",
+      });
+    }
+  } catch (err: any) {
+    res.status(404).send({ error: true, message: err.message });
+  }
+}

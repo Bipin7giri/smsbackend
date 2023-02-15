@@ -1,7 +1,5 @@
 import { Express, Request, Response } from "express";
 import { AppDataSource } from "../DB/data-source";
-import { Class } from "../entity/Classes";
-import { Department } from "../entity/Department";
 import { Role } from "../entity/Role";
 import { Semester } from "../entity/Semester";
 import { Subjects } from "../entity/Subject";
