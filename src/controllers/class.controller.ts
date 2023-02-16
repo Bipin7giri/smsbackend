@@ -3,10 +3,15 @@ import { AppDataSource } from "../DB/data-source";
 import { Class } from "../entity/Classes";
 import { Subjects } from "../entity/Subject";
 import { getCurrentUser } from "../helper/jwt";
-import { ClassPatchSchema, ClassSchema } from "../schema/classSchema";
+import {
+  ClassPatchSchema,
+  ClassSchema,
+  JoinClassRoom,
+} from "../schema/classSchema";
 
 import { generateHashPassword } from "../helper/hashpassword";
 import { User } from "../entity/User";
+import { Semester } from "../entity/Semester";
 const { Client } = require("pg");
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -81,10 +86,14 @@ export const get = async (req: Request, res: Response): Promise<void> => {
     }
     const currentUser: any = getCurrentUser(authHeader || "");
     const repo = AppDataSource.getRepository(Class);
+    console.log(currentUser);
+    const id: any = 5;
     const subject = await repo.find({
       where: {
         subjectId: {
-          teacherId: currentUser.id,
+          teacherId: {
+            id: currentUser.id,
+          },
         },
       },
       relations: ["studentId"],
@@ -128,5 +137,43 @@ export const removeStudent = async (
     }
   } catch (err: any) {
     res.status(404).send({ error: true, message: err.message });
+  }
+};
+
+export const joinClassRoom = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const validate = await JoinClassRoom.validateAsync(req.body);
+    const repo = AppDataSource.getRepository(Class);
+    const subjectRepo = AppDataSource.getRepository(Subjects);
+
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = getCurrentUser(authHeader || "");
+    console.log(currentUser);
+    const subjects: any = await subjectRepo.findOne({
+      where: {
+        classCode: validate.classCode,
+      },
+      relations: ["semesterId"],
+    });
+    console.log(subjects);
+
+    const joinClassRoom = await repo
+      .insert({
+        subjectId: subjects.id,
+        semesterId: subjects.semesterId.id,
+        studentId: currentUser.id,
+      })
+      .then(() => {
+        res.status(202).json({ message: "class room joined" });
+      });
+  } catch (err: any) {
+    res.status(422).json(err);
   }
 };

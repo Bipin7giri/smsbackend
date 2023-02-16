@@ -3,7 +3,10 @@ import { AppDataSource } from "../DB/data-source";
 import { Class } from "../entity/Classes";
 import { Department } from "../entity/Department";
 import { Subjects } from "../entity/Subject";
+import { User } from "../entity/User";
+import { randomString } from "../helper/generateRandomClassCode";
 import { getCurrentUser } from "../helper/jwt";
+import { transporter } from "../helper/nodeMailer";
 import {
   SubjectAndClassShcema,
   SubjectPathSchema,
@@ -13,20 +16,35 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const validate = await SubjectAndClassShcema.validateAsync(req.body);
     const repo = AppDataSource.getRepository(Subjects);
+    const userRepo = AppDataSource.getRepository(User);
+
     const subjects = new Subjects();
     subjects.semesterId = validate.semesterId;
     subjects.subject_name = validate.subjectName;
     subjects.teacherId = validate.teacherId;
+    subjects.classCode = randomString();
     const saveSubject: any = await repo.save(subjects);
-    const classRepo = AppDataSource.getRepository(Class);
-    for (let i = 0; i < validate.studentId.length; i++) {
-      await classRepo.insert({
-        semesterId: validate.semesterId,
-        subjectId: saveSubject.id,
-        studentId: validate.studentId[i],
+
+    const teacherEmail: any = await userRepo.findOne({
+      where: {
+        id: validate.teacherId,
+      },
+    });
+    if (teacherEmail) {
+      const mailData = {
+        from: "giribipin04@gmail.com", // sender address
+        to: teacherEmail.email, // list of receivers
+        subject: "Sending Email using Node.js",
+        text: "That was easy!",
+        html: `<br>Hey there! </br>   <br>ClassRoom has been created and your closecode is ${saveSubject.classCode}</br>`,
+      };
+      transporter.sendMail(mailData, function (err: any, info: any) {
+        if (err) console.log(err);
+        else console.log("ok");
       });
     }
-    res.status(202).json({ message: "class created" });
+
+    res.status(202).json({ message: "subject created" });
   } catch (err: any) {
     res.status(422).json(err);
   }

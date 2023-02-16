@@ -12,17 +12,30 @@
  *
  */
 
-import { addStudent, create, get } from "../controllers/class.controller";
+import {
+  addStudent,
+  create,
+  get,
+  joinClassRoom,
+} from "../controllers/class.controller";
 import * as express from "express";
 import {
   AdminAuthorization,
   HODAuthorization,
+  StudentAuthorization,
   TeacherAuthorization,
   tokenValidation,
 } from "../helper/jwt";
 const router = express.Router();
 
 router.post("/hod/class", tokenValidation, HODAuthorization, create);
+router.post(
+  "/student/class",
+  tokenValidation,
+  StudentAuthorization,
+  joinClassRoom
+);
+
 router.get("/teacher/class", tokenValidation, TeacherAuthorization, get);
 router.post(
   "/teacher/class",
