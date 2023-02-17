@@ -3,6 +3,7 @@ import * as dotenv from "dotenv";
 import { Request, Response, Express } from "express";
 import { connectDb } from "./src/scriptdb";
 import api from "./src/api/api";
+import { connectMongoDB } from "./src/MongoDB/connection";
 dotenv.config();
 const bodyParser = require("body-parser");
 const cloudinary = require("cloudinary");
@@ -23,13 +24,17 @@ const project = process.env?.PROJECT;
 app.use("/api", api);
 connectDb();
 
+// connect mongodb
+
+connectMongoDB()
+
 const swaggerDefinition = {
   info: {
     title: "School Management System",
     version: "1.0.0",
     description: "Endpoints to test the user registration routes",
   },
-  schemes:project === "DEV" ? ["http"]:["https"],
+  schemes: project === "DEV" ? ["http"] : ["https"],
   host: project === "DEV" ? "localhost:5000" : "sms-twox.onrender.com",
   components: {
     schemas: {},

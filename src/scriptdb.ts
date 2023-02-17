@@ -1,4 +1,4 @@
-import { AppDataSource } from "./DB/data-source";
+import { AppDataSource } from "./PGDB/data-source";
 import { Role } from "./entity/Role";
 import { User } from "./entity/User";
 

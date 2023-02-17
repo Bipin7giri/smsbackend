@@ -1,5 +1,5 @@
 import { Express, Request, Response } from "express";
-import { AppDataSource } from "../DB/data-source";
+import { AppDataSource } from "../PGDB/data-source";
 import { Class } from "../entity/Classes";
 import { Subjects } from "../entity/Subject";
 import { getCurrentUser } from "../helper/jwt";
@@ -13,6 +13,7 @@ import { generateHashPassword } from "../helper/hashpassword";
 import { User } from "../entity/User";
 import { Semester } from "../entity/Semester";
 const { Client } = require("pg");
+const repo = AppDataSource.getRepository(Class);
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const validate = await ClassSchema.validateAsync(req.body);
@@ -164,7 +165,7 @@ export const joinClassRoom = async (
     });
     console.log(subjects);
 
-    const joinClassRoom = await repo
+    await repo
       .insert({
         subjectId: subjects.id,
         semesterId: subjects.semesterId.id,

@@ -1,5 +1,5 @@
 import { Express, Request, Response } from "express";
-import { AppDataSource } from "../DB/data-source";
+import { AppDataSource } from "../PGDB/data-source";
 import { Role } from "../entity/Role";
 import { getCurrentUser } from "../helper/jwt";
 import { RoleSchema } from "../schema/roleSchema";

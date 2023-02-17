@@ -8,7 +8,7 @@ import {
 } from "../schema/registerSchema";
 import { Express, Request, Response } from "express";
 const cloudinary = require("cloudinary");
-import { AppDataSource } from "../DB/data-source";
+import { AppDataSource } from "../PGDB/data-source";
 import { User } from "../entity/User";
 import { Role } from "../entity/Role";
 import { generateOTP } from "../helper/generateRandomOTP";

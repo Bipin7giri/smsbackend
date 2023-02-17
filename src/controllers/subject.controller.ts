@@ -1,5 +1,5 @@
 import { Express, Request, Response } from "express";
-import { AppDataSource } from "../DB/data-source";
+import { AppDataSource } from "../PGDB/data-source";
 import { Class } from "../entity/Classes";
 import { Department } from "../entity/Department";
 import { Subjects } from "../entity/Subject";
@@ -11,6 +11,8 @@ import {
   SubjectAndClassShcema,
   SubjectPathSchema,
 } from "../schema/subjectSchema";
+import { sendNotification } from "../Notification/PushNotification";
+import { DATA } from "../Interface/SubjectInterface";
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -117,6 +119,41 @@ export const deleteById = async (
     } else {
       res.status(404).send("No subjects found");
     }
+  } catch (err: any) {
+    res.status(404).send({ error: true, message: err.message });
+  }
+};
+
+export const pushNotification = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    // const token: string = req?.headers["authorization"]?.split(" ")[1] || "";
+    // const currentUser: any = getCurrentUser(token || "");
+    //   after exam
+
+    // get all device id from database of the student that are in this class
+    const deviceID: String[] = [
+      "ExponentPushToken[2N7VCkEvd6Wpgg-HUdWhRB]",
+      "ExponentPushToken[2N7VCkEvd6Wpgg-HUdWhRB]",
+      "ExponentPushToken[2N7VCkEvd6Wpgg-HUdWhRB]",
+      "ExponentPushToken[2N7VCkEvd6Wpgg-HUdWhRB]",
+    ];
+    let data: DATA = {
+      to: deviceID,
+      sound: "default",
+      title: "SMS",
+      body: "notification form SMS system!",
+      data: {
+        wha: "qokq",
+        flakdjlaw: "dlwaldjwalk",
+      },
+    };
+
+    const result = await sendNotification(data);
+    console.log(result);
+    res.status(202).send({ result });
   } catch (err: any) {
     res.status(404).send({ error: true, message: err.message });
   }

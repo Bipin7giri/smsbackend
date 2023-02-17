@@ -37,7 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.connectDb = void 0;
-var data_source_1 = require("./DB/data-source");
+var data_source_1 = require("./PGDB/data-source");
 var Role_1 = require("./entity/Role");
 var User_1 = require("./entity/User");
 var connectDb = function () {
