@@ -7,6 +7,31 @@ var router = express.Router();
 var multer = require("multer");
 var upload = multer({ dest: "uploads/" });
 router.post("/register", auth_controller_1.register);
+/**
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Login
+ *     consumes: application/json
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         schema:
+ *           type: object
+ *           properties:
+ *             email:
+ *               type: string
+ *             password:
+ *                type: string
+ *     responses:
+ *       201:
+ *         description: Created
+ *       400:
+ *         description: Bad Request
+ *       500:
+ *         description: Internal Server Error
+ */
 router.post("/login", auth_controller_1.login);
 /**
  * @swagger

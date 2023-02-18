@@ -12,7 +12,8 @@ import {
   SubjectPathSchema,
 } from "../schema/subjectSchema";
 import { sendNotification } from "../Notification/PushNotification";
-import { DATA } from "../Interface/SubjectInterface";
+import { DATA, NotificationResult } from "../Interface/SubjectInterface";
+import { MAILDATA } from "../Interface/NodeMailerInterface";
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -33,7 +34,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
       },
     });
     if (teacherEmail) {
-      const mailData = {
+      const mailData: MAILDATA = {
         from: "giribipin04@gmail.com", // sender address
         to: teacherEmail.email, // list of receivers
         subject: "Sending Email using Node.js",
@@ -151,7 +152,7 @@ export const pushNotification = async (
       },
     };
 
-    const result = await sendNotification(data);
+    const result: NotificationResult = await sendNotification(data);
     console.log(result);
     res.status(202).send({ result });
   } catch (err: any) {

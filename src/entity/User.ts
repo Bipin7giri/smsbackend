@@ -43,7 +43,7 @@ export class User extends SoftDelete {
   @Column({ nullable: true })
   address?: string;
 
-  @Column({ name: "forget_password", nullable: true, unique: true })
+  @Column({ name: "forget_password", nullable: true })
   forgetPassword?: string;
 
   // @OneToOne(({}) => Role)

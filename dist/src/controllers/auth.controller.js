@@ -382,7 +382,7 @@ function forgetPassword(req, res) {
 exports.forgetPassword = forgetPassword;
 function resetPassword(req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var validate_1, repo_1, hashPassword, verifyOTP, user, err_8;
+        var validate_1, repo_1, hashPassword, verifyOTP, err_8;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -423,7 +423,7 @@ function resetPassword(req, res) {
                             });
                         }); })];
                 case 4:
-                    user = _a.sent();
+                    _a.sent();
                     res.status(202).json({
                         message: "Successfully Reset password",
                     });

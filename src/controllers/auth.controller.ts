@@ -78,7 +78,7 @@ export async function StudentRegister(
     const saveUser = await userRepo.save(user);
     console.log(saveUser);
     if (saveUser) {
-      res.status(202).send({ message: "successfully registered" });
+      res.status(202).send({ message: "successfully registered", status: 202 });
     }
     // } catch (err:any) {
     //   res.status(402).send({ error: true, message: err.message });
@@ -118,6 +118,7 @@ export async function login(
           res.status(200).json({
             access_token: accessToken,
             message: "Login successful !!",
+            status: 200,
           });
         } else {
           res.status(404).json({
@@ -127,13 +128,14 @@ export async function login(
       } else {
         res.status(404).json({
           message: "No email found",
+          status: 404,
         });
       }
     } catch (err: any) {
       // res.status(422).send({ error: true, message: err.message });;
     }
   } catch (err: any) {
-    res.status(422).send({ error: true, message: err.message });
+    res.status(422).send({ error: true, message: err.message, status: 422 });
   }
 }
 
@@ -290,7 +292,7 @@ export async function resetPassword(req: any, res: Response): Promise<void> {
     });
     console.log(verifyOTP);
     if (verifyOTP) {
-      const user = await repo
+      await repo
         .update(
           { forgetPassword: validate.otp },
           {
