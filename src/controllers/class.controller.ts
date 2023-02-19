@@ -8,10 +8,6 @@ import {
   ClassSchema,
   JoinClassRoom,
 } from "../schema/classSchema";
-
-import { generateHashPassword } from "../helper/hashpassword";
-import { User } from "../entity/User";
-import { Semester } from "../entity/Semester";
 const { Client } = require("pg");
 const repo = AppDataSource.getRepository(Class);
 export const create = async (req: Request, res: Response): Promise<void> => {

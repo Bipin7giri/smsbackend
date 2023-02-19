@@ -43,7 +43,7 @@ var Department = /** @class */ (function (_super) {
         __metadata("design:type", String)
     ], Department.prototype, "name", void 0);
     __decorate([
-        (0, typeorm_1.Column)("text", { array: true }),
+        (0, typeorm_1.Column)("text", { array: true, nullable: true }),
         __metadata("design:type", Array)
     ], Department.prototype, "teachers", void 0);
     __decorate([
@@ -52,7 +52,7 @@ var Department = /** @class */ (function (_super) {
     ], Department.prototype, "semesterId", void 0);
     __decorate([
         (0, typeorm_1.ManyToOne)(function () { return User_1.User; }, function (user) { return user.hod; }),
-        (0, typeorm_1.JoinColumn)({ name: 'hod_id' }),
+        (0, typeorm_1.JoinColumn)({ name: "hod_id" }),
         __metadata("design:type", User_1.User)
     ], Department.prototype, "hod", void 0);
     Department = __decorate([

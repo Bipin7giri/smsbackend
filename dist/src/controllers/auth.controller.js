@@ -46,6 +46,7 @@ var User_1 = require("../entity/User");
 var Role_1 = require("../entity/Role");
 var generateRandomOTP_1 = require("../helper/generateRandomOTP");
 var nodeMailer_1 = require("../helper/nodeMailer");
+var typeorm_1 = require("typeorm");
 var nodemailer = require("nodemailer");
 function register(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
@@ -448,32 +449,58 @@ function resetPassword(req, res) {
 }
 exports.resetPassword = resetPassword;
 var getAllUsers = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var totalUser, skip, take, repo, users, err_9;
-    var _a, _b;
-    return __generator(this, function (_c) {
-        switch (_c.label) {
+    var totalUser, skip, take, searchData, repo, searchQuery, users, users, err_9;
+    var _a, _b, _c;
+    return __generator(this, function (_d) {
+        switch (_d.label) {
             case 0:
-                _c.trys.push([0, 3, , 4]);
+                _d.trys.push([0, 6, , 7]);
                 return [4 /*yield*/, countAllusers()];
             case 1:
-                totalUser = _c.sent();
+                totalUser = _d.sent();
                 skip = ((_a = req.query) === null || _a === void 0 ? void 0 : _a.skip) || 0;
                 take = ((_b = req.query) === null || _b === void 0 ? void 0 : _b.take) || totalUser + 1;
+                searchData = ((_c = req.query) === null || _c === void 0 ? void 0 : _c.search) || null;
                 repo = data_source_1.AppDataSource.getRepository(User_1.User);
+                console.log(searchData);
+                searchQuery = "%".concat(searchData, "%");
+                if (!(searchData === "null" ||
+                    searchData === null ||
+                    searchData === undefined ||
+                    searchData === "undefined")) return [3 /*break*/, 3];
                 return [4 /*yield*/, repo.find({
-                        relations: ["roleId"],
+                        relations: ["roleId", "hod"],
+                        order: {
+                            updatedAt: "DESC",
+                        },
                         skip: parseInt(skip),
                         take: parseInt(take),
                     })];
             case 2:
-                users = _c.sent();
+                users = _d.sent();
                 res.json(users);
-                return [3 /*break*/, 4];
-            case 3:
-                err_9 = _c.sent();
+                return [3 /*break*/, 5];
+            case 3: return [4 /*yield*/, repo.find({
+                    relations: ["roleId", "hod"],
+                    where: {
+                        email: (0, typeorm_1.Like)(searchQuery),
+                    },
+                    order: {
+                        updatedAt: "DESC",
+                    },
+                    skip: parseInt(skip),
+                    take: parseInt(take),
+                })];
+            case 4:
+                users = _d.sent();
+                res.json(users);
+                _d.label = 5;
+            case 5: return [3 /*break*/, 7];
+            case 6:
+                err_9 = _d.sent();
                 res.json(err_9);
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
+                return [3 /*break*/, 7];
+            case 7: return [2 /*return*/];
         }
     });
 }); };

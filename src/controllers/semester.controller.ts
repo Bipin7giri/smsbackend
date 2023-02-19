@@ -25,8 +25,12 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 
 export const get = async (req: Request, res: Response): Promise<void> => {
   try {
-    const token: string = req?.headers["authorization"]?.split(" ")[1] || "";
-    const currentUser: any = getCurrentUser(token || "");
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = getCurrentUser(authHeader || "");
     const repo = AppDataSource.getRepository(Semester);
     const semester = await repo.find({
       relations: ["subjects", "subjects.teacherId"],

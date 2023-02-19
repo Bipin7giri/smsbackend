@@ -13,6 +13,8 @@ import { User } from "../entity/User";
 import { Role } from "../entity/Role";
 import { generateOTP } from "../helper/generateRandomOTP";
 import { transporter } from "../helper/nodeMailer";
+import { Like } from "typeorm";
+import { serialize } from "v8";
 let nodemailer = require("nodemailer");
 type CurrentUser = {
   id: number;
@@ -333,13 +335,39 @@ export const getAllUsers = async (
     const totalUser = await countAllusers();
     const skip: any = req.query?.skip || 0;
     const take: any = req.query?.take || totalUser + 1;
+    const searchData: any = req.query?.search || null;
     const repo = AppDataSource.getRepository(User);
-    const users = await repo.find({
-      relations: ["roleId"],
-      skip: parseInt(skip),
-      take: parseInt(take),
-    });
-    res.json(users);
+    console.log(searchData);
+    const searchQuery: any = `%${searchData}%`;
+    if (
+      searchData === "null" ||
+      searchData === null ||
+      searchData === undefined ||
+      searchData === "undefined"
+    ) {
+      const users = await repo.find({
+        relations: ["roleId", "hod"],
+        order: {
+          updatedAt: "DESC",
+        },
+        skip: parseInt(skip),
+        take: parseInt(take),
+      });
+      res.json(users);
+    } else {
+      const users = await repo.find({
+        relations: ["roleId", "hod"],
+        where: {
+          email: Like(searchQuery),
+        },
+        order: {
+          updatedAt: "DESC",
+        },
+        skip: parseInt(skip),
+        take: parseInt(take),
+      });
+      res.json(users);
+    }
   } catch (err: any) {
     res.json(err);
   }

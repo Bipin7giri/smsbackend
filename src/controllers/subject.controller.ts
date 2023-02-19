@@ -55,9 +55,12 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 
 export const get = async (req: Request, res: Response): Promise<void> => {
   try {
-    const token: string = req?.headers["authorization"]?.split(" ")[1] || "";
-    const currentUser: any = getCurrentUser(token || "");
-    console.log(currentUser);
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = getCurrentUser(authHeader || "");
     const repo = AppDataSource.getRepository(Department);
     const subjects = await repo.find({
       where: {
@@ -84,8 +87,12 @@ export const get = async (req: Request, res: Response): Promise<void> => {
 
 export const update = async (req: Request, res: Response): Promise<void> => {
   try {
-    const token: string = req?.headers["authorization"]?.split(" ")[1] || "";
-    const currentUser: any = getCurrentUser(token || "");
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = getCurrentUser(authHeader || "");
     const { subjectId } = req.params;
     const validate = await SubjectPathSchema.validateAsync(req.body);
     const repo = AppDataSource.getRepository(Subjects);
@@ -106,8 +113,12 @@ export const deleteById = async (
   res: Response
 ): Promise<void> => {
   try {
-    const token: string = req?.headers["authorization"]?.split(" ")[1] || "";
-    const currentUser: any = getCurrentUser(token || "");
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = getCurrentUser(authHeader || "");
     const { subjectId } = req.params;
     const repo = AppDataSource.getRepository(Subjects);
     const deleteSubject = await repo.update(subjectId, {

@@ -23,6 +23,5 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     }
   } catch (err: any) {
     res.status(422).json(err);
-    throw err;
   }
 };

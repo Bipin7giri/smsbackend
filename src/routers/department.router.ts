@@ -20,7 +20,7 @@ router.get(
   AdminAuthorization,
   countDepartment
 );
-router.get("/login/department", getAllDepartment);
+router.get("/department", AdminAuthorization, getAllDepartment);
 
 // router.patch('/users/me', tokenValidation,upload.single("avatar"), update)
 //   router.get('/users/me',tokenValidation,getUser)
