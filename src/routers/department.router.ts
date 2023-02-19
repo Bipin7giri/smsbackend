@@ -1,4 +1,5 @@
 import {
+  countDepartment,
   create,
   get,
   getAllDepartment,
@@ -9,9 +10,16 @@ import {
   HODAuthorization,
   tokenValidation,
 } from "../helper/jwt";
+import { count } from "console";
 const router = express.Router();
 router.post("/department", tokenValidation, AdminAuthorization, create);
 router.get("/hod/department", tokenValidation, HODAuthorization, get);
+router.get(
+  "/admin/department/count",
+  tokenValidation,
+  AdminAuthorization,
+  countDepartment
+);
 router.get("/login/department", getAllDepartment);
 
 // router.patch('/users/me', tokenValidation,upload.single("avatar"), update)

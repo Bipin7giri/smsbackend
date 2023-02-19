@@ -50,6 +50,32 @@ export const get = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+export const countDepartment = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    console.log("hi");
+    const token: string = req?.headers["authorization"]?.split(" ")[1] || "";
+    const currentUser: any = getCurrentUser(token || "");
+    const repo = AppDataSource.getRepository(Department);
+    const department = await repo.count({
+      where: {
+        deleted: false,
+      },
+    });
+    console.log(department);
+    if (department) {
+      res.json({
+        department: department,
+      });
+    } else {
+      res.status(404).send("No department found");
+    }
+  } catch (err: any) {
+    res.status(404).send({ error: true, message: err.message });
+  }
+};
 export const addTeacher = async (
   req: Request,
   res: Response

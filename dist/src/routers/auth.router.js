@@ -122,5 +122,6 @@ router.get("/users/me", jwt_1.tokenValidation, auth_controller_1.getUser);
  *         description: Some server error
  */
 router.patch("/users/me", jwt_1.tokenValidation, upload.single("avatar"), auth_controller_1.updateUser);
+router.get("/allusers", jwt_1.tokenValidation, jwt_1.AdminAuthorization, auth_controller_1.getAllUsers);
 exports.default = router;
 //# sourceMappingURL=auth.router.js.map

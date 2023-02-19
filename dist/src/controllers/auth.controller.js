@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resetPassword = exports.forgetPassword = exports.updateUser = exports.getUser = exports.login = exports.StudentRegister = exports.register = void 0;
+exports.countAllusers = exports.getAllUsers = exports.resetPassword = exports.forgetPassword = exports.updateUser = exports.getUser = exports.login = exports.StudentRegister = exports.register = void 0;
 var hashpassword_1 = require("../helper/hashpassword");
 var jwt_1 = require("../helper/jwt");
 var registerSchema_1 = require("../schema/registerSchema");
@@ -122,7 +122,7 @@ function StudentRegister(req, res, next) {
                     saveUser = _a.sent();
                     console.log(saveUser);
                     if (saveUser) {
-                        res.status(202).send({ message: "successfully registered" });
+                        res.status(202).send({ message: "successfully registered", status: 202 });
                     }
                     return [3 /*break*/, 6];
                 case 5:
@@ -170,6 +170,7 @@ function login(req, res, next) {
                     res.status(200).json({
                         access_token: accessToken,
                         message: "Login successful !!",
+                        status: 200,
                     });
                     return [3 /*break*/, 7];
                 case 6:
@@ -181,6 +182,7 @@ function login(req, res, next) {
                 case 8:
                     res.status(404).json({
                         message: "No email found",
+                        status: 404,
                     });
                     _a.label = 9;
                 case 9: return [3 /*break*/, 11];
@@ -190,7 +192,7 @@ function login(req, res, next) {
                 case 11: return [3 /*break*/, 13];
                 case 12:
                     err_4 = _a.sent();
-                    res.status(422).send({ error: true, message: err_4.message });
+                    res.status(422).send({ error: true, message: err_4.message, status: 422 });
                     return [3 /*break*/, 13];
                 case 13: return [2 /*return*/];
             }
@@ -249,6 +251,7 @@ function getUser(req, res) {
                             where: {
                                 id: currentUser.id,
                             },
+                            relations: ["roleId"],
                         })];
                 case 1:
                     user = _a.sent();
@@ -271,47 +274,47 @@ function getUser(req, res) {
 }
 exports.getUser = getUser;
 function updateUser(req, res) {
-    var _a, _b;
+    var _a;
     return __awaiter(this, void 0, void 0, function () {
-        var validate, _c, token, currentUser, repo, imageUrl, user, err_6;
-        return __generator(this, function (_d) {
-            switch (_d.label) {
+        var validate, authHeader, currentUser, repo, imageUrl, user, err_6;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
-                    _d.trys.push([0, 6, , 7]);
+                    _b.trys.push([0, 5, , 6]);
                     return [4 /*yield*/, registerSchema_1.UserUpdateSchema.validateAsync(req.body)];
                 case 1:
-                    validate = _d.sent();
-                    _c = validate;
-                    return [4 /*yield*/, (0, hashpassword_1.generateHashPassword)(validate.password)];
-                case 2:
-                    _c.password = _d.sent();
-                    token = ((_a = req === null || req === void 0 ? void 0 : req.headers["authorization"]) === null || _a === void 0 ? void 0 : _a.split(" ")[1]) || "";
-                    currentUser = (0, jwt_1.getCurrentUser)(token || "");
+                    validate = _b.sent();
+                    authHeader = req.headers["authorization"];
+                    if (authHeader && authHeader.startsWith("Bearer ")) {
+                        // Remove "Bearer " from the authHeader
+                        authHeader = authHeader.slice(7, authHeader.length);
+                    }
+                    currentUser = (0, jwt_1.getCurrentUser)(authHeader || "");
                     repo = data_source_1.AppDataSource.getRepository(User_1.User);
                     console.log(req.file);
-                    if (!(req === null || req === void 0 ? void 0 : req.file)) return [3 /*break*/, 4];
-                    return [4 /*yield*/, cloudinary.uploader.upload((_b = req === null || req === void 0 ? void 0 : req.file) === null || _b === void 0 ? void 0 : _b.path)];
-                case 3:
-                    imageUrl = _d.sent();
+                    if (!(req === null || req === void 0 ? void 0 : req.file)) return [3 /*break*/, 3];
+                    return [4 /*yield*/, cloudinary.uploader.upload((_a = req === null || req === void 0 ? void 0 : req.file) === null || _a === void 0 ? void 0 : _a.path)];
+                case 2:
+                    imageUrl = _b.sent();
                     validate.avatar = imageUrl === null || imageUrl === void 0 ? void 0 : imageUrl.secure_url;
-                    _d.label = 4;
-                case 4:
+                    _b.label = 3;
+                case 3:
                     console.log(validate);
                     return [4 /*yield*/, repo.update(currentUser.id, validate)];
-                case 5:
-                    user = _d.sent();
+                case 4:
+                    user = _b.sent();
                     if (user) {
                         res.json("user successfully updated");
                     }
                     else {
                         res.status(404).send("No use found");
                     }
-                    return [3 /*break*/, 7];
-                case 6:
-                    err_6 = _d.sent();
+                    return [3 /*break*/, 6];
+                case 5:
+                    err_6 = _b.sent();
                     res.status(404).send({ error: true, message: err_6.message });
-                    return [3 /*break*/, 7];
-                case 7: return [2 /*return*/];
+                    return [3 /*break*/, 6];
+                case 6: return [2 /*return*/];
             }
         });
     });
@@ -444,4 +447,53 @@ function resetPassword(req, res) {
     });
 }
 exports.resetPassword = resetPassword;
+var getAllUsers = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var totalUser, skip, take, repo, users, err_9;
+    var _a, _b;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
+            case 0:
+                _c.trys.push([0, 3, , 4]);
+                return [4 /*yield*/, countAllusers()];
+            case 1:
+                totalUser = _c.sent();
+                skip = ((_a = req.query) === null || _a === void 0 ? void 0 : _a.skip) || 0;
+                take = ((_b = req.query) === null || _b === void 0 ? void 0 : _b.take) || totalUser + 1;
+                repo = data_source_1.AppDataSource.getRepository(User_1.User);
+                return [4 /*yield*/, repo.find({
+                        relations: ["roleId"],
+                        skip: parseInt(skip),
+                        take: parseInt(take),
+                    })];
+            case 2:
+                users = _c.sent();
+                res.json(users);
+                return [3 /*break*/, 4];
+            case 3:
+                err_9 = _c.sent();
+                res.json(err_9);
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
+exports.getAllUsers = getAllUsers;
+function countAllusers() {
+    return __awaiter(this, void 0, void 0, function () {
+        var repo;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    repo = data_source_1.AppDataSource.getRepository(User_1.User);
+                    return [4 /*yield*/, repo.count({
+                            where: {
+                                deleted: false,
+                            },
+                        })];
+                case 1: return [2 /*return*/, _a.sent()];
+            }
+        });
+    });
+}
+exports.countAllusers = countAllusers;
 //# sourceMappingURL=auth.controller.js.map

@@ -189,6 +189,7 @@ export async function getUser(req: Request, res: Response): Promise<void> {
       where: {
         id: currentUser.id,
       },
+      relations: ["roleId"],
     });
     // user?.password = null;
     if (user) {
@@ -204,10 +205,12 @@ export async function getUser(req: Request, res: Response): Promise<void> {
 export async function updateUser(req: any, res: Response): Promise<void> {
   try {
     const validate = await UserUpdateSchema.validateAsync(req.body);
-
-    validate.password = await generateHashPassword(validate.password);
-    const token: string = req?.headers["authorization"]?.split(" ")[1] || "";
-    const currentUser: CurrentUser = getCurrentUser(token || "");
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: CurrentUser = getCurrentUser(authHeader || "");
     const repo = AppDataSource.getRepository(User);
     console.log(req.file);
     if (req?.file) {
@@ -320,4 +323,33 @@ export async function resetPassword(req: any, res: Response): Promise<void> {
   } catch (err: any) {
     res.status(404).send({ error: true, message: err.message });
   }
+}
+
+export const getAllUsers = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const totalUser = await countAllusers();
+    const skip: any = req.query?.skip || 0;
+    const take: any = req.query?.take || totalUser + 1;
+    const repo = AppDataSource.getRepository(User);
+    const users = await repo.find({
+      relations: ["roleId"],
+      skip: parseInt(skip),
+      take: parseInt(take),
+    });
+    res.json(users);
+  } catch (err: any) {
+    res.json(err);
+  }
+};
+
+export async function countAllusers(): Promise<number> {
+  const repo = AppDataSource.getRepository(User);
+  return await repo.count({
+    where: {
+      deleted: false,
+    },
+  });
 }
