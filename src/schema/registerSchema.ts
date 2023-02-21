@@ -3,6 +3,7 @@ import * as Joi from "joi";
 export const RegisterSchema = Joi.object({
   password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).required(),
   email: Joi.string().required(),
+  deviceId:Joi.string()
 });
 
 export const StudentRegisterSchema = Joi.object({

@@ -68,6 +68,10 @@ var User = /** @class */ (function (_super) {
         __metadata("design:type", String)
     ], User.prototype, "address", void 0);
     __decorate([
+        (0, typeorm_1.Column)({ nullable: true, name: "device_id" }),
+        __metadata("design:type", String)
+    ], User.prototype, "deviceId", void 0);
+    __decorate([
         (0, typeorm_1.Column)({ name: "forget_password", nullable: true }),
         __metadata("design:type", String)
     ], User.prototype, "forgetPassword", void 0);

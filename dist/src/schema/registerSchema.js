@@ -6,6 +6,7 @@ var Joi = require("joi");
 exports.RegisterSchema = Joi.object({
     password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).required(),
     email: Joi.string().required(),
+    deviceId: Joi.string()
 });
 exports.StudentRegisterSchema = Joi.object({
     password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).required(),

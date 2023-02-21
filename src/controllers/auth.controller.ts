@@ -14,8 +14,10 @@ import { Role } from "../entity/Role";
 import { generateOTP } from "../helper/generateRandomOTP";
 import { transporter } from "../helper/nodeMailer";
 import { Like } from "typeorm";
-import { serialize } from "v8";
+
+const userModel = require("../MongoDB/Schema/UserSchema");
 let nodemailer = require("nodemailer");
+const mongoose = require("mongoose");
 type CurrentUser = {
   id: number;
 };
@@ -101,7 +103,7 @@ export async function login(
     const validate = await RegisterSchema.validateAsync(req.body);
     try {
       const repo = AppDataSource.getRepository(User);
-      const user = await repo.findOne({
+      const user: any = await repo.findOne({
         relations: {
           roleId: true,
         },
@@ -109,7 +111,6 @@ export async function login(
           email: validate.email,
         },
       });
-      console.table(user);
       if (user) {
         const checkPassword: Boolean = await comparePassword(
           user.password,
@@ -117,18 +118,40 @@ export async function login(
         );
         if (checkPassword) {
           const accessToken: any = await generateToken(user);
-          res.status(200).json({
+
+          const result = await repo.update(user.id, {
+            deviceId: validate.deviceId,
+          });
+
+          const checkIfAlreadyExist = await userModel.findOne({
+            username: user.email,
+          });
+          console.log(checkIfAlreadyExist);
+          if (validate.deviceId) {
+            console.log(validate.deviceId)
+            if (!checkIfAlreadyExist) {
+              const chatUser = await userModel.create({
+                username: user.email,
+                displayName: user.firstName,
+                deviceId: validate.deviceId,
+              });
+              console.log(chatUser);
+            }
+          }
+
+          res.json({
             access_token: accessToken,
             message: "Login successful !!",
             status: 200,
           });
         } else {
-          res.status(404).json({
+          res.json({
             message: "Invalid password !!",
+            status: 404,
           });
         }
       } else {
-        res.status(404).json({
+        res.json({
           message: "No email found",
           status: 404,
         });
@@ -191,7 +214,11 @@ export async function getUser(req: Request, res: Response): Promise<void> {
       where: {
         id: currentUser.id,
       },
-      relations: ["roleId"],
+      relations: [
+        "roleId",
+        "classes.subjectId.semesterId",
+        "classes.subjectId.semesterId.departmentId",
+      ],
     });
     // user?.password = null;
     if (user) {
@@ -278,6 +305,7 @@ export async function forgetPassword(req: any, res: Response): Promise<void> {
       else
         res.status(200).json({
           message: "check your email",
+          status: 200,
         });
     });
   } catch (err: any) {

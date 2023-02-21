@@ -43,6 +43,9 @@ export class User extends SoftDelete {
   @Column({ nullable: true })
   address?: string;
 
+  @Column({ nullable: true, name:"device_id" })
+  deviceId?: string;
+
   @Column({ name: "forget_password", nullable: true })
   forgetPassword?: string;
 

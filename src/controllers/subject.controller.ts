@@ -14,6 +14,7 @@ import {
 import { sendNotification } from "../Notification/PushNotification";
 import { DATA, NotificationResult } from "../Interface/SubjectInterface";
 import { MAILDATA } from "../Interface/NodeMailerInterface";
+import { NotificationSchemaTeacher } from "../schema/notificationSchema";
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -141,22 +142,42 @@ export const pushNotification = async (
   res: Response
 ): Promise<void> => {
   try {
+    const validate = await NotificationSchemaTeacher.validateAsync(req.body);
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = getCurrentUser(authHeader || "");
+    const classRepo = AppDataSource.getRepository(Class);
+
+    const getAllStudent: any = await classRepo.find({
+      relations: ["studentId"],
+      where: {
+        subjectId: {
+          teacherId: {
+            id: currentUser.id,
+          },
+        },
+      },
+    });
+    console.log(getAllStudent);
+    const deviceIDs: string[] = getAllStudent.map((item: any, id: any) => {
+      return item.studentId.deviceId;
+    });
+    console.log(deviceIDs);
+
     // const token: string = req?.headers["authorization"]?.split(" ")[1] || "";
     // const currentUser: any = getCurrentUser(token || "");
     //   after exam
 
     // get all device id from database of the student that are in this class
-    const deviceID: String[] = [
-      "ExponentPushToken[2N7VCkEvd6Wpgg-HUdWhRB]",
-      "ExponentPushToken[2N7VCkEvd6Wpgg-HUdWhRB]",
-      "ExponentPushToken[2N7VCkEvd6Wpgg-HUdWhRB]",
-      "ExponentPushToken[2N7VCkEvd6Wpgg-HUdWhRB]",
-    ];
+    const deviceID: String[] = deviceIDs
     let data: DATA = {
       to: deviceID,
       sound: "default",
-      title: "SMS",
-      body: "notification form SMS system!",
+      title: validate.title,
+      body: validate.body,
       data: {
         wha: "qokq",
         flakdjlaw: "dlwaldjwalk",

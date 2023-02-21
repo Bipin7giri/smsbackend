@@ -47,7 +47,9 @@ var Role_1 = require("../entity/Role");
 var generateRandomOTP_1 = require("../helper/generateRandomOTP");
 var nodeMailer_1 = require("../helper/nodeMailer");
 var typeorm_1 = require("typeorm");
+var userModel = require("../MongoDB/Schema/UserSchema");
 var nodemailer = require("nodemailer");
+var mongoose = require("mongoose");
 function register(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
         var validate, hashedPassword, repo, roles, user, userRepo, saveUser, err_1;
@@ -137,17 +139,17 @@ function StudentRegister(req, res, next) {
 exports.StudentRegister = StudentRegister;
 function login(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
-        var validate, repo, user, checkPassword, accessToken, err_3, err_4;
+        var validate, repo, user, checkPassword, accessToken, result, checkIfAlreadyExist, chatUser, err_3, err_4;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 12, , 13]);
+                    _a.trys.push([0, 16, , 17]);
                     return [4 /*yield*/, registerSchema_1.RegisterSchema.validateAsync(req.body)];
                 case 1:
                     validate = _a.sent();
                     _a.label = 2;
                 case 2:
-                    _a.trys.push([2, 10, , 11]);
+                    _a.trys.push([2, 14, , 15]);
                     repo = data_source_1.AppDataSource.getRepository(User_1.User);
                     return [4 /*yield*/, repo.findOne({
                             relations: {
@@ -159,43 +161,67 @@ function login(req, res, next) {
                         })];
                 case 3:
                     user = _a.sent();
-                    console.table(user);
-                    if (!user) return [3 /*break*/, 8];
+                    if (!user) return [3 /*break*/, 12];
                     return [4 /*yield*/, (0, hashpassword_1.comparePassword)(user.password, validate.password)];
                 case 4:
                     checkPassword = _a.sent();
-                    if (!checkPassword) return [3 /*break*/, 6];
+                    if (!checkPassword) return [3 /*break*/, 10];
                     return [4 /*yield*/, (0, jwt_1.generateToken)(user)];
                 case 5:
                     accessToken = _a.sent();
-                    res.status(200).json({
+                    return [4 /*yield*/, repo.update(user.id, {
+                            deviceId: validate.deviceId,
+                        })];
+                case 6:
+                    result = _a.sent();
+                    return [4 /*yield*/, userModel.findOne({
+                            username: user.email,
+                        })];
+                case 7:
+                    checkIfAlreadyExist = _a.sent();
+                    console.log(checkIfAlreadyExist);
+                    if (!validate.deviceId) return [3 /*break*/, 9];
+                    console.log(validate.deviceId);
+                    if (!!checkIfAlreadyExist) return [3 /*break*/, 9];
+                    return [4 /*yield*/, userModel.create({
+                            username: user.email,
+                            displayName: user.firstName,
+                            deviceId: validate.deviceId,
+                        })];
+                case 8:
+                    chatUser = _a.sent();
+                    console.log(chatUser);
+                    _a.label = 9;
+                case 9:
+                    res.json({
                         access_token: accessToken,
                         message: "Login successful !!",
                         status: 200,
                     });
-                    return [3 /*break*/, 7];
-                case 6:
-                    res.status(404).json({
+                    return [3 /*break*/, 11];
+                case 10:
+                    res.json({
                         message: "Invalid password !!",
+                        status: 404,
                     });
-                    _a.label = 7;
-                case 7: return [3 /*break*/, 9];
-                case 8:
-                    res.status(404).json({
+                    _a.label = 11;
+                case 11: return [3 /*break*/, 13];
+                case 12:
+                    res.json({
                         message: "No email found",
                         status: 404,
                     });
-                    _a.label = 9;
-                case 9: return [3 /*break*/, 11];
-                case 10:
+                    _a.label = 13;
+                case 13: return [3 /*break*/, 15];
+                case 14:
                     err_3 = _a.sent();
-                    return [3 /*break*/, 11];
-                case 11: return [3 /*break*/, 13];
-                case 12:
+                    return [3 /*break*/, 15];
+                case 15: return [3 /*break*/, 17];
+                case 16:
                     err_4 = _a.sent();
                     res.status(422).send({ error: true, message: err_4.message, status: 422 });
-                    return [3 /*break*/, 13];
-                case 13: return [2 /*return*/];
+                    return [3 /*break*/, 17];
+                case 17: return [2 /*return*/];
             }
         });
     });
@@ -252,7 +278,11 @@ function getUser(req, res) {
                             where: {
                                 id: currentUser.id,
                             },
-                            relations: ["roleId"],
+                            relations: [
+                                "roleId",
+                                "classes.subjectId.semesterId",
+                                "classes.subjectId.semesterId.departmentId",
+                            ],
                         })];
                 case 1:
                     user = _a.sent();
@@ -371,6 +401,7 @@ function forgetPassword(req, res) {
                         else
                             res.status(200).json({
                                 message: "check your email",
+                                status: 200,
                             });
                     });
                     return [3 /*break*/, 4];

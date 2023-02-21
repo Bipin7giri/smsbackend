@@ -14,6 +14,8 @@ import { uploadFile, } from "../helper/imageupload";
 import { AssignmentSubmission } from "../entity/AssignmentSubmission";
 import { MAILDATA } from "../Interface/NodeMailerInterface";
 import { transporter } from "../helper/nodeMailer";
+import { DATA, NotificationResult } from "../Interface/SubjectInterface";
+import { sendNotification } from "../Notification/PushNotification";
 const assigmnmentRepo = AppDataSource.getRepository(Assignment);
 const subjectRepo = AppDataSource.getRepository(Subjects);
 const assigmnmentSubmitRepo = AppDataSource.getRepository(AssignmentSubmission)
@@ -27,7 +29,8 @@ export const create = async (req: any, res: Response): Promise<void> => {
       // Remove "Bearer " from the authHeader
       authHeader = authHeader.slice(7, authHeader.length);
     }
-    const currentUser: any = getCurrentUser(authHeader || "");
+    const currentUser: any = await getCurrentUser(authHeader || "");
+    console.log(currentUser.id)
     const subjectId: any = await subjectRepo.findOne({
       where: {
         teacherId: {
@@ -35,7 +38,7 @@ export const create = async (req: any, res: Response): Promise<void> => {
         },
       },
     });
-
+    console.log(subjectId)
     validate.subjectId = subjectId.id;
 
     if (req?.file) {
@@ -51,24 +54,42 @@ export const create = async (req: any, res: Response): Promise<void> => {
         studentId:subjectId.id
     }
   })
-     console.log(getAllStudent)
+    //  console.log(getAllStudent)
     const studentEmail  = getAllStudent.map((item:any,id:any)=>{
       return item.studentId.email
     })
-    console.log((studentEmail))
+    // console.log((studentEmail))
   // if(studentEmail.length>0){
     const mailData: MAILDATA = {
         from: "giribipin04@gmail.com", // sender address
         to: studentEmail, // list of receivers
         subject: "Assignment alert",
         text: "Assignment!!!",
-        html: `<br>Please check your assignment details of ${subjectId.name}</br>`,
+        html: `<br>Please check your assignment details of ${subjectId.subject_name}</br>`,
       };
-    console.log(mailData)
+    // console.log(mailData)
     await  transporter.sendMail(mailData, function (err: any, info: any) {
         if (err) console.log(err);
         else console.log("ok");
       });
+      const deviceIDs  = getAllStudent.map((item:any,id:any)=>{
+        return item.studentId.deviceId
+      })
+
+      const deviceID: String[] = deviceIDs
+      let data: DATA = {
+        to: deviceID,
+        sound: "default",
+        title: 'Assignment Alert!!!',
+        body: 'please check your App for '+subjectId.subject_name,
+        data: {
+          wha: "qokq",
+          flakdjlaw: "dlwaldjwalk",
+        },
+      };
+  
+      const results: NotificationResult = await sendNotification(data);
+        // console.log(results)
   // }
     res.status(202).json({ message: "created assignment", status: 202 });
   } catch (err: any) {
