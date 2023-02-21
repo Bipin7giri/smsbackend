@@ -8,6 +8,7 @@ import {
   OneToMany,
   ManyToMany,
 } from "typeorm";
+import { Assignment } from "./Assignment";
 import { Class } from "./Classes";
 import { Department } from "./Department";
 import { Semester } from "./Semester";
@@ -35,4 +36,7 @@ export class Subjects extends SoftDelete {
 
   @OneToMany(() => Class, (c) => c.subjectId)
   classId: Class[];
+
+  @OneToMany(() => Assignment, (a) => a.subjectId)
+  assignment: Class[];
 }

@@ -35,22 +35,51 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.upload = void 0;
-var cloudinary = require('cloudinary');
-function upload(params) {
+exports.uploadFile = void 0;
+var cloudinary = require("cloudinary");
+var dotenv = require("dotenv");
+dotenv.config();
+var APIKey = (_a = process.env) === null || _a === void 0 ? void 0 : _a.APIKey;
+var APISecret = (_b = process.env) === null || _b === void 0 ? void 0 : _b.APISecret;
+var PINATA_ENDPOINT = (_c = process.env) === null || _c === void 0 ? void 0 : _c.PINATA_ENDPOINT;
+function uploadFile(params) {
     return __awaiter(this, void 0, void 0, function () {
-        var imageUrl;
+        var imageUrl, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, cloudinary.uploader
-                        .upload(params)];
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, cloudinary.uploader.upload(params, { resource_type: "auto" })];
                 case 1:
                     imageUrl = _a.sent();
+                    console.log(imageUrl);
                     return [2 /*return*/, imageUrl.secure_url];
+                case 2:
+                    err_1 = _a.sent();
+                    throw err_1;
+                case 3: return [2 /*return*/];
             }
         });
     });
 }
-exports.upload = upload;
+exports.uploadFile = uploadFile;
+// export async function uploadPdf(params:any) {
+//     const response = await axios.post(PINATA_ENDPOINT, params, {
+//         maxContentLength: Infinity,
+//         maxBodyLength: Infinity,
+//         headers: {
+//           'Content-Type': `multipart/form-data;`,
+//           'pinata_api_key': APIKey,
+//           'pinata_secret_api_key': APISecret,
+//         },
+//       });
+//       if (!response.data.IpfsHash) {
+//         console.error(response.data);
+//         // return res.status(500).json({error: 'Failed to upload file to Pinata'});
+//       }
+//       else{
+//         return response.data.IpfsHash}
+//       }
 //# sourceMappingURL=imageupload.js.map

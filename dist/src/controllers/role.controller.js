@@ -67,7 +67,7 @@ var create = function (req, res) { return __awaiter(void 0, void 0, void 0, func
             case 3:
                 err_1 = _b.sent();
                 res.status(422).json(err_1);
-                throw err_1;
+                return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
     });
