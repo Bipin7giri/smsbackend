@@ -3,11 +3,6 @@ import { AppDataSource } from "../PGDB/data-source";
 import { Class } from "../entity/Classes";
 import { Subjects } from "../entity/Subject";
 import { getCurrentUser } from "../helper/jwt";
-import {
-  ClassPatchSchema,
-  ClassSchema,
-  JoinClassRoom,
-} from "../schema/classSchema";
 import { CreateAssignment, SubmitAssigment } from "../schema/assignmentSchema";
 import { Assignment } from "../entity/Assignment";
 import { uploadFile, } from "../helper/imageupload";

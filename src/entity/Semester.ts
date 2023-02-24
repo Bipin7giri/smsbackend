@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, OneToOne, ManyToOne
 import { Subject } from "typeorm/persistence/Subject"
 import { Class } from "./Classes"
 import { Department } from "./Department"
+import { Reports } from "./Reports"
 import { SoftDelete } from "./SoftDelete"
 import { Subjects } from "./Subject"
 import { User } from "./User"
@@ -27,6 +28,9 @@ export class Semester extends SoftDelete {
     
     @OneToMany(() => Class,(c)=>c.semesterId)
     classes: Class[]
+
+    @OneToMany(() => Reports,(c)=>c.semesterId)
+    reports: Reports[]
     
     @ManyToOne(() => Department, (dep) => dep.semesterId)
     @JoinColumn({name:'department_id'})

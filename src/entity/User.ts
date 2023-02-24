@@ -10,8 +10,11 @@ import {
   ManyToOne,
   OneToMany,
 } from "typeorm";
+import { Absent } from "./Absent";
 import { Class } from "./Classes";
 import { Department } from "./Department";
+import { Present } from "./Present";
+import { Reports } from "./Reports";
 import { Role } from "./Role";
 import { Semester } from "./Semester";
 import { SoftDelete } from "./SoftDelete";
@@ -60,6 +63,17 @@ export class User extends SoftDelete {
   @OneToMany(() => Class, (c) => c.studentId)
   classes: Class[];
 
+  @OneToMany(() => Present, (p) => p.studentId)
+  presnet: Present[];
+
+  @OneToMany(() => Absent, (a) => a.studentId)
+  absent: Absent[];
+
+
+  @OneToMany(() => Reports, (r) => r.studentId)
+  reports: Reports[];
+
   @OneToMany(() => Department, (dep) => dep.hod)
   hod: Department[];
+
 }

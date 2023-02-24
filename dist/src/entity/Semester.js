@@ -28,6 +28,7 @@ exports.Semester = void 0;
 var typeorm_1 = require("typeorm");
 var Classes_1 = require("./Classes");
 var Department_1 = require("./Department");
+var Reports_1 = require("./Reports");
 var SoftDelete_1 = require("./SoftDelete");
 var Subject_1 = require("./Subject");
 var Semester = /** @class */ (function (_super) {
@@ -51,6 +52,10 @@ var Semester = /** @class */ (function (_super) {
         (0, typeorm_1.OneToMany)(function () { return Classes_1.Class; }, function (c) { return c.semesterId; }),
         __metadata("design:type", Array)
     ], Semester.prototype, "classes", void 0);
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return Reports_1.Reports; }, function (c) { return c.semesterId; }),
+        __metadata("design:type", Array)
+    ], Semester.prototype, "reports", void 0);
     __decorate([
         (0, typeorm_1.ManyToOne)(function () { return Department_1.Department; }, function (dep) { return dep.semesterId; }),
         (0, typeorm_1.JoinColumn)({ name: 'department_id' }),

@@ -26,8 +26,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 var typeorm_1 = require("typeorm");
+var Absent_1 = require("./Absent");
 var Classes_1 = require("./Classes");
 var Department_1 = require("./Department");
+var Present_1 = require("./Present");
+var Reports_1 = require("./Reports");
 var Role_1 = require("./Role");
 var SoftDelete_1 = require("./SoftDelete");
 var User = /** @class */ (function (_super) {
@@ -84,6 +87,18 @@ var User = /** @class */ (function (_super) {
         (0, typeorm_1.OneToMany)(function () { return Classes_1.Class; }, function (c) { return c.studentId; }),
         __metadata("design:type", Array)
     ], User.prototype, "classes", void 0);
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return Present_1.Present; }, function (p) { return p.studentId; }),
+        __metadata("design:type", Array)
+    ], User.prototype, "presnet", void 0);
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return Absent_1.Absent; }, function (a) { return a.studentId; }),
+        __metadata("design:type", Array)
+    ], User.prototype, "absent", void 0);
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return Reports_1.Reports; }, function (r) { return r.studentId; }),
+        __metadata("design:type", Array)
+    ], User.prototype, "reports", void 0);
     __decorate([
         (0, typeorm_1.OneToMany)(function () { return Department_1.Department; }, function (dep) { return dep.hod; }),
         __metadata("design:type", Array)

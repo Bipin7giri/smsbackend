@@ -7,6 +7,8 @@ import classes from "../routers/class.router";
 import subjects from "../routers/subject.router";
 import assignment from "../routers/assignment.router";
 import chat from "../routers/chat.router";
+import attendance from "../routers/attendance.router";
+
 
 
 router.use("/auth", auth);
@@ -17,6 +19,7 @@ router.use("/", classes);
 router.use("/", subjects);
 router.use("/", assignment);
 router.use("/", chat);
+router.use("/",attendance)
 
 
 export default router;
