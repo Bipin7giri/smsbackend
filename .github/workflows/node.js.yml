@@ -44,7 +44,7 @@ jobs:
               . ~/.nvm/nvm.sh
                nvm instal 14
                npm install -g pm2
-               cd ~/CICD
+               cd ~/smsbackend
                git pull origin main
                npm install
                npm run build
