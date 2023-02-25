@@ -79,6 +79,10 @@ var User = /** @class */ (function (_super) {
         __metadata("design:type", String)
     ], User.prototype, "forgetPassword", void 0);
     __decorate([
+        (0, typeorm_1.Column)({ nullable: true, default: false }),
+        __metadata("design:type", Boolean)
+    ], User.prototype, "blocked", void 0);
+    __decorate([
         (0, typeorm_1.ManyToOne)(function () { return Role_1.Role; }, function (role) { return role.userId; }),
         (0, typeorm_1.JoinColumn)({ name: "role_id" }),
         __metadata("design:type", Role_1.Role)

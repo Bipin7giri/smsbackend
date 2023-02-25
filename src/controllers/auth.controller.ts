@@ -1,6 +1,7 @@
 import { comparePassword, generateHashPassword } from "../helper/hashpassword";
 import { generateToken, getCurrentUser } from "../helper/jwt";
 import {
+  BlockUser,
   ForgetPassword,
   RegisterSchema,
   ResetPassword,
@@ -112,6 +113,7 @@ export async function login(
         },
         where: {
           email: validate.email,
+          blocked: false,
         },
       });
       if (user) {
@@ -131,7 +133,7 @@ export async function login(
           });
           console.log(checkIfAlreadyExist);
           if (validate.deviceId) {
-            console.log(validate.deviceId)
+            console.log(validate.deviceId);
             if (!checkIfAlreadyExist) {
               const chatUser = await userModel.create({
                 username: user.email,
@@ -155,7 +157,7 @@ export async function login(
         }
       } else {
         res.json({
-          message: "No email found",
+          message: "No email found or Blocked",
           status: 404,
         });
       }
@@ -412,20 +414,53 @@ export async function countAllusers(): Promise<number> {
   });
 }
 
-
-export const updateUserRole =async (req:Request,res:Response): Promise<void> => {
-  try{
+export const updateUserRole = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
     const validate = await UpdateUserRole.validateAsync(req.body);
-     const  result =  await userRepo.update(validate.userId, {
-      roleId:validate.roleId
-     });
-     res.json({
-      status:202,
-      message:"Successfully updated role"
-     })
-    
-  } catch(err:any){
-    res.json({error:err?.message})
-
+    const result = await userRepo.update(validate.userId, {
+      roleId: validate.roleId,
+    });
+    res.json({
+      status: 202,
+      message: "Successfully updated role",
+    });
+  } catch (err: any) {
+    res.json({ error: err?.message });
   }
-}
+};
+
+export const blockUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const validate = await BlockUser.validateAsync(req.body);
+    const result = await userRepo.update(validate.userId, {
+      blocked: true,
+    });
+    res.json({
+      status: 202,
+      message: "Successfully blocked users",
+    });
+  } catch (err: any) {
+    res.json({ error: err?.message });
+  }
+};
+
+export const viewBlockUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const result = await userRepo.find({
+      where: {
+        blocked: true,
+      },
+    });
+    res.json({
+      result,
+    });
+  } catch (err: any) {
+    res.json({ error: err?.message });
+  }
+};

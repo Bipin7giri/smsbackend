@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ResetPassword = exports.ForgetPassword = exports.AddTeacherSchema = exports.UserUpdateSchema = exports.StudentRegisterSchema = exports.RegisterSchema = void 0;
+exports.BlockUser = exports.ResetPassword = exports.ForgetPassword = exports.AddTeacherSchema = exports.UserUpdateSchema = exports.StudentRegisterSchema = exports.RegisterSchema = void 0;
 // const Joi = require('joi');
 var Joi = require("joi");
 exports.RegisterSchema = Joi.object({
@@ -35,5 +35,8 @@ exports.ForgetPassword = Joi.object({
 exports.ResetPassword = Joi.object({
     otp: Joi.string().required(),
     password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).required(),
+});
+exports.BlockUser = Joi.object({
+    userId: Joi.number().required()
 });
 //# sourceMappingURL=registerSchema.js.map

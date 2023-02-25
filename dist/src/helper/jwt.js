@@ -117,7 +117,7 @@ function AdminAuthorization(req, res, next) {
                 }
                 else {
                     res.status(401).json({
-                        message: "unauthorized access you are not admin!! sorry baby",
+                        message: "unauthorized access you are not admin!!",
                     });
                     return [2 /*return*/];
                 }
@@ -145,7 +145,7 @@ function StudentAuthorization(req, res, next) {
                 }
                 else {
                     res.status(401).json({
-                        message: "unauthorized access you are not student!! sorry baby",
+                        message: "unauthorized access you are not student!!",
                     });
                     return [2 /*return*/];
                 }
@@ -176,7 +176,7 @@ function TeacherAuthorization(req, res, next) {
             }
             if (counter === user.roles.length) {
                 res.status(401).json({
-                    message: "unauthorized access you are not Teacher!! sorry baby",
+                    message: "unauthorized access you are not Teacher!!",
                 });
             }
             return [2 /*return*/];
@@ -205,7 +205,7 @@ function HODAuthorization(req, res, next) {
             }
             if (counter === user.roles.length) {
                 res.status(401).json({
-                    message: "unauthorized access you are not HOD!! sorry baby",
+                    message: "unauthorized access you are not HOD!!",
                 });
             }
             return [2 /*return*/];

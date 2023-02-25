@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUserRole = exports.countAllusers = exports.getAllUsers = exports.resetPassword = exports.forgetPassword = exports.updateUser = exports.getUser = exports.login = exports.StudentRegister = exports.register = void 0;
+exports.viewBlockUser = exports.blockUser = exports.updateUserRole = exports.countAllusers = exports.getAllUsers = exports.resetPassword = exports.forgetPassword = exports.updateUser = exports.getUser = exports.login = exports.StudentRegister = exports.register = void 0;
 var hashpassword_1 = require("../helper/hashpassword");
 var jwt_1 = require("../helper/jwt");
 var registerSchema_1 = require("../schema/registerSchema");
@@ -160,6 +160,7 @@ function login(req, res, next) {
                             },
                             where: {
                                 email: validate.email,
+                                blocked: false,
                             },
                         })];
                 case 3:
@@ -211,7 +212,7 @@ function login(req, res, next) {
                 case 11: return [3 /*break*/, 13];
                 case 12:
                     res.json({
-                        message: "No email found",
+                        message: "No email found or Blocked",
                         status: 404,
                     });
                     _a.label = 13;
@@ -566,13 +567,13 @@ var updateUserRole = function (req, res) { return __awaiter(void 0, void 0, void
             case 1:
                 validate = _a.sent();
                 return [4 /*yield*/, userRepo.update(validate.userId, {
-                        roleId: validate.roleId
+                        roleId: validate.roleId,
                     })];
             case 2:
                 result = _a.sent();
                 res.json({
                     status: 202,
-                    message: "Successfully updated role"
+                    message: "Successfully updated role",
                 });
                 return [3 /*break*/, 4];
             case 3:
@@ -584,4 +585,58 @@ var updateUserRole = function (req, res) { return __awaiter(void 0, void 0, void
     });
 }); };
 exports.updateUserRole = updateUserRole;
+var blockUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var validate, result, err_11;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 3, , 4]);
+                return [4 /*yield*/, registerSchema_1.BlockUser.validateAsync(req.body)];
+            case 1:
+                validate = _a.sent();
+                return [4 /*yield*/, userRepo.update(validate.userId, {
+                        blocked: true,
+                    })];
+            case 2:
+                result = _a.sent();
+                res.json({
+                    status: 202,
+                    message: "Successfully blocked users",
+                });
+                return [3 /*break*/, 4];
+            case 3:
+                err_11 = _a.sent();
+                res.json({ error: err_11 === null || err_11 === void 0 ? void 0 : err_11.message });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
+exports.blockUser = blockUser;
+var viewBlockUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var result, err_12;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, userRepo.find({
+                        where: {
+                            blocked: true,
+                        },
+                    })];
+            case 1:
+                result = _a.sent();
+                res.json({
+                    result: result,
+                });
+                return [3 /*break*/, 3];
+            case 2:
+                err_12 = _a.sent();
+                res.json({ error: err_12 === null || err_12 === void 0 ? void 0 : err_12.message });
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); };
+exports.viewBlockUser = viewBlockUser;
 //# sourceMappingURL=auth.controller.js.map

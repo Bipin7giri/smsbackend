@@ -7,6 +7,8 @@ import {
   resetPassword,
   getAllUsers,
   updateUserRole,
+  blockUser,
+  viewBlockUser,
 } from "../controllers/auth.controller";
 import * as express from "express";
 import { AdminAuthorization, tokenValidation } from "../helper/jwt";
@@ -140,5 +142,10 @@ router.patch("/users/me", tokenValidation, upload.single("avatar"), updateUser);
 router.get("/allusers", tokenValidation, AdminAuthorization, getAllUsers);
 
 router.patch("/users-roles", tokenValidation, AdminAuthorization, updateUserRole);
+
+
+router.patch("/blockuser", tokenValidation, AdminAuthorization, blockUser);
+
+router.get("/blockuser", tokenValidation, AdminAuthorization, viewBlockUser);
 
 export default router;

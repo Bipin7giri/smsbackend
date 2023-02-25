@@ -52,6 +52,9 @@ export class User extends SoftDelete {
   @Column({ name: "forget_password", nullable: true })
   forgetPassword?: string;
 
+  @Column({nullable:true,default:false})
+  blocked?: boolean
+
   // @OneToOne(({}) => Role)
   // @JoinColumn({name: 'role_id'})
   // roleId: Role
