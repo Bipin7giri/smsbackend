@@ -32,7 +32,7 @@ connectMongoDB();
 
 const swaggerDefinition = {
   info: {
-    title: "School Management System What the fuck",
+    title: "School Management System CICD madherchut",
     version: "1.0.0",
     description: "Endpoints to test the user registration routes",
   },
