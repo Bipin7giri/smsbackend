@@ -14,6 +14,7 @@ import { Role } from "../entity/Role";
 import { generateOTP } from "../helper/generateRandomOTP";
 import { transporter } from "../helper/nodeMailer";
 import { Like } from "typeorm";
+import { UpdateUserRole } from "../schema/roleSchema";
 
 const userModel = require("../MongoDB/Schema/UserSchema");
 let nodemailer = require("nodemailer");
@@ -21,6 +22,8 @@ const mongoose = require("mongoose");
 type CurrentUser = {
   id: number;
 };
+const userRepo = AppDataSource.getRepository(User);
+const roleRepo = AppDataSource.getRepository(Role);
 
 export async function register(
   req: Request,
@@ -241,7 +244,6 @@ export async function updateUser(req: any, res: Response): Promise<void> {
     }
     const currentUser: CurrentUser = getCurrentUser(authHeader || "");
     const repo = AppDataSource.getRepository(User);
-    console.log(req.file);
     if (req?.file) {
       const imageUrl = await cloudinary.uploader.upload(req?.file?.path);
       validate.avatar = imageUrl?.secure_url;
@@ -408,4 +410,22 @@ export async function countAllusers(): Promise<number> {
       deleted: false,
     },
   });
+}
+
+
+export const updateUserRole =async (req:Request,res:Response): Promise<void> => {
+  try{
+    const validate = await UpdateUserRole.validateAsync(req.body);
+     const  result =  await userRepo.update(validate.userId, {
+      roleId:validate.roleId
+     });
+     res.json({
+      status:202,
+      message:"Successfully updated role"
+     })
+    
+  } catch(err:any){
+    res.json({error:err?.message})
+
+  }
 }

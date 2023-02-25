@@ -123,5 +123,6 @@ router.get("/users/me", jwt_1.tokenValidation, auth_controller_1.getUser);
  */
 router.patch("/users/me", jwt_1.tokenValidation, upload.single("avatar"), auth_controller_1.updateUser);
 router.get("/allusers", jwt_1.tokenValidation, jwt_1.AdminAuthorization, auth_controller_1.getAllUsers);
+router.patch("/users-roles", jwt_1.tokenValidation, jwt_1.AdminAuthorization, auth_controller_1.updateUserRole);
 exports.default = router;
 //# sourceMappingURL=auth.router.js.map

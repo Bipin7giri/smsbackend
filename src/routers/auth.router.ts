@@ -6,6 +6,7 @@ import {
   forgetPassword,
   resetPassword,
   getAllUsers,
+  updateUserRole,
 } from "../controllers/auth.controller";
 import * as express from "express";
 import { AdminAuthorization, tokenValidation } from "../helper/jwt";
@@ -137,5 +138,7 @@ router.get("/users/me", tokenValidation, getUser);
 router.patch("/users/me", tokenValidation, upload.single("avatar"), updateUser);
 
 router.get("/allusers", tokenValidation, AdminAuthorization, getAllUsers);
+
+router.patch("/users-roles", tokenValidation, AdminAuthorization, updateUserRole);
 
 export default router;

@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.countAllusers = exports.getAllUsers = exports.resetPassword = exports.forgetPassword = exports.updateUser = exports.getUser = exports.login = exports.StudentRegister = exports.register = void 0;
+exports.updateUserRole = exports.countAllusers = exports.getAllUsers = exports.resetPassword = exports.forgetPassword = exports.updateUser = exports.getUser = exports.login = exports.StudentRegister = exports.register = void 0;
 var hashpassword_1 = require("../helper/hashpassword");
 var jwt_1 = require("../helper/jwt");
 var registerSchema_1 = require("../schema/registerSchema");
@@ -47,12 +47,15 @@ var Role_1 = require("../entity/Role");
 var generateRandomOTP_1 = require("../helper/generateRandomOTP");
 var nodeMailer_1 = require("../helper/nodeMailer");
 var typeorm_1 = require("typeorm");
+var roleSchema_1 = require("../schema/roleSchema");
 var userModel = require("../MongoDB/Schema/UserSchema");
 var nodemailer = require("nodemailer");
 var mongoose = require("mongoose");
+var userRepo = data_source_1.AppDataSource.getRepository(User_1.User);
+var roleRepo = data_source_1.AppDataSource.getRepository(Role_1.Role);
 function register(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
-        var validate, hashedPassword, repo, roles, user, userRepo, saveUser, err_1;
+        var validate, hashedPassword, repo, roles, user, userRepo_1, saveUser, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -75,8 +78,8 @@ function register(req, res, next) {
                     user.email = validate.email;
                     user.password = hashedPassword;
                     user.roleId = roles;
-                    userRepo = data_source_1.AppDataSource.getRepository(User_1.User);
-                    return [4 /*yield*/, userRepo.save(user)];
+                    userRepo_1 = data_source_1.AppDataSource.getRepository(User_1.User);
+                    return [4 /*yield*/, userRepo_1.save(user)];
                 case 4:
                     saveUser = _a.sent();
                     console.log(saveUser);
@@ -96,7 +99,7 @@ function register(req, res, next) {
 exports.register = register;
 function StudentRegister(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
-        var validate, hashedPassword, repo, roles, user, userRepo, saveUser, err_2;
+        var validate, hashedPassword, repo, roles, user, userRepo_2, saveUser, err_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -119,8 +122,8 @@ function StudentRegister(req, res, next) {
                     user.email = validate.email;
                     user.password = hashedPassword;
                     user.roleId = roles;
-                    userRepo = data_source_1.AppDataSource.getRepository(User_1.User);
-                    return [4 /*yield*/, userRepo.save(user)];
+                    userRepo_2 = data_source_1.AppDataSource.getRepository(User_1.User);
+                    return [4 /*yield*/, userRepo_2.save(user)];
                 case 4:
                     saveUser = _a.sent();
                     console.log(saveUser);
@@ -322,7 +325,6 @@ function updateUser(req, res) {
                     }
                     currentUser = (0, jwt_1.getCurrentUser)(authHeader || "");
                     repo = data_source_1.AppDataSource.getRepository(User_1.User);
-                    console.log(req.file);
                     if (!(req === null || req === void 0 ? void 0 : req.file)) return [3 /*break*/, 3];
                     return [4 /*yield*/, cloudinary.uploader.upload((_a = req === null || req === void 0 ? void 0 : req.file) === null || _a === void 0 ? void 0 : _a.path)];
                 case 2:
@@ -554,4 +556,32 @@ function countAllusers() {
     });
 }
 exports.countAllusers = countAllusers;
+var updateUserRole = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var validate, result, err_10;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 3, , 4]);
+                return [4 /*yield*/, roleSchema_1.UpdateUserRole.validateAsync(req.body)];
+            case 1:
+                validate = _a.sent();
+                return [4 /*yield*/, userRepo.update(validate.userId, {
+                        roleId: validate.roleId
+                    })];
+            case 2:
+                result = _a.sent();
+                res.json({
+                    status: 202,
+                    message: "Successfully updated role"
+                });
+                return [3 /*break*/, 4];
+            case 3:
+                err_10 = _a.sent();
+                res.json({ error: err_10 === null || err_10 === void 0 ? void 0 : err_10.message });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
+exports.updateUserRole = updateUserRole;
 //# sourceMappingURL=auth.controller.js.map

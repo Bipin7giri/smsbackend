@@ -77,7 +77,7 @@ export async function AdminAuthorization(
       return;
     } else {
       res.status(401).json({
-        message: "unauthorized access you are not admin!! sorry baby",
+        message: "unauthorized access you are not admin!!",
       });
       return;
     }
@@ -104,7 +104,7 @@ export async function StudentAuthorization(
       return;
     } else {
       res.status(401).json({
-        message: "unauthorized access you are not student!! sorry baby",
+        message: "unauthorized access you are not student!!",
       });
       return;
     }
@@ -135,7 +135,7 @@ export async function TeacherAuthorization(
   }
   if (counter === user.roles.length) {
     res.status(401).json({
-      message: "unauthorized access you are not Teacher!! sorry baby",
+      message: "unauthorized access you are not Teacher!!",
     });
   }
 }
@@ -164,7 +164,7 @@ export async function HODAuthorization(
   }
   if (counter === user.roles.length) {
     res.status(401).json({
-      message: "unauthorized access you are not HOD!! sorry baby",
+      message: "unauthorized access you are not HOD!!",
     });
   }
 }
