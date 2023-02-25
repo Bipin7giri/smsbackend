@@ -41,7 +41,7 @@ jobs:
           port:  ${{ secrets.PORT }}
           script: |
                npm install -g pm2
-               cd ~/smsbackend
+               cd ~/smsbackend-main
                git pull origin main
                npm install
                npm run build
