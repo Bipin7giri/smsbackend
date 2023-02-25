@@ -58,3 +58,31 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   //     }
   //  })
 };
+
+
+export const get = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const validate = await ChatSchema.validateAsync(req.body);
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = await getCurrentUser(authHeader || "");
+    console.log(currentUser);
+   
+    const users = await userModel.findMany({
+      username:{ $ne:currentUser.email },
+    });
+
+    res.send(users);
+  } catch (err: any) {
+    res.json({ message: err.message });
+  }
+
+  //  const sender = await userRepo.findOne({
+  //     where:{
+  //         id:
+  //     }
+  //  })
+};
