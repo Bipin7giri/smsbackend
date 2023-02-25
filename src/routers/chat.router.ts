@@ -1,4 +1,4 @@
-import { create} from "../controllers/chat.controller";
+import { create, get} from "../controllers/chat.controller";
 import * as express from "express";
 import {
   AdminAuthorization,
@@ -16,6 +16,8 @@ router.post(
 //   upload.single("assignment"),
   create
 );
+
+router.get("/chat/users",tokenValidation,get)
 
 // router.post(
 //     "/student/assignment",

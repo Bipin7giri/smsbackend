@@ -62,7 +62,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 
 export const get = async (req: Request, res: Response): Promise<void> => {
   try {
-    const validate = await ChatSchema.validateAsync(req.body);
+    // const validate = await ChatSchema.validateAsync(req.body);
     let authHeader = req.headers["authorization"];
     if (authHeader && authHeader.startsWith("Bearer ")) {
       // Remove "Bearer " from the authHeader
@@ -71,7 +71,7 @@ export const get = async (req: Request, res: Response): Promise<void> => {
     const currentUser: any = await getCurrentUser(authHeader || "");
     console.log(currentUser);
    
-    const users = await userModel.findMany({
+    const users = await userModel.find({
       username:{ $ne:currentUser.email },
     });
 
