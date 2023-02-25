@@ -29,7 +29,7 @@ app.use("/api", api_1.default);
 (0, connection_1.connectMongoDB)();
 var swaggerDefinition = {
     info: {
-        title: "School Management System",
+        title: "School Management System testing cicd",
         version: "1.0.0",
         description: "Endpoints to test the user registration routes",
     },
