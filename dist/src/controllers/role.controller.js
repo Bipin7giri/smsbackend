@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.create = void 0;
+exports.get = exports.create = void 0;
 var data_source_1 = require("../PGDB/data-source");
 var Role_1 = require("../entity/Role");
 var jwt_1 = require("../helper/jwt");
@@ -73,4 +73,27 @@ var create = function (req, res) { return __awaiter(void 0, void 0, void 0, func
     });
 }); };
 exports.create = create;
+var get = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var repo, allRole, err_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                repo = data_source_1.AppDataSource.getRepository(Role_1.Role);
+                return [4 /*yield*/, repo.find()];
+            case 1:
+                allRole = _a.sent();
+                if (allRole) {
+                    res.status(202).json({ allRole: allRole });
+                }
+                return [3 /*break*/, 3];
+            case 2:
+                err_2 = _a.sent();
+                res.status(422).json(err_2);
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); };
+exports.get = get;
 //# sourceMappingURL=role.controller.js.map

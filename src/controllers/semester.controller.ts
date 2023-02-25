@@ -54,6 +54,38 @@ export const get = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+export const getSemesterStudent = async (req: Request, res: Response): Promise<void> => {
+  try {
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = getCurrentUser(authHeader || "");
+    const repo = AppDataSource.getRepository(Semester);
+    const semester = await repo.find({
+      relations: [ "departmentId", "subjects", "subjects.teacherId"],
+      where: {
+        classes: {
+          studentId: {
+            id: currentUser.id,
+          },
+        },
+      },
+    });
+    // user?.password = null;
+    console.table(semester);
+    if (semester) {
+      res.json(semester);
+    } else {
+      res.status(404).send("No semester found");
+    }
+  } catch (err: any) {
+    res.status(404).send({ error: true, message: err.message });
+  }
+};
+
+
 export const addTeacher = async (
   req: Request,
   res: Response

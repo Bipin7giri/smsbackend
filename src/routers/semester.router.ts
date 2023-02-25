@@ -2,11 +2,13 @@ import {
   addBulkStudent,
   create,
   get,
+  getSemesterStudent,
 } from "../controllers/semester.controller";
 import * as express from "express";
 import {
   AdminAuthorization,
   HODAuthorization,
+  StudentAuthorization,
   TeacherAuthorization,
   tokenValidation,
 } from "../helper/jwt";
@@ -28,6 +30,7 @@ router.post(
   upload.single("students"),
   addBulkStudent
 );
+router.get("/student/semester", tokenValidation, StudentAuthorization,getSemesterStudent);
 
 router.get("/hod/semester", tokenValidation, HODAuthorization, get);
 

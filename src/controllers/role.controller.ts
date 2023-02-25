@@ -25,3 +25,16 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     res.status(422).json(err);
   }
 };
+
+
+export const get = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const repo = AppDataSource.getRepository(Role);
+    const allRole = await repo.find();
+    if (allRole) {
+      res.status(202).json({ allRole });
+    }
+  } catch (err: any) {
+    res.status(422).json(err);
+  }
+};
