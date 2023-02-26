@@ -43,3 +43,7 @@ export const ResetPassword = Joi.object({
 export const BlockUser = Joi.object({
 userId:Joi.number().required()
 });
+
+export const VerifyOTP = Joi.object({
+  otp:Joi.string().required()
+});

@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.viewBlockUser = exports.blockUser = exports.updateUserRole = exports.countAllusers = exports.getAllUsers = exports.resetPassword = exports.forgetPassword = exports.updateUser = exports.getUser = exports.login = exports.StudentRegister = exports.register = void 0;
+exports.viewBlockUser = exports.blockUser = exports.updateUserRole = exports.countAllusers = exports.getAllUsers = exports.verifyEmail = exports.resetPassword = exports.forgetPassword = exports.updateUser = exports.getUser = exports.login = exports.StudentRegister = exports.register = void 0;
 var hashpassword_1 = require("../helper/hashpassword");
 var jwt_1 = require("../helper/jwt");
 var registerSchema_1 = require("../schema/registerSchema");
@@ -55,11 +55,11 @@ var userRepo = data_source_1.AppDataSource.getRepository(User_1.User);
 var roleRepo = data_source_1.AppDataSource.getRepository(Role_1.Role);
 function register(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
-        var validate, hashedPassword, repo, roles, user, userRepo_1, saveUser, err_1;
+        var validate, hashedPassword, repo, roles, user, userRepo_1, saveUser, mailData, email, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 5, , 6]);
+                    _a.trys.push([0, 6, , 7]);
                     return [4 /*yield*/, registerSchema_1.RegisterSchema.validateAsync(req.body)];
                 case 1:
                     validate = _a.sent();
@@ -78,20 +78,36 @@ function register(req, res, next) {
                     user.email = validate.email;
                     user.password = hashedPassword;
                     user.roleId = roles;
+                    user.emailOtp = (0, generateRandomOTP_1.generateOTP)();
                     userRepo_1 = data_source_1.AppDataSource.getRepository(User_1.User);
                     return [4 /*yield*/, userRepo_1.save(user)];
                 case 4:
                     saveUser = _a.sent();
+                    mailData = {
+                        to: user.email,
+                        subject: '[SMS] Account Verification Request',
+                        html: "<div>\n            <p>Hello,</p>\n            <p style=\"color: green;\">We have successfully registered your account with email address: ".concat(user.email, "</p>\n            <p>To verify your account please use provided OTP below</p>\n            <p>Your OTP for account verification opt is: ").concat(saveUser.emailOtp, "</p>\n            <p>If you didn\u2019t request to reset your password, please ignore this email or reset your password to protect your account.</p>\n      </div>"),
+                        from: "giribipin04@gmail.com",
+                        text: "Verifiication"
+                    };
+                    return [4 /*yield*/, nodeMailer_1.transporter.sendMail(mailData, function (err, info) {
+                            if (err)
+                                console.log(err);
+                            else
+                                console.log("ok");
+                        })];
+                case 5:
+                    email = _a.sent();
                     console.log(saveUser);
                     if (saveUser) {
                         res.status(202).send({ message: "successfully registered" });
                     }
-                    return [3 /*break*/, 6];
-                case 5:
+                    return [3 /*break*/, 7];
+                case 6:
                     err_1 = _a.sent();
                     res.status(404).send({ error: true, message: err_1.message });
-                    return [3 /*break*/, 6];
-                case 6: return [2 /*return*/];
+                    return [3 /*break*/, 7];
+                case 7: return [2 /*return*/];
             }
         });
     });
@@ -99,7 +115,7 @@ function register(req, res, next) {
 exports.register = register;
 function StudentRegister(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
-        var validate, hashedPassword, repo, roles, user, userRepo_2, saveUser, err_2;
+        var validate, hashedPassword, repo, roles, randomOTP, user, userRepo_2, saveUser, err_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -118,10 +134,13 @@ function StudentRegister(req, res, next) {
                         })];
                 case 3:
                     roles = _a.sent();
+                    randomOTP = (0, generateRandomOTP_1.generateOTP)();
+                    console.log(randomOTP);
                     user = new User_1.User();
                     user.email = validate.email;
                     user.password = hashedPassword;
                     user.roleId = roles;
+                    user.emailOtp = randomOTP;
                     userRepo_2 = data_source_1.AppDataSource.getRepository(User_1.User);
                     return [4 /*yield*/, userRepo_2.save(user)];
                 case 4:
@@ -170,6 +189,12 @@ function login(req, res, next) {
                 case 4:
                     checkPassword = _a.sent();
                     if (!checkPassword) return [3 /*break*/, 10];
+                    if ((user === null || user === void 0 ? void 0 : user.isEmailVerified) === false) {
+                        res.json({
+                            "message": "Not verified Email please check our email for verification"
+                        });
+                        return [2 /*return*/];
+                    }
                     return [4 /*yield*/, (0, jwt_1.generateToken)(user)];
                 case 5:
                     accessToken = _a.sent();
@@ -482,8 +507,57 @@ function resetPassword(req, res) {
     });
 }
 exports.resetPassword = resetPassword;
+function verifyEmail(req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        var validate, repo, verifyOTP, err_9;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    console.log(req.body);
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 7, , 8]);
+                    return [4 /*yield*/, registerSchema_1.VerifyOTP.validateAsync(req.body)];
+                case 2:
+                    validate = _a.sent();
+                    repo = data_source_1.AppDataSource.getRepository(User_1.User);
+                    return [4 /*yield*/, repo.findOne({
+                            where: {
+                                emailOtp: validate.otp,
+                            },
+                        })];
+                case 3:
+                    verifyOTP = _a.sent();
+                    console.log(verifyOTP);
+                    if (!verifyOTP) return [3 /*break*/, 5];
+                    return [4 /*yield*/, repo
+                            .update({ emailOtp: validate.otp }, {
+                            isEmailVerified: true,
+                        })];
+                case 4:
+                    _a.sent();
+                    res.status(202).json({
+                        message: "Successfully verified",
+                    });
+                    return [3 /*break*/, 6];
+                case 5:
+                    res.status(401).json({
+                        message: "invalid opt",
+                    });
+                    _a.label = 6;
+                case 6: return [3 /*break*/, 8];
+                case 7:
+                    err_9 = _a.sent();
+                    res.status(404).send({ error: true, message: err_9.message });
+                    return [3 /*break*/, 8];
+                case 8: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.verifyEmail = verifyEmail;
 var getAllUsers = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var totalUser, skip, take, searchData, repo, searchQuery, users, users, err_9;
+    var totalUser, skip, take, searchData, repo, searchQuery, users, users, err_10;
     var _a, _b, _c;
     return __generator(this, function (_d) {
         switch (_d.label) {
@@ -531,8 +605,8 @@ var getAllUsers = function (req, res) { return __awaiter(void 0, void 0, void 0,
                 _d.label = 5;
             case 5: return [3 /*break*/, 7];
             case 6:
-                err_9 = _d.sent();
-                res.json(err_9);
+                err_10 = _d.sent();
+                res.json(err_10);
                 return [3 /*break*/, 7];
             case 7: return [2 /*return*/];
         }
@@ -558,7 +632,7 @@ function countAllusers() {
 }
 exports.countAllusers = countAllusers;
 var updateUserRole = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var validate, result, err_10;
+    var validate, result, err_11;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -577,8 +651,8 @@ var updateUserRole = function (req, res) { return __awaiter(void 0, void 0, void
                 });
                 return [3 /*break*/, 4];
             case 3:
-                err_10 = _a.sent();
-                res.json({ error: err_10 === null || err_10 === void 0 ? void 0 : err_10.message });
+                err_11 = _a.sent();
+                res.json({ error: err_11 === null || err_11 === void 0 ? void 0 : err_11.message });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
@@ -586,7 +660,7 @@ var updateUserRole = function (req, res) { return __awaiter(void 0, void 0, void
 }); };
 exports.updateUserRole = updateUserRole;
 var blockUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var validate, result, err_11;
+    var validate, result, err_12;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -605,8 +679,8 @@ var blockUser = function (req, res) { return __awaiter(void 0, void 0, void 0, f
                 });
                 return [3 /*break*/, 4];
             case 3:
-                err_11 = _a.sent();
-                res.json({ error: err_11 === null || err_11 === void 0 ? void 0 : err_11.message });
+                err_12 = _a.sent();
+                res.json({ error: err_12 === null || err_12 === void 0 ? void 0 : err_12.message });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
@@ -614,7 +688,7 @@ var blockUser = function (req, res) { return __awaiter(void 0, void 0, void 0, f
 }); };
 exports.blockUser = blockUser;
 var viewBlockUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var result, err_12;
+    var result, err_13;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -631,8 +705,8 @@ var viewBlockUser = function (req, res) { return __awaiter(void 0, void 0, void 
                 });
                 return [3 /*break*/, 3];
             case 2:
-                err_12 = _a.sent();
-                res.json({ error: err_12 === null || err_12 === void 0 ? void 0 : err_12.message });
+                err_13 = _a.sent();
+                res.json({ error: err_13 === null || err_13 === void 0 ? void 0 : err_13.message });
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }

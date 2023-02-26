@@ -9,6 +9,7 @@ import {
   updateUserRole,
   blockUser,
   viewBlockUser,
+  verifyEmail,
 } from "../controllers/auth.controller";
 import * as express from "express";
 import { AdminAuthorization, tokenValidation } from "../helper/jwt";
@@ -147,5 +148,7 @@ router.patch("/users-roles", tokenValidation, AdminAuthorization, updateUserRole
 router.patch("/blockuser", tokenValidation, AdminAuthorization, blockUser);
 
 router.get("/blockuser", tokenValidation, AdminAuthorization, viewBlockUser);
+router.post("/email/verification", verifyEmail);
+
 
 export default router;

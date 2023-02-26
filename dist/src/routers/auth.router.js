@@ -126,5 +126,6 @@ router.get("/allusers", jwt_1.tokenValidation, jwt_1.AdminAuthorization, auth_co
 router.patch("/users-roles", jwt_1.tokenValidation, jwt_1.AdminAuthorization, auth_controller_1.updateUserRole);
 router.patch("/blockuser", jwt_1.tokenValidation, jwt_1.AdminAuthorization, auth_controller_1.blockUser);
 router.get("/blockuser", jwt_1.tokenValidation, jwt_1.AdminAuthorization, auth_controller_1.viewBlockUser);
+router.post("/email/verification", auth_controller_1.verifyEmail);
 exports.default = router;
 //# sourceMappingURL=auth.router.js.map

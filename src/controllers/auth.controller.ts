@@ -6,6 +6,7 @@ import {
   RegisterSchema,
   ResetPassword,
   UserUpdateSchema,
+  VerifyOTP,
 } from "../schema/registerSchema";
 import { Express, Request, Response } from "express";
 const cloudinary = require("cloudinary");
@@ -16,6 +17,7 @@ import { generateOTP } from "../helper/generateRandomOTP";
 import { transporter } from "../helper/nodeMailer";
 import { Like } from "typeorm";
 import { UpdateUserRole } from "../schema/roleSchema";
+import { MAILDATA } from "../Interface/NodeMailerInterface";
 
 const userModel = require("../MongoDB/Schema/UserSchema");
 let nodemailer = require("nodemailer");
@@ -47,16 +49,34 @@ export async function register(
     user.email = validate.email;
     user.password = hashedPassword;
     user.roleId = roles;
+    user.emailOtp = generateOTP()
     const userRepo = AppDataSource.getRepository(User);
     const saveUser = await userRepo.save(user);
+
+
+    const mailData:MAILDATA ={
+      to: user.email,
+      subject: '[SMS] Account Verification Request',
+      html: `<div>
+            <p>Hello,</p>
+            <p style="color: green;">We have successfully registered your account with email address: ${user.email}</p>
+            <p>To verify your account please use provided OTP below</p>
+            <p>Your OTP for account verification opt is: ${saveUser.emailOtp}</p>
+            <p>If you didn’t request to reset your password, please ignore this email or reset your password to protect your account.</p>
+      </div>`,
+      from: "giribipin04@gmail.com",
+      text: "Verifiication"
+    }; 
+      const email =   await  transporter.sendMail(mailData, function (err: any, info: any) {
+      if (err) console.log(err);
+      else console.log("ok");
+    });
+
+
     console.log(saveUser);
     if (saveUser) {
       res.status(202).send({ message: "successfully registered" });
     }
-    // } catch (err:any) {
-    //   res.status(402).send({ error: true, message: err.message });
-    //   throw err
-    // }
   } catch (err: any) {
     res.status(404).send({ error: true, message: err.message });
   }
@@ -78,12 +98,19 @@ export async function StudentRegister(
         name: "student",
       },
     });
+    const randomOTP  = generateOTP();
+    console.log(randomOTP)
     const user = new User();
     user.email = validate.email;
     user.password = hashedPassword;
     user.roleId = roles;
+    user.emailOtp = randomOTP
     const userRepo = AppDataSource.getRepository(User);
     const saveUser = await userRepo.save(user);
+    
+    
+
+  
     console.log(saveUser);
     if (saveUser) {
       res.status(202).send({ message: "successfully registered", status: 202 });
@@ -116,12 +143,19 @@ export async function login(
           blocked: false,
         },
       });
+   
       if (user) {
         const checkPassword: Boolean = await comparePassword(
           user.password,
           validate.password
         );
         if (checkPassword) {
+          if(user?.isEmailVerified === false){
+            res.json({
+             "message":"Not verified Email please check our email for verification"
+            })
+            return;
+         }
           const accessToken: any = await generateToken(user);
 
           const result = await repo.update(user.id, {
@@ -360,6 +394,39 @@ export async function resetPassword(req: any, res: Response): Promise<void> {
   }
 }
 
+
+export async function verifyEmail(req: any, res: Response): Promise<void> {
+ console.log(req.body)
+  try {
+    const validate = await VerifyOTP.validateAsync(req.body);
+    const repo = AppDataSource.getRepository(User);
+    const verifyOTP = await repo.findOne({
+      where: {
+        emailOtp: validate.otp,
+      },
+    });
+    console.log(verifyOTP);
+    if (verifyOTP) {
+      await repo
+        .update(
+          { emailOtp: validate.otp },
+          {
+          isEmailVerified: true,
+          }
+        )
+      res.status(202).json({
+        message: "Successfully verified",
+      });
+    } else {
+      res.status(401).json({
+        message: "invalid opt",
+      });
+    }
+  } catch (err: any) {
+    res.status(404).send({ error: true, message: err.message });
+  }
+}
+
 export const getAllUsers = async (
   req: Request,
   res: Response
@@ -465,3 +532,4 @@ export const viewBlockUser = async (
     res.json({ error: err?.message });
   }
 };
+

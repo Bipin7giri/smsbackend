@@ -62,7 +62,7 @@ export const create = async (req: any, res: Response): Promise<void> => {
     res.status(202).json({ message:"notification send", status: 202 });
 
   } catch (err: any) {
-    res.status(422).json(err);
+    res.status(422).json(err.message);
   }
 };
 
@@ -73,7 +73,7 @@ export const get = async (req: any, res: Response): Promise<void> => {
         const notification: NotificationResult = await sendNotification(data);
         res.status(202).json({ data, status: 202 });
     } catch (err: any) {
-        res.status(422).json(err);
+        res.status(422).json(err.message);
     }
 };
 

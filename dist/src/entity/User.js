@@ -67,6 +67,10 @@ var User = /** @class */ (function (_super) {
         __metadata("design:type", String)
     ], User.prototype, "password", void 0);
     __decorate([
+        (0, typeorm_1.Column)({ name: "email_opt", nullable: true }),
+        __metadata("design:type", String)
+    ], User.prototype, "emailOtp", void 0);
+    __decorate([
         (0, typeorm_1.Column)({ nullable: true }),
         __metadata("design:type", String)
     ], User.prototype, "address", void 0);
@@ -82,6 +86,10 @@ var User = /** @class */ (function (_super) {
         (0, typeorm_1.Column)({ nullable: true, default: false }),
         __metadata("design:type", Boolean)
     ], User.prototype, "blocked", void 0);
+    __decorate([
+        (0, typeorm_1.Column)({ nullable: true, name: 'is_email_verified', default: false }),
+        __metadata("design:type", Boolean)
+    ], User.prototype, "isEmailVerified", void 0);
     __decorate([
         (0, typeorm_1.ManyToOne)(function () { return Role_1.Role; }, function (role) { return role.userId; }),
         (0, typeorm_1.JoinColumn)({ name: "role_id" }),

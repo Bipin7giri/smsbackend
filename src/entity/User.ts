@@ -42,6 +42,9 @@ export class User extends SoftDelete {
 
   @Column()
   password: string;
+  
+  @Column({name:"email_opt",nullable:true})
+   emailOtp:string
 
   @Column({ nullable: true })
   address?: string;
@@ -54,6 +57,9 @@ export class User extends SoftDelete {
 
   @Column({nullable:true,default:false})
   blocked?: boolean
+
+  @Column({nullable:true,name:'is_email_verified', default:false})
+  isEmailVerified?: boolean
 
   // @OneToOne(({}) => Role)
   // @JoinColumn({name: 'role_id'})
