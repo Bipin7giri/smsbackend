@@ -8,7 +8,7 @@ import subjects from "../routers/subject.router";
 import assignment from "../routers/assignment.router";
 import chat from "../routers/chat.router";
 import attendance from "../routers/attendance.router";
-
+import adminNotification from "../routers/notification.router"
 
 
 router.use("/auth", auth);
@@ -20,6 +20,6 @@ router.use("/", subjects);
 router.use("/", assignment);
 router.use("/", chat);
 router.use("/",attendance)
-
+router.use("/",adminNotification)
 
 export default router;

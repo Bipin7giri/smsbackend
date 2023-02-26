@@ -12,6 +12,7 @@ import { AssignmentSubmission } from "../entity/AssignmentSubmission";
 import { Present } from "../entity/Present";
 import { Absent } from "../entity/Absent";
 import { Reports } from "../entity/Reports";
+import {Notification} from "../entity/Notification";
 dotenv.config();
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -29,7 +30,8 @@ export const AppDataSource = new DataSource({
     AssignmentSubmission,
     Present,
     Absent,
-    Reports
+    Reports,
+      Notification
   ],
   migrations: [],
   subscribers: [],

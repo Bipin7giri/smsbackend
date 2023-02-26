@@ -162,6 +162,7 @@ export async function login(
         });
       }
     } catch (err: any) {
+      throw err
       // res.status(422).send({ error: true, message: err.message });;
     }
   } catch (err: any) {

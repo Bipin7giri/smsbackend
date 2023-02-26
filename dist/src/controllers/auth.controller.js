@@ -219,7 +219,7 @@ function login(req, res, next) {
                 case 13: return [3 /*break*/, 15];
                 case 14:
                     err_3 = _a.sent();
-                    return [3 /*break*/, 15];
+                    throw err_3;
                 case 15: return [3 /*break*/, 17];
                 case 16:
                     err_4 = _a.sent();

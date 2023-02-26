@@ -92,7 +92,6 @@ export const addTeacher = async (
     const validate = await AddTeacherSchema.validateAsync(req.body);
     const { department } = req.params;
     const departmentId: number = parseInt(department);
-
     const semesterRepo = AppDataSource.getRepository(Semester);
     const departments: any = await semesterRepo.findOne({
       where: {
@@ -169,6 +168,9 @@ export const getAllDepartment = async (
     const repo = AppDataSource.getRepository(Department);
     const department = await repo.find({
       relations: ["semesterId"],
+      where:{
+        deleted:false
+      }
     });
     if (department) {
       res.json(department);

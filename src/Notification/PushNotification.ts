@@ -18,7 +18,7 @@ export const  sendNotification = async (data:any):Promise<any>=> {
         console.table(JSON.stringify(response.data));
       })
       .catch(function (error: any) {
-        console.log(error);
+        console.log(error.message);
       });
  return  result;
 }

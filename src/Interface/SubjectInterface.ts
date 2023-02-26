@@ -1,9 +1,9 @@
 export type DATA = {
-  to: any;
+  to: any|  string[];
   sound: string;
   title: string;
-  body: string;
-  data: any;
+  body?: string;
+  data?: any;
 };
 export type STATUS = {
   status: string;
