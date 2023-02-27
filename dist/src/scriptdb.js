@@ -86,6 +86,7 @@ var connectDb = function () {
                     user.password =
                         "$2a$12$DzW7DBrHUTYFRie7ycF8ouIubkmsrKzNcZs2bZ6mtWpY4FDYoTwhm";
                     user.roleId = roles;
+                    user.isEmailVerified = true;
                     return [4 /*yield*/, data_source_1.AppDataSource.manager.save(user)];
                 case 6:
                     adminCreated = _a.sent();

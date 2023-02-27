@@ -25,7 +25,7 @@ export const connectDb = () => {
         accountant.roles = ["accountant"];
         teacher.name = "teacher";
         teacher.roles = ["teacher"];
-
+      
         let roles = await AppDataSource.manager.save(admin);
         await AppDataSource.manager.save(student);
         await AppDataSource.manager.save(teacher);
@@ -38,6 +38,7 @@ export const connectDb = () => {
         user.password =
           "$2a$12$DzW7DBrHUTYFRie7ycF8ouIubkmsrKzNcZs2bZ6mtWpY4FDYoTwhm";
         user.roleId = roles;
+        user.isEmailVerified = true
         let adminCreated = await AppDataSource.manager.save(user);
         console.log(adminCreated);
       }
