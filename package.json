@@ -31,7 +31,6 @@
       "swagger-jsdoc": "^6.2.8",
       "swagger-ui-express": "^4.6.0",
       "typeorm": "0.3.11",
-      "typeorm-pagination": "^2.0.3",
       "xlsx": "^0.18.5"
    },
    "scripts": {
