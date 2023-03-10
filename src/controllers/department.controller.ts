@@ -167,10 +167,10 @@ export const getAllDepartment = async (
     const currentUser: any = getCurrentUser(authHeader || "");
     const repo = AppDataSource.getRepository(Department);
     const department = await repo.find({
-      relations: ["semesterId","hod"],
-      where:{
-        deleted:false
-      }
+      relations: ["semesterId", "hod"],
+      where: {
+        deleted: false,
+      },
     });
     if (department) {
       res.json(department);

@@ -1,8 +1,6 @@
 let axios = require("axios");
 
-
-
-export const  sendNotification = async (data:any):Promise<any>=> {
+export const sendNotification = async (data: any): Promise<any> => {
   let config = {
     method: "post",
     maxBodyLength: Infinity,
@@ -12,14 +10,14 @@ export const  sendNotification = async (data:any):Promise<any>=> {
     },
     data: data,
   };
- const result = await axios(config)
-      .then(function (response: any) {
-          return response.data
-        console.table(JSON.stringify(response.data));
-      })
-      .catch(function (error: any) {
-        console.log(error.message);
-      });
- return  result;
-}
-
+  const result = await axios(config)
+    .then(function (response: any) {
+      console.log(response);
+      return response.data;
+      console.table(JSON.stringify(response.data));
+    })
+    .catch(function (error: any) {
+      console.log(error.message);
+    });
+  return result;
+};

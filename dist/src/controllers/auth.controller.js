@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.viewBlockUser = exports.blockUser = exports.updateUserRole = exports.countAllusers = exports.getAllUsers = exports.verifyEmail = exports.resetPassword = exports.forgetPassword = exports.updateUser = exports.getUser = exports.login = exports.StudentRegister = exports.register = void 0;
+exports.viewBlockUser = exports.unBlockUser = exports.blockUser = exports.updateUserRole = exports.countAllusers = exports.getAllUsers = exports.verifyEmail = exports.resetPassword = exports.forgetPassword = exports.updateUser = exports.getUser = exports.login = exports.StudentRegister = exports.register = void 0;
 var hashpassword_1 = require("../helper/hashpassword");
 var jwt_1 = require("../helper/jwt");
 var registerSchema_1 = require("../schema/registerSchema");
@@ -85,10 +85,10 @@ function register(req, res, next) {
                     saveUser = _a.sent();
                     mailData = {
                         to: user.email,
-                        subject: '[SMS] Account Verification Request',
+                        subject: "[SMS] Account Verification Request",
                         html: "<div>\n            <p>Hello,</p>\n            <p style=\"color: green;\">We have successfully registered your account with email address: ".concat(user.email, "</p>\n            <p>To verify your account please use provided OTP below</p>\n            <p>Your OTP for account verification opt is: ").concat(saveUser.emailOtp, "</p>\n            <p>If you didn\u2019t request to reset your password, please ignore this email or reset your password to protect your account.</p>\n      </div>"),
                         from: "giribipin04@gmail.com",
-                        text: "Verifiication"
+                        text: "Verifiication",
                     };
                     return [4 /*yield*/, nodeMailer_1.transporter.sendMail(mailData, function (err, info) {
                             if (err)
@@ -191,7 +191,7 @@ function login(req, res, next) {
                     if (!checkPassword) return [3 /*break*/, 10];
                     if ((user === null || user === void 0 ? void 0 : user.isEmailVerified) === false) {
                         res.json({
-                            "message": "Not verified Email please check our email for verification"
+                            message: "Not verified Email please check our email for verification",
                         });
                         return [2 /*return*/];
                     }
@@ -229,14 +229,14 @@ function login(req, res, next) {
                     });
                     return [3 /*break*/, 11];
                 case 10:
-                    res.json({
+                    res.status(401).json({
                         message: "Invalid password !!",
                         status: 404,
                     });
                     _a.label = 11;
                 case 11: return [3 /*break*/, 13];
                 case 12:
-                    res.json({
+                    res.status(401).json({
                         message: "No email found or Blocked",
                         status: 404,
                     });
@@ -296,6 +296,7 @@ function getUser(req, res) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
+                    console.log("hi");
                     authHeader = req.headers["authorization"];
                     if (authHeader && authHeader.startsWith("Bearer ")) {
                         // Remove "Bearer " from the authHeader
@@ -317,6 +318,7 @@ function getUser(req, res) {
                     user = _a.sent();
                     // user?.password = null;
                     if (user) {
+                        console.log(user);
                         res.json(user);
                     }
                     else {
@@ -530,8 +532,7 @@ function verifyEmail(req, res) {
                     verifyOTP = _a.sent();
                     console.log(verifyOTP);
                     if (!verifyOTP) return [3 /*break*/, 5];
-                    return [4 /*yield*/, repo
-                            .update({ emailOtp: validate.otp }, {
+                    return [4 /*yield*/, repo.update({ emailOtp: validate.otp }, {
                             isEmailVerified: true,
                         })];
                 case 4:
@@ -687,8 +688,36 @@ var blockUser = function (req, res) { return __awaiter(void 0, void 0, void 0, f
     });
 }); };
 exports.blockUser = blockUser;
+var unBlockUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var validate, result, err_13;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 3, , 4]);
+                return [4 /*yield*/, registerSchema_1.BlockUser.validateAsync(req.body)];
+            case 1:
+                validate = _a.sent();
+                return [4 /*yield*/, userRepo.update(validate.userId, {
+                        blocked: false,
+                    })];
+            case 2:
+                result = _a.sent();
+                res.json({
+                    status: 202,
+                    message: "Successfully blocked users",
+                });
+                return [3 /*break*/, 4];
+            case 3:
+                err_13 = _a.sent();
+                res.json({ error: err_13 === null || err_13 === void 0 ? void 0 : err_13.message });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
+exports.unBlockUser = unBlockUser;
 var viewBlockUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var result, err_13;
+    var result, err_14;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -705,8 +734,8 @@ var viewBlockUser = function (req, res) { return __awaiter(void 0, void 0, void 
                 });
                 return [3 /*break*/, 3];
             case 2:
-                err_13 = _a.sent();
-                res.json({ error: err_13 === null || err_13 === void 0 ? void 0 : err_13.message });
+                err_14 = _a.sent();
+                res.json({ error: err_14 === null || err_14 === void 0 ? void 0 : err_14.message });
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }

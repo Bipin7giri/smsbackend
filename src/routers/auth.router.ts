@@ -10,6 +10,7 @@ import {
   blockUser,
   viewBlockUser,
   verifyEmail,
+  unBlockUser,
 } from "../controllers/auth.controller";
 import * as express from "express";
 import { AdminAuthorization, tokenValidation } from "../helper/jwt";
@@ -142,13 +143,18 @@ router.patch("/users/me", tokenValidation, upload.single("avatar"), updateUser);
 
 router.get("/allusers", tokenValidation, AdminAuthorization, getAllUsers);
 
-router.patch("/users-roles", tokenValidation, AdminAuthorization, updateUserRole);
-
+router.patch(
+  "/users-roles",
+  tokenValidation,
+  AdminAuthorization,
+  updateUserRole
+);
 
 router.patch("/blockuser", tokenValidation, AdminAuthorization, blockUser);
+router.patch("/unblockuser", tokenValidation, AdminAuthorization, unBlockUser);
 
 router.get("/blockuser", tokenValidation, AdminAuthorization, viewBlockUser);
-router.post("/email/verification", verifyEmail);
 
+router.post("/email/verification", verifyEmail);
 
 export default router;

@@ -49,14 +49,13 @@ export async function register(
     user.email = validate.email;
     user.password = hashedPassword;
     user.roleId = roles;
-    user.emailOtp = generateOTP()
+    user.emailOtp = generateOTP();
     const userRepo = AppDataSource.getRepository(User);
     const saveUser = await userRepo.save(user);
 
-
-    const mailData:MAILDATA ={
+    const mailData: MAILDATA = {
       to: user.email,
-      subject: '[SMS] Account Verification Request',
+      subject: "[SMS] Account Verification Request",
       html: `<div>
             <p>Hello,</p>
             <p style="color: green;">We have successfully registered your account with email address: ${user.email}</p>
@@ -65,13 +64,15 @@ export async function register(
             <p>If you didn’t request to reset your password, please ignore this email or reset your password to protect your account.</p>
       </div>`,
       from: "giribipin04@gmail.com",
-      text: "Verifiication"
-    }; 
-      const email =   await  transporter.sendMail(mailData, function (err: any, info: any) {
-      if (err) console.log(err);
-      else console.log("ok");
-    });
-
+      text: "Verifiication",
+    };
+    const email = await transporter.sendMail(
+      mailData,
+      function (err: any, info: any) {
+        if (err) console.log(err);
+        else console.log("ok");
+      }
+    );
 
     console.log(saveUser);
     if (saveUser) {
@@ -98,19 +99,16 @@ export async function StudentRegister(
         name: "student",
       },
     });
-    const randomOTP  = generateOTP();
-    console.log(randomOTP)
+    const randomOTP = generateOTP();
+    console.log(randomOTP);
     const user = new User();
     user.email = validate.email;
     user.password = hashedPassword;
     user.roleId = roles;
-    user.emailOtp = randomOTP
+    user.emailOtp = randomOTP;
     const userRepo = AppDataSource.getRepository(User);
     const saveUser = await userRepo.save(user);
-    
-    
 
-  
     console.log(saveUser);
     if (saveUser) {
       res.status(202).send({ message: "successfully registered", status: 202 });
@@ -143,19 +141,20 @@ export async function login(
           blocked: false,
         },
       });
-   
+
       if (user) {
         const checkPassword: Boolean = await comparePassword(
           user.password,
           validate.password
         );
         if (checkPassword) {
-          if(user?.isEmailVerified === false){
+          if (user?.isEmailVerified === false) {
             res.json({
-             "message":"Not verified Email please check our email for verification"
-            })
+              message:
+                "Not verified Email please check our email for verification",
+            });
             return;
-         }
+          }
           const accessToken: any = await generateToken(user);
 
           const result = await repo.update(user.id, {
@@ -184,19 +183,19 @@ export async function login(
             status: 200,
           });
         } else {
-          res.json({
+          res.status(401).json({
             message: "Invalid password !!",
             status: 404,
           });
         }
       } else {
-        res.json({
+        res.status(401).json({
           message: "No email found or Blocked",
           status: 404,
         });
       }
     } catch (err: any) {
-      throw err
+      throw err;
       // res.status(422).send({ error: true, message: err.message });;
     }
   } catch (err: any) {
@@ -243,6 +242,7 @@ export async function login(
 
 export async function getUser(req: Request, res: Response): Promise<void> {
   try {
+    console.log("hi");
     let authHeader = req.headers["authorization"];
     if (authHeader && authHeader.startsWith("Bearer ")) {
       // Remove "Bearer " from the authHeader
@@ -262,6 +262,7 @@ export async function getUser(req: Request, res: Response): Promise<void> {
     });
     // user?.password = null;
     if (user) {
+      console.log(user);
       res.json(user);
     } else {
       res.status(404).send("No use found");
@@ -394,9 +395,8 @@ export async function resetPassword(req: any, res: Response): Promise<void> {
   }
 }
 
-
 export async function verifyEmail(req: any, res: Response): Promise<void> {
- console.log(req.body)
+  console.log(req.body);
   try {
     const validate = await VerifyOTP.validateAsync(req.body);
     const repo = AppDataSource.getRepository(User);
@@ -407,13 +407,12 @@ export async function verifyEmail(req: any, res: Response): Promise<void> {
     });
     console.log(verifyOTP);
     if (verifyOTP) {
-      await repo
-        .update(
-          { emailOtp: validate.otp },
-          {
+      await repo.update(
+        { emailOtp: validate.otp },
+        {
           isEmailVerified: true,
-          }
-        )
+        }
+      );
       res.status(202).json({
         message: "Successfully verified",
       });
@@ -514,6 +513,23 @@ export const blockUser = async (req: Request, res: Response): Promise<void> => {
     res.json({ error: err?.message });
   }
 };
+export const unBlockUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const validate = await BlockUser.validateAsync(req.body);
+    const result = await userRepo.update(validate.userId, {
+      blocked: false,
+    });
+    res.json({
+      status: 202,
+      message: "Successfully blocked users",
+    });
+  } catch (err: any) {
+    res.json({ error: err?.message });
+  }
+};
 
 export const viewBlockUser = async (
   req: Request,
@@ -532,4 +548,3 @@ export const viewBlockUser = async (
     res.json({ error: err?.message });
   }
 };
-

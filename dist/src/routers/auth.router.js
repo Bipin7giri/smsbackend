@@ -125,6 +125,7 @@ router.patch("/users/me", jwt_1.tokenValidation, upload.single("avatar"), auth_c
 router.get("/allusers", jwt_1.tokenValidation, jwt_1.AdminAuthorization, auth_controller_1.getAllUsers);
 router.patch("/users-roles", jwt_1.tokenValidation, jwt_1.AdminAuthorization, auth_controller_1.updateUserRole);
 router.patch("/blockuser", jwt_1.tokenValidation, jwt_1.AdminAuthorization, auth_controller_1.blockUser);
+router.patch("/unblockuser", jwt_1.tokenValidation, jwt_1.AdminAuthorization, auth_controller_1.unBlockUser);
 router.get("/blockuser", jwt_1.tokenValidation, jwt_1.AdminAuthorization, auth_controller_1.viewBlockUser);
 router.post("/email/verification", auth_controller_1.verifyEmail);
 exports.default = router;
