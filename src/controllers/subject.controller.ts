@@ -86,6 +86,36 @@ export const get = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+
+
+export const getByID = async (req: Request, res: Response): Promise<void> => {
+  try {
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = getCurrentUser(authHeader || "");
+    const repo = AppDataSource.getRepository(Subjects);
+    const  subjectId:any  = req.params.subjectId;
+    const subjects = await repo.findOne({
+      where:{
+        id:subjectId
+      },
+      relations: ["classId", "classId.studentId","teacherId"],
+    });
+    console.log(subjects);
+    // user?.password = null;
+    if (subjects) {
+      res.json(subjects);
+    } else {
+      res.status(404).send("No subjects found");
+    }
+  } catch (err: any) {
+    res.status(404).send({ error: true, message: err.message });
+  }
+};
+
 export const update = async (req: Request, res: Response): Promise<void> => {
   try {
     let authHeader = req.headers["authorization"];

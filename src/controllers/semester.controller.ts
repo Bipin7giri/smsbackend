@@ -9,15 +9,32 @@ import { getCurrentUser } from "../helper/jwt";
 import { AddTeacherSchema, RegisterSchema } from "../schema/registerSchema";
 import { SemesterSchema } from "../schema/semesterSchema";
 import * as xlsx from "xlsx";
+import {Department} from "../entity/Department";
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const validate = await SemesterSchema.validateAsync(req.body);
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = await getCurrentUser(authHeader || "");
+    console.log(currentUser.id);
     const repo = AppDataSource.getRepository(Semester);
-    await repo.insert({
+    const deaprtmentRepo = AppDataSource.getRepository(Department);
+
+    const departmentId:any = await  deaprtmentRepo.findOne({
+      where:{
+        hod:{
+          id:currentUser.id
+        }
+      }
+    })
+   const semester =  await repo.save({
       name: validate.name,
-      departmentId: validate.departmentId,
+      departmentId: departmentId.id,
     });
-    res.status(202).json({ message: "created semester" });
+    res.status(202).send(semester);
   } catch (err: any) {
     res.status(422).json(err);
   }
@@ -30,7 +47,9 @@ export const get = async (req: Request, res: Response): Promise<void> => {
       // Remove "Bearer " from the authHeader
       authHeader = authHeader.slice(7, authHeader.length);
     }
+
     const currentUser: any = getCurrentUser(authHeader || "");
+    console.log(currentUser)
     const repo = AppDataSource.getRepository(Semester);
     const semester = await repo.find({
       relations: ["subjects", "subjects.teacherId"],
@@ -43,7 +62,7 @@ export const get = async (req: Request, res: Response): Promise<void> => {
       },
     });
     // user?.password = null;
-    console.table(semester);
+    console.log(semester);
     if (semester) {
       res.json(semester);
     } else {

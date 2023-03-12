@@ -25,6 +25,9 @@ export class Department extends SoftDelete {
   @OneToMany(() => Semester, (sem) => sem.departmentId)
   semesterId: Semester[];
 
+  @OneToMany(() => User, (user) => user.departmentId)
+  userId: User[];
+
   @ManyToOne(() => User, (user) => user.hod)
   @JoinColumn({ name: "hod_id" })
   hod: User;

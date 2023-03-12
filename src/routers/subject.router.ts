@@ -1,7 +1,7 @@
 import {
   create,
   deleteById,
-  get,
+  get, getByID,
   pushNotification,
   update,
 } from "../controllers/subject.controller";
@@ -15,6 +15,8 @@ import {
 const router = express.Router();
 router.post("/hod/subject", tokenValidation, HODAuthorization, create);
 router.get("/hod/subject", tokenValidation, HODAuthorization, get);
+router.get("/hod/subject/:subjectId", tokenValidation, HODAuthorization, getByID);
+
 router.patch(
   "/hod/subject/:subjectId",
   tokenValidation,

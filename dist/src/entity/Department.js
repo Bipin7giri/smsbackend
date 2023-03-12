@@ -51,6 +51,10 @@ var Department = /** @class */ (function (_super) {
         __metadata("design:type", Array)
     ], Department.prototype, "semesterId", void 0);
     __decorate([
+        (0, typeorm_1.OneToMany)(function () { return User_1.User; }, function (user) { return user.departmentId; }),
+        __metadata("design:type", Array)
+    ], Department.prototype, "userId", void 0);
+    __decorate([
         (0, typeorm_1.ManyToOne)(function () { return User_1.User; }, function (user) { return user.hod; }),
         (0, typeorm_1.JoinColumn)({ name: "hod_id" }),
         __metadata("design:type", User_1.User)

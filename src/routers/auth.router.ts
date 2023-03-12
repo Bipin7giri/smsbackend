@@ -141,7 +141,7 @@ router.get("/users/me", tokenValidation, getUser);
 
 router.patch("/users/me", tokenValidation, upload.single("avatar"), updateUser);
 
-router.get("/allusers", tokenValidation, AdminAuthorization, getAllUsers);
+router.get("/allusers", tokenValidation, getAllUsers);
 
 router.patch(
   "/users-roles",

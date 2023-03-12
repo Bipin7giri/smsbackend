@@ -87,7 +87,7 @@ var User = /** @class */ (function (_super) {
         __metadata("design:type", Boolean)
     ], User.prototype, "blocked", void 0);
     __decorate([
-        (0, typeorm_1.Column)({ nullable: true, name: 'is_email_verified', default: false }),
+        (0, typeorm_1.Column)({ nullable: true, name: "is_email_verified", default: false }),
         __metadata("design:type", Boolean)
     ], User.prototype, "isEmailVerified", void 0);
     __decorate([
@@ -95,6 +95,11 @@ var User = /** @class */ (function (_super) {
         (0, typeorm_1.JoinColumn)({ name: "role_id" }),
         __metadata("design:type", Role_1.Role)
     ], User.prototype, "roleId", void 0);
+    __decorate([
+        (0, typeorm_1.ManyToOne)(function () { return Department_1.Department; }, function (department) { return department.userId; }),
+        (0, typeorm_1.JoinColumn)({ name: "department_id" }),
+        __metadata("design:type", Department_1.Department)
+    ], User.prototype, "departmentId", void 0);
     __decorate([
         (0, typeorm_1.OneToMany)(function () { return Classes_1.Class; }, function (c) { return c.studentId; }),
         __metadata("design:type", Array)

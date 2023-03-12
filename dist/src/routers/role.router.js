@@ -4,8 +4,8 @@ var role_controller_1 = require("../controllers/role.controller");
 var express = require("express");
 var jwt_1 = require("../helper/jwt");
 var router = express.Router();
-router.post("/role", jwt_1.tokenValidation, jwt_1.AdminAuthorization, role_controller_1.create);
-router.get("/role", jwt_1.tokenValidation, jwt_1.AdminAuthorization, role_controller_1.get);
+router.post("/role", jwt_1.tokenValidation, role_controller_1.create);
+router.get("/role", jwt_1.tokenValidation, role_controller_1.get);
 //   router.post('/login',login)
 // router.patch('/users/me', tokenValidation,upload.single("avatar"), update)
 //   router.get('/users/me',tokenValidation,getUser)

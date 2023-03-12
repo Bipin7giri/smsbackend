@@ -42,24 +42,24 @@ export class User extends SoftDelete {
 
   @Column()
   password: string;
-  
-  @Column({name:"email_opt",nullable:true})
-   emailOtp:string
+
+  @Column({ name: "email_opt", nullable: true })
+  emailOtp: string;
 
   @Column({ nullable: true })
   address?: string;
 
-  @Column({ nullable: true, name:"device_id" })
+  @Column({ nullable: true, name: "device_id" })
   deviceId?: string;
 
   @Column({ name: "forget_password", nullable: true })
   forgetPassword?: string;
 
-  @Column({nullable:true,default:false})
-  blocked?: boolean
+  @Column({ nullable: true, default: false })
+  blocked?: boolean;
 
-  @Column({nullable:true,name:'is_email_verified', default:false})
-  isEmailVerified?: boolean
+  @Column({ nullable: true, name: "is_email_verified", default: false })
+  isEmailVerified?: boolean;
 
   // @OneToOne(({}) => Role)
   // @JoinColumn({name: 'role_id'})
@@ -68,6 +68,10 @@ export class User extends SoftDelete {
   @ManyToOne(() => Role, (role) => role.userId)
   @JoinColumn({ name: "role_id" })
   roleId: Role;
+
+  @ManyToOne(() => Department, (department) => department.userId)
+  @JoinColumn({ name: "department_id" })
+  departmentId: Department;
 
   @OneToMany(() => Class, (c) => c.studentId)
   classes: Class[];
@@ -78,11 +82,9 @@ export class User extends SoftDelete {
   @OneToMany(() => Absent, (a) => a.studentId)
   absent: Absent[];
 
-
   @OneToMany(() => Reports, (r) => r.studentId)
   reports: Reports[];
 
   @OneToMany(() => Department, (dep) => dep.hod)
   hod: Department[];
-
 }

@@ -8,6 +8,9 @@ import { Semester } from "../entity/Semester";
 import { Role } from "../entity/Role";
 import { generateHashPassword } from "../helper/hashpassword";
 import { User } from "../entity/User";
+import * as xlsx from "xlsx";
+import { Like } from "typeorm";
+const departmentRepo = AppDataSource.getRepository(Department);
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -154,6 +157,60 @@ export const updateDepartment = async (
   }
 };
 
+export const getStudent = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = getCurrentUser(authHeader || "");
+    const searchData: any = req.query?.search || null;
+    const searchQuery: any = `%${searchData}%`;
+
+    if (
+      searchData === "null" ||
+      searchData === null ||
+      searchData === undefined ||
+      searchData === "undefined"
+    ) {
+      const students = await departmentRepo.findOne({
+        relations: ["userId"],
+        order: {
+          updatedAt: "DESC",
+        },
+        where: {
+          hod: {
+            id: currentUser.id,
+          },
+        },
+      });
+      console.log(students);
+      res.json(students);
+    } else {
+      const students = await departmentRepo.findOne({
+        relations: ["userId"],
+        order: {
+          updatedAt: "DESC",
+        },
+        where: {
+          hod: {
+            id: currentUser.id,
+          },
+          userId: {
+            email: Like(searchQuery),
+          },
+        },
+      });
+      console.log(students);
+      res.json(students);
+    }
+  } catch (err) {}
+};
+
 export const getAllDepartment = async (
   req: Request,
   res: Response
@@ -179,5 +236,44 @@ export const getAllDepartment = async (
     }
   } catch (err: any) {
     res.status(404).send({ error: true, message: err.message });
+  }
+};
+export const addBulkStudent = async (
+  req: any,
+  res: Response
+): Promise<void> => {
+  try {
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = await getCurrentUser(authHeader || "");
+    const departmentId = await departmentRepo.findOne({
+      where: {
+        hod: {
+          id: currentUser.id,
+        },
+      },
+    });
+    const workbook = xlsx.readFile(req.file.path);
+    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    const data: any = xlsx.utils.sheet_to_json(worksheet);
+
+    for (let index = 0; index < data.length; index++) {
+      data[index].password = await generateHashPassword(
+        data[index].password.toString()
+      );
+      data[index].departmentId = departmentId?.id;
+      data[index].isEmailVerified = true;
+    }
+    const output = await AppDataSource.createQueryBuilder()
+      .insert()
+      .into(User)
+      .values(data)
+      .execute();
+    res.json(output);
+  } catch (err: any) {
+    res.json(err.message);
   }
 };
