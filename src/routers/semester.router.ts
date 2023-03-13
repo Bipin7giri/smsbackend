@@ -2,7 +2,7 @@ import {
   addBulkStudent,
   create,
   get,
-  getSemesterStudent,
+  getSemesterStudent, removeSemester, updateSemester,
 } from "../controllers/semester.controller";
 import * as express from "express";
 import {
@@ -17,6 +17,8 @@ const router = express.Router();
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 router.post("/hod/semester", tokenValidation, HODAuthorization, create);
+router.patch("/hod/semester/:id", tokenValidation, HODAuthorization, updateSemester);
+router.delete("/hod/semester/:id", tokenValidation, HODAuthorization, removeSemester);
 router.post(
   "/hod/semester/addTeacher/:semester",
   tokenValidation,

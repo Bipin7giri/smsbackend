@@ -124,10 +124,12 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       authHeader = authHeader.slice(7, authHeader.length);
     }
     const currentUser: any = getCurrentUser(authHeader || "");
-    const { subjectId } = req.params;
+    const  subjectId:any  = req.params.subjectId;
     const validate = await SubjectPathSchema.validateAsync(req.body);
     const repo = AppDataSource.getRepository(Subjects);
     console.table(validate);
+    const test  = await  repo.find(subjectId)
+    console.log(test)
     const updateSubject = await repo.update(subjectId, validate);
     if (updateSubject) {
       res.json(updateSubject);
@@ -135,7 +137,8 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       res.status(404).send("No subjects found");
     }
   } catch (err: any) {
-    res.status(404).send({ error: true, message: err.message });
+    res.status(404).send({ error: true, message: err });
+    // throw  err
   }
 };
 

@@ -1,5 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, OneToOne, ManyToOne, OneToMany } from "typeorm"
 import { SoftDelete } from "./SoftDelete"
+import {Role} from "./Role";
+import {Department} from "./Department";
 
 @Entity()
 export class Notification extends SoftDelete {
@@ -12,5 +14,9 @@ export class Notification extends SoftDelete {
 
     @Column()
     body:string
+
+    @ManyToOne(() => Department, (department) => department.notificationID)
+    @JoinColumn({ name: "notification_id" })
+    departmentId: Department;
 
 }

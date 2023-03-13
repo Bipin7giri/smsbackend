@@ -10,6 +10,7 @@ import {
 import { Semester } from "./Semester";
 import { SoftDelete } from "./SoftDelete";
 import { User } from "./User";
+import {Notification} from "./Notification";
 
 @Entity()
 export class Department extends SoftDelete {
@@ -31,4 +32,8 @@ export class Department extends SoftDelete {
   @ManyToOne(() => User, (user) => user.hod)
   @JoinColumn({ name: "hod_id" })
   hod: User;
+
+
+  @OneToMany(() => Notification,(notification)=>notification.departmentId)
+  notificationID: Notification[]
 }

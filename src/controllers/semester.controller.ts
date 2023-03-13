@@ -7,9 +7,12 @@ import { User } from "../entity/User";
 import { generateHashPassword } from "../helper/hashpassword";
 import { getCurrentUser } from "../helper/jwt";
 import { AddTeacherSchema, RegisterSchema } from "../schema/registerSchema";
-import { SemesterSchema } from "../schema/semesterSchema";
+import {SemesterPatchSchema, SemesterSchema} from "../schema/semesterSchema";
 import * as xlsx from "xlsx";
 import {Department} from "../entity/Department";
+import {getUserById} from "../helper/getUserById";
+const semseterRepo = AppDataSource.getRepository(Semester);
+const userRepo = AppDataSource.getRepository(User);
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const validate = await SemesterSchema.validateAsync(req.body);
@@ -59,10 +62,11 @@ export const get = async (req: Request, res: Response): Promise<void> => {
             id: currentUser.id,
           },
         },
+        deleted:false
       },
     });
     // user?.password = null;
-    console.log(semester);
+    console.table(semester);
     if (semester) {
       res.json(semester);
     } else {
@@ -178,3 +182,49 @@ export const addBulkStudent = async (
     res.json(err.message);
   }
 };
+
+export const updateSemester = async (req:Request,res:Response): Promise<void> =>{
+  try{
+    const validate = await SemesterPatchSchema.validateAsync(req.body);
+    const id:any = req?.params?.id;
+    console.log(validate)
+    const updateSemester = await semseterRepo.update(id,{
+      name:validate.name
+    })
+    console.table(updateSemester)
+    res.json({message:"Updated Semester"})
+  }catch (err:any){
+   res.send(err.message)
+  }
+}
+
+export const removeSemester = async (req:Request,res:Response): Promise<void> =>{
+  try{
+    const id:any = req.params.id;
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = getCurrentUser(authHeader || "");
+    // res.send(currentUser)
+const userDetails =  await userRepo.findOne({
+  where:{
+    id:currentUser.id
+  }
+})
+  const result =   await semseterRepo.update(id,{
+      deleted:true,
+      deletedAt:new Date(),
+      deletedBy:userDetails?.email
+    })
+    console.log(result)
+    res.json({
+      result,
+      message:"Successfull Removed"
+    })
+  }
+  catch (err:any){
+throw err
+  }
+}

@@ -29,6 +29,7 @@ var typeorm_1 = require("typeorm");
 var Semester_1 = require("./Semester");
 var SoftDelete_1 = require("./SoftDelete");
 var User_1 = require("./User");
+var Notification_1 = require("./Notification");
 var Department = /** @class */ (function (_super) {
     __extends(Department, _super);
     function Department() {
@@ -59,6 +60,10 @@ var Department = /** @class */ (function (_super) {
         (0, typeorm_1.JoinColumn)({ name: "hod_id" }),
         __metadata("design:type", User_1.User)
     ], Department.prototype, "hod", void 0);
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return Notification_1.Notification; }, function (notification) { return notification.departmentId; }),
+        __metadata("design:type", Array)
+    ], Department.prototype, "notificationID", void 0);
     Department = __decorate([
         (0, typeorm_1.Entity)()
     ], Department);

@@ -10,8 +10,15 @@ import { generateHashPassword } from "../helper/hashpassword";
 import { User } from "../entity/User";
 import * as xlsx from "xlsx";
 import { Like } from "typeorm";
+import { sendNotification } from "../Notification/PushNotification";
+import {NotificationSchemaAdmin} from "../schema/notificationSchema";
+import {MAILDATA} from "../Interface/NodeMailerInterface";
+import {transporter} from "../helper/nodeMailer";
+import {DATA, NotificationResult} from "../Interface/SubjectInterface";
+import {Notification} from "../entity/Notification";
 const departmentRepo = AppDataSource.getRepository(Department);
-
+const userRepo = AppDataSource.getRepository(User)
+const notificationRepo = AppDataSource.getRepository(Notification)
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const validate = await DepartmentSchema.validateAsync(req.body);
@@ -277,3 +284,97 @@ export const addBulkStudent = async (
     res.json(err.message);
   }
 };
+
+export  const createNotification = async (req:Request,res:Response):Promise<void> =>{
+  try {
+    const validate = await NotificationSchemaAdmin.validateAsync(req.body);
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = await getCurrentUser(authHeader || "");
+    console.log(currentUser.id);
+const findDepartmentId:any = await  departmentRepo.findOne({
+  where:{
+    userId:{
+      id:currentUser.id
+    }
+  }
+})
+    console.log(findDepartmentId)
+    const allUsers: User[] = await userRepo.find({
+      where: {
+        deleted: false,
+        blocked: false,
+        departmentId:findDepartmentId?.id
+      },
+    });
+
+    const userEmail: any = allUsers.map((item: any) => {
+      return item.email;
+    });
+    const userNotification = allUsers
+        .filter((item: any) => item.deviceId !== null)
+        .map((item: any) => item.deviceId);
+
+    console.log(userNotification);
+    console.log(userEmail)
+    const mailData: MAILDATA = {
+      from: "giribipin04@gmail.com", // sender address
+      to: userEmail, // list of receivers
+      subject: validate.title,
+      text: "Alert!!!",
+      html: `<br>${validate.body} </br>`,
+    };
+    const email = await transporter.sendMail(
+        mailData,
+        function (err: any, info: any) {
+          if (err) console.log(err);
+          else console.log("ok");
+        }
+    );
+
+    const deviceID: any = userNotification;
+    let data: DATA = {
+      to: deviceID,
+      sound: "default",
+      title: validate.title,
+      body: validate.body,
+    };
+    const datas = await notificationRepo.save(validate);
+    console.log(datas);
+    const notification: any = await sendNotification(data);
+    console.log(notification);
+    res
+        .status(202)
+        .json({ data: notification, message: "notification send", status: 202 });
+  } catch (err: any) {
+    res.status(422).json(err.message);
+  }
+}
+export  const getNotification = async (req:Request,res:Response): Promise<void> =>{
+  try{
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = await getCurrentUser(authHeader || "");
+    const getDepartmentId = await  departmentRepo.findOne({
+      where:{
+        userId:{
+          id:currentUser.id
+        }
+      }
+    })
+    const getNotifications = await notificationRepo.find({
+      where:{
+        id:getDepartmentId?.id
+      }
+    })
+    res.json(getNotifications)
+  }catch (err:any){
+res.json(err.message)
+  }
+}

@@ -9,5 +9,4 @@ export const SubjectAndClassShcema = Joi.object({
 export const SubjectPathSchema = Joi.object({
   subject_name: Joi.string(),
   teacherId: Joi.number(),
-  semesterId: Joi.number(),
 });

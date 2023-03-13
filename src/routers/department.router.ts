@@ -1,9 +1,9 @@
 import {
   addBulkStudent,
   countDepartment,
-  create,
+  create, createNotification,
   get,
-  getAllDepartment,
+  getAllDepartment, getNotification,
   getStudent,
 } from "../controllers/department.controller";
 import * as express from "express";
@@ -32,15 +32,13 @@ router.get(
   countDepartment
 );
 router.get("/department", AdminAuthorization, getAllDepartment);
+router.post("/department/notification", HODAuthorization, createNotification);
+router.get("/department/notification", HODAuthorization, getNotification);
+
 router.post(
   "/hod/addBulkStudent",
   HODAuthorization,
   upload.single("students"),
   addBulkStudent
 );
-// router.patch('/users/me', tokenValidation,upload.single("avatar"), update)
-//   router.get('/users/me',tokenValidation,getUser)
-// router.get('/users/all',tokenValidation,Authorization, getAllUsers)
-// router.put("/edithod/:user_name",editHOD)
-// module.exports = router
 export default router;
