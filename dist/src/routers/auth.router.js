@@ -32,7 +32,7 @@ router.post("/register", auth_controller_1.register);
  *       500:
  *         description: Internal Server Error
  */
-router.post("/login", auth_controller_1.login);
+router.post("/admin/login", auth_controller_1.adminlogin);
 /**
  * @swagger
  * /auth/login:
@@ -121,6 +121,9 @@ router.get("/users/me", jwt_1.tokenValidation, auth_controller_1.getUser);
  *       500:
  *         description: Some server error
  */
+router.post("/hod/login", auth_controller_1.hodLogin);
+router.post("/student/login", auth_controller_1.studentLogin);
+router.post("/teacher/login", auth_controller_1.teacherLogin);
 router.patch("/users/me", jwt_1.tokenValidation, upload.single("avatar"), auth_controller_1.updateUser);
 router.get("/allusers", jwt_1.tokenValidation, auth_controller_1.getAllUsers);
 router.patch("/users-roles", jwt_1.tokenValidation, jwt_1.AdminAuthorization, auth_controller_1.updateUserRole);

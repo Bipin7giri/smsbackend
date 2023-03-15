@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.viewBlockUser = exports.unBlockUser = exports.blockUser = exports.updateUserRole = exports.countAllusers = exports.getAllUsers = exports.verifyEmail = exports.resetPassword = exports.forgetPassword = exports.updateUser = exports.getUser = exports.login = exports.StudentRegister = exports.register = void 0;
+exports.viewBlockUser = exports.unBlockUser = exports.blockUser = exports.updateUserRole = exports.countAllusers = exports.getAllUsers = exports.verifyEmail = exports.resetPassword = exports.forgetPassword = exports.updateUser = exports.getUser = exports.studentLogin = exports.teacherLogin = exports.hodLogin = exports.adminlogin = exports.StudentRegister = exports.register = void 0;
 var hashpassword_1 = require("../helper/hashpassword");
 var jwt_1 = require("../helper/jwt");
 var registerSchema_1 = require("../schema/registerSchema");
@@ -48,6 +48,7 @@ var generateRandomOTP_1 = require("../helper/generateRandomOTP");
 var nodeMailer_1 = require("../helper/nodeMailer");
 var typeorm_1 = require("typeorm");
 var roleSchema_1 = require("../schema/roleSchema");
+var RoleEnum_1 = require("../ENUMS/RoleEnum");
 var userModel = require("../MongoDB/Schema/UserSchema");
 var nodemailer = require("nodemailer");
 var mongoose = require("mongoose");
@@ -55,7 +56,7 @@ var userRepo = data_source_1.AppDataSource.getRepository(User_1.User);
 var roleRepo = data_source_1.AppDataSource.getRepository(Role_1.Role);
 function register(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
-        var validate, hashedPassword, repo, roles, user, userRepo_1, saveUser, mailData, email, err_1;
+        var validate, hashedPassword, repo, roles_1, user, userRepo_1, saveUser, mailData, email, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -73,11 +74,11 @@ function register(req, res, next) {
                             },
                         })];
                 case 3:
-                    roles = _a.sent();
+                    roles_1 = _a.sent();
                     user = new User_1.User();
                     user.email = validate.email;
                     user.password = hashedPassword;
-                    user.roleId = roles;
+                    user.roleId = roles_1;
                     user.emailOtp = (0, generateRandomOTP_1.generateOTP)();
                     userRepo_1 = data_source_1.AppDataSource.getRepository(User_1.User);
                     return [4 /*yield*/, userRepo_1.save(user)];
@@ -115,7 +116,7 @@ function register(req, res, next) {
 exports.register = register;
 function StudentRegister(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
-        var validate, hashedPassword, repo, roles, randomOTP, user, userRepo_2, saveUser, err_2;
+        var validate, hashedPassword, repo, roles_2, randomOTP, user, userRepo_2, saveUser, err_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -133,13 +134,13 @@ function StudentRegister(req, res, next) {
                             },
                         })];
                 case 3:
-                    roles = _a.sent();
+                    roles_2 = _a.sent();
                     randomOTP = (0, generateRandomOTP_1.generateOTP)();
                     console.log(randomOTP);
                     user = new User_1.User();
                     user.email = validate.email;
                     user.password = hashedPassword;
-                    user.roleId = roles;
+                    user.roleId = roles_2;
                     user.emailOtp = randomOTP;
                     userRepo_2 = data_source_1.AppDataSource.getRepository(User_1.User);
                     return [4 /*yield*/, userRepo_2.save(user)];
@@ -159,7 +160,7 @@ function StudentRegister(req, res, next) {
     });
 }
 exports.StudentRegister = StudentRegister;
-function login(req, res, next) {
+function adminlogin(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
         var validate, repo, user, checkPassword, accessToken, result, checkIfAlreadyExist, chatUser, err_3, err_4;
         return __generator(this, function (_a) {
@@ -180,6 +181,9 @@ function login(req, res, next) {
                             where: {
                                 email: validate.email,
                                 blocked: false,
+                                roleId: {
+                                    name: RoleEnum_1.roles.ADMIN
+                                }
                             },
                         })];
                 case 3:
@@ -255,7 +259,307 @@ function login(req, res, next) {
         });
     });
 }
-exports.login = login;
+exports.adminlogin = adminlogin;
+function hodLogin(req, res, next) {
+    return __awaiter(this, void 0, void 0, function () {
+        var validate, repo, user, checkPassword, accessToken, result, checkIfAlreadyExist, chatUser, err_5, err_6;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 16, , 17]);
+                    return [4 /*yield*/, registerSchema_1.RegisterSchema.validateAsync(req.body)];
+                case 1:
+                    validate = _a.sent();
+                    _a.label = 2;
+                case 2:
+                    _a.trys.push([2, 14, , 15]);
+                    repo = data_source_1.AppDataSource.getRepository(User_1.User);
+                    return [4 /*yield*/, repo.findOne({
+                            relations: {
+                                roleId: true,
+                            },
+                            where: {
+                                email: validate.email,
+                                blocked: false,
+                                roleId: {
+                                    name: RoleEnum_1.roles.HOD
+                                }
+                            },
+                        })];
+                case 3:
+                    user = _a.sent();
+                    if (!user) return [3 /*break*/, 12];
+                    return [4 /*yield*/, (0, hashpassword_1.comparePassword)(user.password, validate.password)];
+                case 4:
+                    checkPassword = _a.sent();
+                    if (!checkPassword) return [3 /*break*/, 10];
+                    if ((user === null || user === void 0 ? void 0 : user.isEmailVerified) === false) {
+                        res.json({
+                            message: "Not verified Email please check our email for verification",
+                        });
+                        return [2 /*return*/];
+                    }
+                    return [4 /*yield*/, (0, jwt_1.generateToken)(user)];
+                case 5:
+                    accessToken = _a.sent();
+                    return [4 /*yield*/, repo.update(user.id, {
+                            deviceId: validate.deviceId,
+                        })];
+                case 6:
+                    result = _a.sent();
+                    return [4 /*yield*/, userModel.findOne({
+                            username: user.email,
+                        })];
+                case 7:
+                    checkIfAlreadyExist = _a.sent();
+                    console.log(checkIfAlreadyExist);
+                    if (!validate.deviceId) return [3 /*break*/, 9];
+                    console.log(validate.deviceId);
+                    if (!!checkIfAlreadyExist) return [3 /*break*/, 9];
+                    return [4 /*yield*/, userModel.create({
+                            username: user.email,
+                            displayName: user.firstName,
+                            deviceId: validate.deviceId,
+                        })];
+                case 8:
+                    chatUser = _a.sent();
+                    console.log(chatUser);
+                    _a.label = 9;
+                case 9:
+                    res.json({
+                        access_token: accessToken,
+                        message: "Login successful !!",
+                        status: 200,
+                    });
+                    return [3 /*break*/, 11];
+                case 10:
+                    res.status(401).json({
+                        message: "Invalid password !!",
+                        status: 404,
+                    });
+                    _a.label = 11;
+                case 11: return [3 /*break*/, 13];
+                case 12:
+                    res.status(401).json({
+                        message: "No email found or Blocked",
+                        status: 404,
+                    });
+                    _a.label = 13;
+                case 13: return [3 /*break*/, 15];
+                case 14:
+                    err_5 = _a.sent();
+                    throw err_5;
+                case 15: return [3 /*break*/, 17];
+                case 16:
+                    err_6 = _a.sent();
+                    res.status(422).send({ error: true, message: err_6.message, status: 422 });
+                    return [3 /*break*/, 17];
+                case 17: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.hodLogin = hodLogin;
+function teacherLogin(req, res, next) {
+    return __awaiter(this, void 0, void 0, function () {
+        var validate, repo, user, checkPassword, accessToken, result, checkIfAlreadyExist, chatUser, err_7, err_8;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 16, , 17]);
+                    return [4 /*yield*/, registerSchema_1.RegisterSchema.validateAsync(req.body)];
+                case 1:
+                    validate = _a.sent();
+                    _a.label = 2;
+                case 2:
+                    _a.trys.push([2, 14, , 15]);
+                    repo = data_source_1.AppDataSource.getRepository(User_1.User);
+                    return [4 /*yield*/, repo.findOne({
+                            relations: {
+                                roleId: true,
+                            },
+                            where: {
+                                email: validate.email,
+                                blocked: false,
+                                roleId: {
+                                    name: RoleEnum_1.roles.TEACHER
+                                }
+                            },
+                        })];
+                case 3:
+                    user = _a.sent();
+                    if (!user) return [3 /*break*/, 12];
+                    return [4 /*yield*/, (0, hashpassword_1.comparePassword)(user.password, validate.password)];
+                case 4:
+                    checkPassword = _a.sent();
+                    if (!checkPassword) return [3 /*break*/, 10];
+                    if ((user === null || user === void 0 ? void 0 : user.isEmailVerified) === false) {
+                        res.json({
+                            message: "Not verified Email please check our email for verification",
+                        });
+                        return [2 /*return*/];
+                    }
+                    return [4 /*yield*/, (0, jwt_1.generateToken)(user)];
+                case 5:
+                    accessToken = _a.sent();
+                    return [4 /*yield*/, repo.update(user.id, {
+                            deviceId: validate.deviceId,
+                        })];
+                case 6:
+                    result = _a.sent();
+                    return [4 /*yield*/, userModel.findOne({
+                            username: user.email,
+                        })];
+                case 7:
+                    checkIfAlreadyExist = _a.sent();
+                    console.log(checkIfAlreadyExist);
+                    if (!validate.deviceId) return [3 /*break*/, 9];
+                    console.log(validate.deviceId);
+                    if (!!checkIfAlreadyExist) return [3 /*break*/, 9];
+                    return [4 /*yield*/, userModel.create({
+                            username: user.email,
+                            displayName: user.firstName,
+                            deviceId: validate.deviceId,
+                        })];
+                case 8:
+                    chatUser = _a.sent();
+                    console.log(chatUser);
+                    _a.label = 9;
+                case 9:
+                    res.json({
+                        access_token: accessToken,
+                        message: "Login successful !!",
+                        status: 200,
+                    });
+                    return [3 /*break*/, 11];
+                case 10:
+                    res.status(401).json({
+                        message: "Invalid password !!",
+                        status: 404,
+                    });
+                    _a.label = 11;
+                case 11: return [3 /*break*/, 13];
+                case 12:
+                    res.status(401).json({
+                        message: "No email found or Blocked",
+                        status: 404,
+                    });
+                    _a.label = 13;
+                case 13: return [3 /*break*/, 15];
+                case 14:
+                    err_7 = _a.sent();
+                    throw err_7;
+                case 15: return [3 /*break*/, 17];
+                case 16:
+                    err_8 = _a.sent();
+                    res.status(422).send({ error: true, message: err_8.message, status: 422 });
+                    return [3 /*break*/, 17];
+                case 17: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.teacherLogin = teacherLogin;
+function studentLogin(req, res, next) {
+    return __awaiter(this, void 0, void 0, function () {
+        var validate, repo, user, checkPassword, accessToken, result, checkIfAlreadyExist, chatUser, err_9, err_10;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 16, , 17]);
+                    return [4 /*yield*/, registerSchema_1.RegisterSchema.validateAsync(req.body)];
+                case 1:
+                    validate = _a.sent();
+                    _a.label = 2;
+                case 2:
+                    _a.trys.push([2, 14, , 15]);
+                    repo = data_source_1.AppDataSource.getRepository(User_1.User);
+                    return [4 /*yield*/, repo.findOne({
+                            relations: {
+                                roleId: true,
+                            },
+                            where: {
+                                email: validate.email,
+                                blocked: false,
+                                roleId: {
+                                    name: RoleEnum_1.roles.STUDENT
+                                }
+                            },
+                        })];
+                case 3:
+                    user = _a.sent();
+                    if (!user) return [3 /*break*/, 12];
+                    return [4 /*yield*/, (0, hashpassword_1.comparePassword)(user.password, validate.password)];
+                case 4:
+                    checkPassword = _a.sent();
+                    if (!checkPassword) return [3 /*break*/, 10];
+                    if ((user === null || user === void 0 ? void 0 : user.isEmailVerified) === false) {
+                        res.json({
+                            message: "Not verified Email please check our email for verification",
+                        });
+                        return [2 /*return*/];
+                    }
+                    return [4 /*yield*/, (0, jwt_1.generateToken)(user)];
+                case 5:
+                    accessToken = _a.sent();
+                    return [4 /*yield*/, repo.update(user.id, {
+                            deviceId: validate.deviceId,
+                        })];
+                case 6:
+                    result = _a.sent();
+                    return [4 /*yield*/, userModel.findOne({
+                            username: user.email,
+                        })];
+                case 7:
+                    checkIfAlreadyExist = _a.sent();
+                    console.log(checkIfAlreadyExist);
+                    if (!validate.deviceId) return [3 /*break*/, 9];
+                    console.log(validate.deviceId);
+                    if (!!checkIfAlreadyExist) return [3 /*break*/, 9];
+                    return [4 /*yield*/, userModel.create({
+                            username: user.email,
+                            displayName: user.firstName,
+                            deviceId: validate.deviceId,
+                        })];
+                case 8:
+                    chatUser = _a.sent();
+                    console.log(chatUser);
+                    _a.label = 9;
+                case 9:
+                    res.json({
+                        access_token: accessToken,
+                        message: "Login successful !!",
+                        status: 200,
+                    });
+                    return [3 /*break*/, 11];
+                case 10:
+                    res.status(401).json({
+                        message: "Invalid password !!",
+                        status: 404,
+                    });
+                    _a.label = 11;
+                case 11: return [3 /*break*/, 13];
+                case 12:
+                    res.status(401).json({
+                        message: "No email found or Blocked",
+                        status: 404,
+                    });
+                    _a.label = 13;
+                case 13: return [3 /*break*/, 15];
+                case 14:
+                    err_9 = _a.sent();
+                    throw err_9;
+                case 15: return [3 /*break*/, 17];
+                case 16:
+                    err_10 = _a.sent();
+                    res.status(422).send({ error: true, message: err_10.message, status: 422 });
+                    return [3 /*break*/, 17];
+                case 17: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.studentLogin = studentLogin;
 // export async function update(req: any, res: Response):Promise<void> {
 //   try {
 //     const token = req?.headers["authorization"]?.split(" ")[1];
@@ -291,7 +595,7 @@ exports.login = login;
 // }
 function getUser(req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var authHeader, currentUser, repo, user, err_5;
+        var authHeader, currentUser, repo, user, err_11;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -326,8 +630,8 @@ function getUser(req, res) {
                     }
                     return [3 /*break*/, 3];
                 case 2:
-                    err_5 = _a.sent();
-                    res.status(404).send({ error: true, message: err_5.message });
+                    err_11 = _a.sent();
+                    res.status(404).send({ error: true, message: err_11.message });
                     return [3 /*break*/, 3];
                 case 3: return [2 /*return*/];
             }
@@ -338,7 +642,7 @@ exports.getUser = getUser;
 function updateUser(req, res) {
     var _a;
     return __awaiter(this, void 0, void 0, function () {
-        var validate, authHeader, currentUser, repo, imageUrl, user, err_6;
+        var validate, authHeader, currentUser, repo, imageUrl, user, err_12;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -372,8 +676,8 @@ function updateUser(req, res) {
                     }
                     return [3 /*break*/, 6];
                 case 5:
-                    err_6 = _b.sent();
-                    res.status(404).send({ error: true, message: err_6.message });
+                    err_12 = _b.sent();
+                    res.status(404).send({ error: true, message: err_12.message });
                     return [3 /*break*/, 6];
                 case 6: return [2 /*return*/];
             }
@@ -403,7 +707,7 @@ exports.updateUser = updateUser;
 // }
 function forgetPassword(req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var validate, repo, randomOTP, user, mailData, err_7;
+        var validate, repo, randomOTP, user, mailData, err_13;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -436,8 +740,8 @@ function forgetPassword(req, res) {
                     });
                     return [3 /*break*/, 4];
                 case 3:
-                    err_7 = _a.sent();
-                    res.status(404).send({ error: true, message: err_7.message });
+                    err_13 = _a.sent();
+                    res.status(404).send({ error: true, message: err_13.message });
                     return [3 /*break*/, 4];
                 case 4: return [2 /*return*/];
             }
@@ -447,7 +751,7 @@ function forgetPassword(req, res) {
 exports.forgetPassword = forgetPassword;
 function resetPassword(req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var validate_1, repo_1, hashPassword, verifyOTP, err_8;
+        var validate_1, repo_1, hashPassword, verifyOTP, err_14;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -500,8 +804,8 @@ function resetPassword(req, res) {
                     _a.label = 6;
                 case 6: return [3 /*break*/, 8];
                 case 7:
-                    err_8 = _a.sent();
-                    res.status(404).send({ error: true, message: err_8.message });
+                    err_14 = _a.sent();
+                    res.status(404).send({ error: true, message: err_14.message });
                     return [3 /*break*/, 8];
                 case 8: return [2 /*return*/];
             }
@@ -511,7 +815,7 @@ function resetPassword(req, res) {
 exports.resetPassword = resetPassword;
 function verifyEmail(req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var validate, repo, verifyOTP, err_9;
+        var validate, repo, verifyOTP, err_15;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -548,8 +852,8 @@ function verifyEmail(req, res) {
                     _a.label = 6;
                 case 6: return [3 /*break*/, 8];
                 case 7:
-                    err_9 = _a.sent();
-                    res.status(404).send({ error: true, message: err_9.message });
+                    err_15 = _a.sent();
+                    res.status(404).send({ error: true, message: err_15.message });
                     return [3 /*break*/, 8];
                 case 8: return [2 /*return*/];
             }
@@ -558,7 +862,7 @@ function verifyEmail(req, res) {
 }
 exports.verifyEmail = verifyEmail;
 var getAllUsers = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var totalUser, skip, take, searchData, repo, searchQuery, users, users, err_10;
+    var totalUser, skip, take, searchData, repo, searchQuery, users, users, err_16;
     var _a, _b, _c;
     return __generator(this, function (_d) {
         switch (_d.label) {
@@ -606,8 +910,8 @@ var getAllUsers = function (req, res) { return __awaiter(void 0, void 0, void 0,
                 _d.label = 5;
             case 5: return [3 /*break*/, 7];
             case 6:
-                err_10 = _d.sent();
-                res.json(err_10);
+                err_16 = _d.sent();
+                res.json(err_16);
                 return [3 /*break*/, 7];
             case 7: return [2 /*return*/];
         }
@@ -633,7 +937,7 @@ function countAllusers() {
 }
 exports.countAllusers = countAllusers;
 var updateUserRole = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var validate, result, err_11;
+    var validate, result, err_17;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -652,8 +956,8 @@ var updateUserRole = function (req, res) { return __awaiter(void 0, void 0, void
                 });
                 return [3 /*break*/, 4];
             case 3:
-                err_11 = _a.sent();
-                res.json({ error: err_11 === null || err_11 === void 0 ? void 0 : err_11.message });
+                err_17 = _a.sent();
+                res.json({ error: err_17 === null || err_17 === void 0 ? void 0 : err_17.message });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
@@ -661,7 +965,7 @@ var updateUserRole = function (req, res) { return __awaiter(void 0, void 0, void
 }); };
 exports.updateUserRole = updateUserRole;
 var blockUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var validate, result, err_12;
+    var validate, result, err_18;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -680,8 +984,8 @@ var blockUser = function (req, res) { return __awaiter(void 0, void 0, void 0, f
                 });
                 return [3 /*break*/, 4];
             case 3:
-                err_12 = _a.sent();
-                res.json({ error: err_12 === null || err_12 === void 0 ? void 0 : err_12.message });
+                err_18 = _a.sent();
+                res.json({ error: err_18 === null || err_18 === void 0 ? void 0 : err_18.message });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
@@ -689,7 +993,7 @@ var blockUser = function (req, res) { return __awaiter(void 0, void 0, void 0, f
 }); };
 exports.blockUser = blockUser;
 var unBlockUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var validate, result, err_13;
+    var validate, result, err_19;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -708,8 +1012,8 @@ var unBlockUser = function (req, res) { return __awaiter(void 0, void 0, void 0,
                 });
                 return [3 /*break*/, 4];
             case 3:
-                err_13 = _a.sent();
-                res.json({ error: err_13 === null || err_13 === void 0 ? void 0 : err_13.message });
+                err_19 = _a.sent();
+                res.json({ error: err_19 === null || err_19 === void 0 ? void 0 : err_19.message });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
@@ -717,7 +1021,7 @@ var unBlockUser = function (req, res) { return __awaiter(void 0, void 0, void 0,
 }); };
 exports.unBlockUser = unBlockUser;
 var viewBlockUser = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var result, err_14;
+    var result, err_20;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -734,8 +1038,8 @@ var viewBlockUser = function (req, res) { return __awaiter(void 0, void 0, void 
                 });
                 return [3 /*break*/, 3];
             case 2:
-                err_14 = _a.sent();
-                res.json({ error: err_14 === null || err_14 === void 0 ? void 0 : err_14.message });
+                err_20 = _a.sent();
+                res.json({ error: err_20 === null || err_20 === void 0 ? void 0 : err_20.message });
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }

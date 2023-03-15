@@ -1,6 +1,5 @@
 import {
   register,
-  login,
   getUser,
   updateUser,
   forgetPassword,
@@ -10,7 +9,7 @@ import {
   blockUser,
   viewBlockUser,
   verifyEmail,
-  unBlockUser,
+  unBlockUser, adminlogin, hodLogin, studentLogin, teacherLogin,
 } from "../controllers/auth.controller";
 import * as express from "express";
 import { AdminAuthorization, tokenValidation } from "../helper/jwt";
@@ -44,7 +43,7 @@ router.post("/register", register);
  *         description: Internal Server Error
  */
 
-router.post("/login", login);
+router.post("/admin/login", adminlogin);
 /**
  * @swagger
  * /auth/login:
@@ -138,6 +137,13 @@ router.get("/users/me", tokenValidation, getUser);
  *       500:
  *         description: Some server error
  */
+
+router.post("/hod/login", hodLogin);
+router.post("/student/login",studentLogin);
+router.post("/teacher/login", teacherLogin);
+
+
+
 
 router.patch("/users/me", tokenValidation, upload.single("avatar"), updateUser);
 

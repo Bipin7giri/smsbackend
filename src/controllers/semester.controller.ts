@@ -172,6 +172,11 @@ export const addBulkStudent = async (
         data[index].password.toString()
       );
     }
+
+
+
+
+
     const output = await AppDataSource.createQueryBuilder()
       .insert()
       .into(User)
