@@ -1,19 +1,11 @@
 import { Express, Request, Response } from "express";
 import { AppDataSource } from "../PGDB/data-source";
-import { Class } from "../entity/Classes";
 import { Subjects } from "../entity/Subject";
 import { getCurrentUser } from "../helper/jwt";
-import {
-  ClassPatchSchema,
-  ClassSchema,
-  JoinClassRoom,
-} from "../schema/classSchema";
-
 import { Absent } from "../entity/Absent";
 import { Present } from "../entity/Present";
 import { Reports } from "../entity/Reports";
 import { AttendanceSchema } from "../schema/attendanceSchema";
-import { date } from "joi";
 const absentRepo = AppDataSource.getRepository(Absent);
 const presentRepo = AppDataSource.getRepository(Present);
 const reportsRepo = AppDataSource.getRepository(Reports);

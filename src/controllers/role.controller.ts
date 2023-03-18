@@ -3,6 +3,7 @@ import { AppDataSource } from "../PGDB/data-source";
 import { Role } from "../entity/Role";
 import { getCurrentUser } from "../helper/jwt";
 import { RoleSchema } from "../schema/roleSchema";
+const repo = AppDataSource.getRepository(Role);
 
 type CurrentUser = {
   id: number;
@@ -25,6 +26,17 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     res.status(422).json(err);
   }
 };
+export const remove = async (req:Request,res:Response) : Promise<void>=>{
+  try {
+    const {roleId}  =req.params;
+    await repo.update(+roleId,{
+      deleted:true,
+      deletedAt: new Date(),
+    })
+  }catch (err:any){
+    res.json(err.message)
+  }
+}
 
 
 export const get = async (req: Request, res: Response): Promise<void> => {

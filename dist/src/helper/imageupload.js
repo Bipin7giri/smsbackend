@@ -51,7 +51,9 @@ function uploadFile(params) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, cloudinary.uploader.upload(params, { resource_type: "auto" })];
+                    return [4 /*yield*/, cloudinary.uploader.upload(params, {
+                            resource_type: "auto",
+                        })];
                 case 1:
                     imageUrl = _a.sent();
                     console.log(imageUrl);

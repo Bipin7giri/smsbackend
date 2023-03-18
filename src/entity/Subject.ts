@@ -3,20 +3,18 @@ import {
   PrimaryGeneratedColumn,
   Column,
   JoinColumn,
-  OneToOne,
   ManyToOne,
   OneToMany,
-  ManyToMany,
 } from "typeorm";
 import { Absent } from "./Absent";
 import { Assignment } from "./Assignment";
 import { Class } from "./Classes";
-import { Department } from "./Department";
 import { Present } from "./Present";
 import { Reports } from "./Reports";
 import { Semester } from "./Semester";
 import { SoftDelete } from "./SoftDelete";
 import { User } from "./User";
+import {Notes} from "./Notes";
 
 @Entity()
 export class Subjects extends SoftDelete {
@@ -29,7 +27,7 @@ export class Subjects extends SoftDelete {
   @Column({ nullable: true, name: "class_code" })
   classCode?: string;
 
-  @OneToOne(() => User)
+  @ManyToOne(() => User)
   @JoinColumn({ name: "teacher_id" })
   teacherId: User;
 
@@ -39,6 +37,9 @@ export class Subjects extends SoftDelete {
 
   @OneToMany(() => Class, (c) => c.subjectId)
   classId: Class[];
+
+  @OneToMany(() => Notes, (n) => n.subjectId)
+  noteId: Notes[];
 
   @OneToMany(() => Reports, (r) => r.subjectId)
   reports: Reports[];

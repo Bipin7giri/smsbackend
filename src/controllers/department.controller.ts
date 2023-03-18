@@ -342,7 +342,8 @@ const findDepartmentId:any = await  departmentRepo.findOne({
       title: validate.title,
       body: validate.body,
     };
-    const datas = await notificationRepo.save(validate);
+    console.log(validate)
+    const datas = await notificationRepo.save({departmentId:findDepartmentId.id,...validate});
     console.log(datas);
     const notification: any = await sendNotification(data);
     console.log(notification);
@@ -361,7 +362,7 @@ export  const getNotification = async (req:Request,res:Response): Promise<void> 
       authHeader = authHeader.slice(7, authHeader.length);
     }
     const currentUser: any = await getCurrentUser(authHeader || "");
-    const getDepartmentId = await  departmentRepo.findOne({
+    const getDepartmentId:any = await  departmentRepo.findOne({
       where:{
         userId:{
           id:currentUser.id
@@ -370,7 +371,7 @@ export  const getNotification = async (req:Request,res:Response): Promise<void> 
     })
     const getNotifications = await notificationRepo.find({
       where:{
-        id:getDepartmentId?.id
+        departmentId:getDepartmentId?.id
       }
     })
     res.json(getNotifications)

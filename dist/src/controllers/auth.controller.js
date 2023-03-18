@@ -560,39 +560,6 @@ function studentLogin(req, res, next) {
     });
 }
 exports.studentLogin = studentLogin;
-// export async function update(req: any, res: Response):Promise<void> {
-//   try {
-//     const token = req?.headers["authorization"]?.split(" ")[1];
-//     const currentUser = getCurrentUser(token || "");
-//     const validate = await UserPatchSchema.validateAsync(req.body);
-//     if (req?.file) {
-//       const imageUrl = await cloudinary.uploader.upload(req?.file?.path);
-//       const user = await prisma.user.update({
-//         where: {
-//           id: currentUser?.id,
-//         },
-//         data: {
-//           name: validate.name,
-//           phone_Int: validate.phoneNumber,
-//           address: validate.address,
-//           avatar: imageUrl?.secure_url,
-//         },
-//       });
-//       res.json(user);
-//     } else {
-//       const user = await prisma.user.update({
-//         where: {
-//           id: currentUser?.id,
-//         },
-//         data: validate,
-//       });
-//       res.json(user);
-//     }
-//     if (!currentUser) throw new Error("Something went wrong!!");
-//   } catch (err: any) {
-//     res.status(422).send({ error: true, message: err.message });;
-//   }
-// }
 function getUser(req, res) {
     return __awaiter(this, void 0, void 0, function () {
         var authHeader, currentUser, repo, user, err_11;
@@ -685,26 +652,6 @@ function updateUser(req, res) {
     });
 }
 exports.updateUser = updateUser;
-// export async function countAllusers():Promise<number> {
-//   return await prisma.user.count({where:{
-//     deleted:false
-//   }})
-// }
-// export async function getAllUsers(req:Request,res:Response):Promise<void> {
-//   try{
-//     const totalUser =  await countAllusers();
-//     const skip:any = req.query?.skip||0
-//     const take:any = req.query?.take||totalUser+1
-//     console.log(totalUser)
-//     const data = await prisma.user.findMany({
-//       skip:  parseInt(skip),
-//       take: parseInt(take),
-//     });
-//     res.status(200).json(data)
-//   }catch(err:any){
-//     res.json(err.message)
-//   }
-// }
 function forgetPassword(req, res) {
     return __awaiter(this, void 0, void 0, function () {
         var validate, repo, randomOTP, user, mailData, err_13;

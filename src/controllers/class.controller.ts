@@ -8,8 +8,6 @@ import {
   ClassSchema,
   JoinClassRoom,
 } from "../schema/classSchema";
-const { Client } = require("pg");
-const repo = AppDataSource.getRepository(Class);
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const validate = await ClassSchema.validateAsync(req.body);

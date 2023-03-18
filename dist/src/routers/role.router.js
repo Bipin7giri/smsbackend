@@ -6,6 +6,7 @@ var jwt_1 = require("../helper/jwt");
 var router = express.Router();
 router.post("/role", jwt_1.tokenValidation, role_controller_1.create);
 router.get("/role", jwt_1.tokenValidation, role_controller_1.get);
+router.delete("/role", jwt_1.tokenValidation, role_controller_1.remove);
 //   router.post('/login',login)
 // router.patch('/users/me', tokenValidation,upload.single("avatar"), update)
 //   router.get('/users/me',tokenValidation,getUser)

@@ -61,6 +61,8 @@ export class User extends SoftDelete {
   @Column({ nullable: true, name: "is_email_verified", default: false })
   isEmailVerified?: boolean;
 
+
+
   // @OneToOne(({}) => Role)
   // @JoinColumn({name: 'role_id'})
   // roleId: Role

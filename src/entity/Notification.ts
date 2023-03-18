@@ -16,7 +16,7 @@ export class Notification extends SoftDelete {
     body:string
 
     @ManyToOne(() => Department, (department) => department.notificationID)
-    @JoinColumn({ name: "notification_id" })
+    @JoinColumn({ name: "department_id" })
     departmentId: Department;
 
 }

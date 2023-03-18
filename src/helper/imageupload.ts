@@ -5,10 +5,12 @@ dotenv.config();
 
 const APIKey = process.env?.APIKey;
 const APISecret = process.env?.APISecret;
-const PINATA_ENDPOINT:any = process.env?.PINATA_ENDPOINT
+const PINATA_ENDPOINT: any = process.env?.PINATA_ENDPOINT;
 export async function uploadFile(params: any) {
   try {
-    const imageUrl = await cloudinary.uploader.upload(params,{resource_type: "auto"});
+    const imageUrl = await cloudinary.uploader.upload(params, {
+      resource_type: "auto",
+    });
     console.log(imageUrl);
     return imageUrl.secure_url;
   } catch (err) {
@@ -33,5 +35,3 @@ export async function uploadFile(params: any) {
 //       else{
 //         return response.data.IpfsHash}
 //       }
-
-

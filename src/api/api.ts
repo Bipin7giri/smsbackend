@@ -9,10 +9,11 @@ import assignment from "../routers/assignment.router";
 import chat from "../routers/chat.router";
 import attendance from "../routers/attendance.router";
 import adminNotification from "../routers/notification.router"
-
+import notes from '../routers/notes.router'
 
 router.use("/auth", auth);
 router.use("/", role);
+router.use("/", notes);
 router.use("/", department);
 router.use("/", semester);
 router.use("/", classes);

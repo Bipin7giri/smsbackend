@@ -226,7 +226,7 @@ const userDetails =  await userRepo.findOne({
     console.log(result)
     res.json({
       result,
-      message:"Successfull Removed"
+      message:"Successfully Removed"
     })
   }
   catch (err:any){

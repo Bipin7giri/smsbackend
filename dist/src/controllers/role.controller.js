@@ -36,13 +36,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.get = exports.create = void 0;
+exports.get = exports.remove = exports.create = void 0;
 var data_source_1 = require("../PGDB/data-source");
 var Role_1 = require("../entity/Role");
 var jwt_1 = require("../helper/jwt");
 var roleSchema_1 = require("../schema/roleSchema");
+var repo = data_source_1.AppDataSource.getRepository(Role_1.Role);
 var create = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var token, currentUser, validate, role, repo, saveRole, err_1;
+    var token, currentUser, validate, role, repo_1, saveRole, err_1;
     var _a;
     return __generator(this, function (_b) {
         switch (_b.label) {
@@ -54,10 +55,10 @@ var create = function (req, res) { return __awaiter(void 0, void 0, void 0, func
             case 1:
                 validate = _b.sent();
                 role = new Role_1.Role();
-                repo = data_source_1.AppDataSource.getRepository(Role_1.Role);
+                repo_1 = data_source_1.AppDataSource.getRepository(Role_1.Role);
                 role.name = validate.name;
                 role.roles = validate.roles;
-                return [4 /*yield*/, repo.save(role)];
+                return [4 /*yield*/, repo_1.save(role)];
             case 2:
                 saveRole = _b.sent();
                 if (saveRole) {
@@ -73,14 +74,37 @@ var create = function (req, res) { return __awaiter(void 0, void 0, void 0, func
     });
 }); };
 exports.create = create;
-var get = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var repo, allRole, err_2;
+var remove = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var roleId, err_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                repo = data_source_1.AppDataSource.getRepository(Role_1.Role);
-                return [4 /*yield*/, repo.find()];
+                roleId = req.params.roleId;
+                return [4 /*yield*/, repo.update(+roleId, {
+                        deleted: true,
+                        deletedAt: new Date(),
+                    })];
+            case 1:
+                _a.sent();
+                return [3 /*break*/, 3];
+            case 2:
+                err_2 = _a.sent();
+                res.json(err_2.message);
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); };
+exports.remove = remove;
+var get = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var repo_2, allRole, err_3;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                repo_2 = data_source_1.AppDataSource.getRepository(Role_1.Role);
+                return [4 /*yield*/, repo_2.find()];
             case 1:
                 allRole = _a.sent();
                 if (allRole) {
@@ -88,8 +112,8 @@ var get = function (req, res) { return __awaiter(void 0, void 0, void 0, functio
                 }
                 return [3 /*break*/, 3];
             case 2:
-                err_2 = _a.sent();
-                res.status(422).json(err_2);
+                err_3 = _a.sent();
+                res.status(422).json(err_3);
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
