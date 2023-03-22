@@ -6,11 +6,12 @@ import semester from "../routers/semester.router";
 import classes from "../routers/class.router";
 import subjects from "../routers/subject.router";
 import assignment from "../routers/assignment.router";
-import chat from "../routers/chat.router";
+import chat from "../routers/chat.router/chat.router";
 import attendance from "../routers/attendance.router";
-import adminNotification from "../routers/notification.router"
-import notes from '../routers/notes.router'
-
+import adminNotification from "../routers/notification.router";
+import notes from "../routers/notes.router";
+import stats from "../routers/stats.router";
+import message from "../routers/chat.router/message.router";
 router.use("/auth", auth);
 router.use("/", role);
 router.use("/", notes);
@@ -19,8 +20,11 @@ router.use("/", semester);
 router.use("/", classes);
 router.use("/", subjects);
 router.use("/", assignment);
-router.use("/", chat);
-router.use("/",attendance)
-router.use("/",adminNotification)
+router.use("/chat", chat);
+router.use("/message", message);
+
+router.use("/", attendance);
+router.use("/", adminNotification);
+router.use("/stats", stats);
 
 export default router;
