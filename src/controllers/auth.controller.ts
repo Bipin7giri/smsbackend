@@ -307,10 +307,7 @@ export async function login(
         },
         where: {
           email: validate.email,
-          blocked: false,
-          roleId:{
-            name:roles.TEACHER
-          }
+          blocked: false
         },
       });
 
