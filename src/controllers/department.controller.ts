@@ -400,3 +400,17 @@ export const getNotification = async (
     res.json(err.message);
   }
 };
+
+export const remove = async (req: Request, res: Response) => {
+  try {
+    const { departmentId } = req?.params;
+    const result = await departmentRepo.update(departmentId, {
+      deleted: true,
+    });
+    res.status(200).json({
+      message: "Deleted Department",
+    });
+  } catch (err: any) {
+    res.json(err.message);
+  }
+};

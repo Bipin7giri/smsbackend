@@ -9,7 +9,11 @@ import {
   blockUser,
   viewBlockUser,
   verifyEmail,
-  unBlockUser, adminlogin, hodLogin, studentLogin, teacherLogin,
+  unBlockUser,
+  adminlogin,
+  hodLogin,
+  studentLogin,
+  login,
 } from "../controllers/auth.controller";
 import * as express from "express";
 import { AdminAuthorization, tokenValidation } from "../helper/jwt";
@@ -139,11 +143,8 @@ router.get("/users/me", tokenValidation, getUser);
  */
 
 router.post("/hod/login", hodLogin);
-router.post("/student/login",studentLogin);
-router.post("/teacher/login", teacherLogin);
-
-
-
+router.post("/login", login);
+// router.post("/teacher/login", teacherLogin);
 
 router.patch("/users/me", tokenValidation, upload.single("avatar"), updateUser);
 

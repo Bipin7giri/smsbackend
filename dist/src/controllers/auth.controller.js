@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.viewBlockUser = exports.unBlockUser = exports.blockUser = exports.updateUserRole = exports.countAllusers = exports.getAllUsers = exports.verifyEmail = exports.resetPassword = exports.forgetPassword = exports.updateUser = exports.getUser = exports.studentLogin = exports.teacherLogin = exports.hodLogin = exports.adminlogin = exports.StudentRegister = exports.register = void 0;
+exports.viewBlockUser = exports.unBlockUser = exports.blockUser = exports.updateUserRole = exports.countAllusers = exports.getAllUsers = exports.verifyEmail = exports.resetPassword = exports.forgetPassword = exports.updateUser = exports.getUser = exports.studentLogin = exports.login = exports.hodLogin = exports.adminlogin = exports.StudentRegister = exports.register = void 0;
 var hashpassword_1 = require("../helper/hashpassword");
 var jwt_1 = require("../helper/jwt");
 var registerSchema_1 = require("../schema/registerSchema");
@@ -360,19 +360,20 @@ function hodLogin(req, res, next) {
     });
 }
 exports.hodLogin = hodLogin;
-function teacherLogin(req, res, next) {
+function login(req, res, next) {
+    var _a;
     return __awaiter(this, void 0, void 0, function () {
         var validate, repo, user, checkPassword, accessToken, result, checkIfAlreadyExist, chatUser, err_7, err_8;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
-                    _a.trys.push([0, 16, , 17]);
+                    _b.trys.push([0, 16, , 17]);
                     return [4 /*yield*/, registerSchema_1.RegisterSchema.validateAsync(req.body)];
                 case 1:
-                    validate = _a.sent();
-                    _a.label = 2;
+                    validate = _b.sent();
+                    _b.label = 2;
                 case 2:
-                    _a.trys.push([2, 14, , 15]);
+                    _b.trys.push([2, 14, , 15]);
                     repo = data_source_1.AppDataSource.getRepository(User_1.User);
                     return [4 /*yield*/, repo.findOne({
                             relations: {
@@ -387,11 +388,11 @@ function teacherLogin(req, res, next) {
                             },
                         })];
                 case 3:
-                    user = _a.sent();
+                    user = _b.sent();
                     if (!user) return [3 /*break*/, 12];
                     return [4 /*yield*/, (0, hashpassword_1.comparePassword)(user.password, validate.password)];
                 case 4:
-                    checkPassword = _a.sent();
+                    checkPassword = _b.sent();
                     if (!checkPassword) return [3 /*break*/, 10];
                     if ((user === null || user === void 0 ? void 0 : user.isEmailVerified) === false) {
                         res.json({
@@ -401,17 +402,17 @@ function teacherLogin(req, res, next) {
                     }
                     return [4 /*yield*/, (0, jwt_1.generateToken)(user)];
                 case 5:
-                    accessToken = _a.sent();
+                    accessToken = _b.sent();
                     return [4 /*yield*/, repo.update(user.id, {
                             deviceId: validate.deviceId,
                         })];
                 case 6:
-                    result = _a.sent();
+                    result = _b.sent();
                     return [4 /*yield*/, userModel.findOne({
                             username: user.email,
                         })];
                 case 7:
-                    checkIfAlreadyExist = _a.sent();
+                    checkIfAlreadyExist = _b.sent();
                     console.log(checkIfAlreadyExist);
                     if (!validate.deviceId) return [3 /*break*/, 9];
                     console.log(validate.deviceId);
@@ -422,13 +423,14 @@ function teacherLogin(req, res, next) {
                             deviceId: validate.deviceId,
                         })];
                 case 8:
-                    chatUser = _a.sent();
+                    chatUser = _b.sent();
                     console.log(chatUser);
-                    _a.label = 9;
+                    _b.label = 9;
                 case 9:
                     res.json({
                         access_token: accessToken,
                         message: "Login successful !!",
+                        role: (_a = user.roleId) === null || _a === void 0 ? void 0 : _a.name,
                         status: 200,
                     });
                     return [3 /*break*/, 11];
@@ -437,21 +439,21 @@ function teacherLogin(req, res, next) {
                         message: "Invalid password !!",
                         status: 404,
                     });
-                    _a.label = 11;
+                    _b.label = 11;
                 case 11: return [3 /*break*/, 13];
                 case 12:
                     res.status(401).json({
                         message: "No email found or Blocked",
                         status: 404,
                     });
-                    _a.label = 13;
+                    _b.label = 13;
                 case 13: return [3 /*break*/, 15];
                 case 14:
-                    err_7 = _a.sent();
+                    err_7 = _b.sent();
                     throw err_7;
                 case 15: return [3 /*break*/, 17];
                 case 16:
-                    err_8 = _a.sent();
+                    err_8 = _b.sent();
                     res.status(422).send({ error: true, message: err_8.message, status: 422 });
                     return [3 /*break*/, 17];
                 case 17: return [2 /*return*/];
@@ -459,7 +461,7 @@ function teacherLogin(req, res, next) {
         });
     });
 }
-exports.teacherLogin = teacherLogin;
+exports.login = login;
 function studentLogin(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
         var validate, repo, user, checkPassword, accessToken, result, checkIfAlreadyExist, chatUser, err_9, err_10;

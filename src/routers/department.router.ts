@@ -1,10 +1,13 @@
 import {
   addBulkStudent,
   countDepartment,
-  create, createNotification,
+  create,
+  createNotification,
   get,
-  getAllDepartment, getNotification,
+  getAllDepartment,
+  getNotification,
   getStudent,
+  remove,
 } from "../controllers/department.controller";
 import * as express from "express";
 import {
@@ -41,4 +44,6 @@ router.post(
   upload.single("students"),
   addBulkStudent
 );
+
+router.delete("/admin/department/:departmentId", AdminAuthorization, remove);
 export default router;

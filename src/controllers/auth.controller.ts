@@ -292,7 +292,7 @@ export async function hodLogin(
   }
 }
 
-export async function teacherLogin(
+export async function login(
     req: Request,
     res: Response,
     next: any
@@ -352,6 +352,7 @@ export async function teacherLogin(
           res.json({
             access_token: accessToken,
             message: "Login successful !!",
+            role:user.roleId?.name,
             status: 200,
           });
         } else {
