@@ -3,8 +3,8 @@ import {
   createMeeting,
   deleteById,
   get,
+  getAssignSubject,
   getByID,
-  getByIDStudent,
   pushNotification,
   update,
 } from "../controllers/subject.controller";
@@ -25,7 +25,8 @@ router.get(
   HODAuthorization,
   getByID
 );
-router.get("/student/subject/:subjectId", tokenValidation, getByIDStudent);
+router.get("/student/subject/:subjectId", tokenValidation, getByID);
+router.get("/student/subject", tokenValidation, getAssignSubject);
 router.patch(
   "/hod/subject/:subjectId",
   tokenValidation,

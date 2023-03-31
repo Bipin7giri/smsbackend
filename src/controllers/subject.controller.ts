@@ -122,7 +122,8 @@ export const getByID = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const getByIDStudent = async (req: Request, res: Response) => {
+// get all the subject that is assgin by teacher
+export const getAssignSubject = async (req: Request, res: Response) => {
   try {
     let authHeader = req.headers["authorization"];
     if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -131,20 +132,15 @@ export const getByIDStudent = async (req: Request, res: Response) => {
     }
     const currentUser: any = getCurrentUser(authHeader || "");
     const repo = AppDataSource.getRepository(Subjects);
-    const subjectId: any = req.params.subjectId;
-    const subjects = await repo.findOne({
+    const subjects = await repo.find({
       where: {
-        id: subjectId,
-        // classId: {
-        //   studentId: {
-        //     id: Not(currentUser.id),
-        //   },
-        // },
+        classId: {
+          studentId: {
+            id: currentUser.id,
+          },
+        },
       },
-      relations: ["classId", "classId.studentId", "teacherId"],
     });
-    console.log(subjects);
-    // user?.password = null;
     if (subjects) {
       res.json(subjects);
     } else {
@@ -153,12 +149,6 @@ export const getByIDStudent = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(404).send({ error: true, message: err.message });
   }
-
-  // classId: {
-  //   studentId: {
-  //     id: Not(currentUser.id),
-  //   },
-  // },
 };
 export const update = async (req: Request, res: Response): Promise<void> => {
   try {
