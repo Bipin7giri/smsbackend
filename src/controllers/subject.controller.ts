@@ -15,15 +15,13 @@ import { sendNotification } from "../Notification/PushNotification";
 import { DATA, NotificationResult } from "../Interface/SubjectInterface";
 import { MAILDATA } from "../Interface/NodeMailerInterface";
 import { NotificationSchemaTeacher } from "../schema/notificationSchema";
-const jwt = require("jsonwebtoken");
-require("dotenv").config();
+import { createMeetingApi } from "../services/zoommeeting";
+import { Meeting } from "../entity/Meeting";
+import { isTypedArray } from "util/types";
 
-const requestPromise = require("request-promise");
-const payload = {
-  iss: process.env.ZOOM_API_KEY,
-  exp: new Date().getTime() + 5000,
-};
-const token = jwt.sign(payload, process.env.ZOOM_API_SECRET_KEY);
+const meetingRepo = AppDataSource.getRepository(Meeting);
+const subjectRepo = AppDataSource.getRepository(Subjects);
+const classRepo = AppDataSource.getRepository(Class);
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const validate = await SubjectAndClassShcema.validateAsync(req.body);
@@ -138,6 +136,7 @@ export const getAssignSubject = async (req: Request, res: Response) => {
           studentId: {
             id: currentUser.id,
           },
+          deleted: false,
         },
       },
     });
@@ -260,36 +259,77 @@ export const pushNotification = async (
 };
 
 export const createMeeting = async (req: Request, res: Response) => {
-  let email = "bipingiri27@gmail.com"; // your zoom developer email account
-  var options = {
-    method: "POST",
-    uri: "https://api.zoom.us/v2/users/" + email + "/meetings",
-    body: {
-      topic: "Zoom Meeting Using Node JS",
-      type: 1,
-      settings: {
-        host_video: "true",
-        participant_video: "true",
+  try {
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = getCurrentUser(authHeader || "");
+    const meetingUrl: any = await createMeetingApi(req.body);
+    const subjectId: any = await subjectRepo.findOne({
+      where: {
+        teacherId: {
+          id: currentUser.id,
+        },
+        deleted: false,
       },
-    },
-    auth: {
-      bearer: token,
-    },
-    headers: {
-      "User-Agent": "Zoom-api-Jwt-Request",
-      "content-type": "application/json",
-    },
-    json: true, //Parse the JSON string in the response
-  };
-
-  requestPromise(options)
-    .then(function (response: any) {
-      console.log("response is: ", response);
-      res.json(response);
-    })
-    .catch(function (err: any) {
-      // API call failed...
-      console.log("API call failed, reason ", err);
-      res.json(err);
     });
+    const saveDb = await meetingRepo.save({
+      title: req.body.title,
+      joinUrl: meetingUrl.join_url,
+      startUrl: meetingUrl.start_url,
+      password: meetingUrl.password,
+      subjectId: subjectId.id,
+    });
+
+    const getAllStudent: any = await classRepo.find({
+      relations: ["studentId"],
+      where: {
+        studentId: subjectId.id,
+      },
+    });
+    const studentEmail = getAllStudent.map((item: any, id: any) => {
+      return item.studentId.email;
+    });
+
+    const mailData: MAILDATA = {
+      to: studentEmail, // list of receivers
+      subject: "[SMS] Account Verification Request",
+      html: `<div>
+            <p>Hello,</p>
+            <p style="color: green;">Please join the meeting link: ${meetingUrl.join_url}</p>
+            <p>and here is meeting code: ${meetingUrl.password}</p>
+      </div>`,
+      from: "giribipin04@gmail.com",
+      text: "Online classroom link",
+    };
+    // console.log(mailData)
+    await transporter.sendMail(mailData, function (err: any, info: any) {
+      if (err) console.log(err);
+      else console.log("ok");
+    });
+    res.send(saveDb);
+  } catch (err: any) {
+    res.json(err);
+  }
+};
+
+export const joinMeeting = async (req: Request, res: Response) => {
+  try {
+    const subjectId: any = req.params.subjectId;
+    const meetingUrl = await meetingRepo.find({
+      where: {
+        subjectId: {
+          id: subjectId,
+        },
+      },
+      order: {
+        updatedAt: "DESC",
+      },
+    });
+    res.json(meetingUrl[0]);
+  } catch (err: any) {
+    res.json(err);
+  }
 };

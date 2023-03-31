@@ -15,6 +15,7 @@ import { Semester } from "./Semester";
 import { SoftDelete } from "./SoftDelete";
 import { User } from "./User";
 import { Notes } from "./Notes";
+import { Meeting } from "./Meeting";
 
 @Entity()
 export class Subjects extends SoftDelete {
@@ -52,4 +53,7 @@ export class Subjects extends SoftDelete {
 
   @OneToMany(() => Assignment, (a) => a.subjectId)
   assignment: Class[];
+
+  @OneToMany(() => Meeting, (m) => m.subjectId)
+  meetingUrl: Meeting[];
 }

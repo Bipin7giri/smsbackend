@@ -5,6 +5,7 @@ import {
   get,
   getAssignSubject,
   getByID,
+  joinMeeting,
   pushNotification,
   update,
 } from "../controllers/subject.controller";
@@ -43,5 +44,7 @@ router.get("/teacher/subject", tokenValidation, TeacherAuthorization, get);
 router.post("/class/notification", pushNotification);
 
 // create meeting
-router.get("/createmeeting", createMeeting);
+router.post("/createmeeting", tokenValidation, createMeeting);
+router.get("/joinmeeting/:subjectId", tokenValidation, joinMeeting);
+
 export default router;
