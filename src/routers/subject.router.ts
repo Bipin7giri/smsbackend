@@ -1,5 +1,6 @@
 import {
   create,
+  createMeeting,
   deleteById,
   get,
   getByID,
@@ -40,4 +41,6 @@ router.delete(
 router.get("/teacher/subject", tokenValidation, TeacherAuthorization, get);
 router.post("/class/notification", pushNotification);
 
+// create meeting
+router.get("/createmeeting", createMeeting);
 export default router;

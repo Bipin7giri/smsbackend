@@ -15,8 +15,15 @@ import { sendNotification } from "../Notification/PushNotification";
 import { DATA, NotificationResult } from "../Interface/SubjectInterface";
 import { MAILDATA } from "../Interface/NodeMailerInterface";
 import { NotificationSchemaTeacher } from "../schema/notificationSchema";
-import { Not } from "typeorm";
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
+const requestPromise = require("request-promise");
+const payload = {
+  iss: process.env.ZOOM_API_KEY,
+  exp: new Date().getTime() + 5000,
+};
+const token = jwt.sign(payload, process.env.ZOOM_API_SECRET_KEY);
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const validate = await SubjectAndClassShcema.validateAsync(req.body);
@@ -260,4 +267,39 @@ export const pushNotification = async (
   } catch (err: any) {
     res.status(404).send({ error: true, message: err.message });
   }
+};
+
+export const createMeeting = async (req: Request, res: Response) => {
+  let email = "bipingiri27@gmail.com"; // your zoom developer email account
+  var options = {
+    method: "POST",
+    uri: "https://api.zoom.us/v2/users/" + email + "/meetings",
+    body: {
+      topic: "Zoom Meeting Using Node JS",
+      type: 1,
+      settings: {
+        host_video: "true",
+        participant_video: "true",
+      },
+    },
+    auth: {
+      bearer: token,
+    },
+    headers: {
+      "User-Agent": "Zoom-api-Jwt-Request",
+      "content-type": "application/json",
+    },
+    json: true, //Parse the JSON string in the response
+  };
+
+  requestPromise(options)
+    .then(function (response: any) {
+      console.log("response is: ", response);
+      res.json(response);
+    })
+    .catch(function (err: any) {
+      // API call failed...
+      console.log("API call failed, reason ", err);
+      res.json(err);
+    });
 };

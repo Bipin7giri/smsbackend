@@ -7,13 +7,9 @@ import {
   ManyToOne,
   OneToMany,
 } from "typeorm";
-import { Subject } from "typeorm/persistence/Subject";
 import { AssignmentSubmission } from "./AssignmentSubmission";
-import { Department } from "./Department";
-import { Semester } from "./Semester";
 import { SoftDelete } from "./SoftDelete";
 import { Subjects } from "./Subject";
-import { User } from "./User";
 
 @Entity()
 export class Assignment extends SoftDelete {
