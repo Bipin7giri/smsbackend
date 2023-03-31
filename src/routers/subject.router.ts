@@ -1,7 +1,9 @@
 import {
   create,
   deleteById,
-  get, getByID,
+  get,
+  getByID,
+  getByIDStudent,
   pushNotification,
   update,
 } from "../controllers/subject.controller";
@@ -9,14 +11,20 @@ import * as express from "express";
 import {
   AdminAuthorization,
   HODAuthorization,
+  StudentAuthorization,
   TeacherAuthorization,
   tokenValidation,
 } from "../helper/jwt";
 const router = express.Router();
 router.post("/hod/subject", tokenValidation, HODAuthorization, create);
 router.get("/hod/subject", tokenValidation, HODAuthorization, get);
-router.get("/hod/subject/:subjectId", tokenValidation, HODAuthorization, getByID);
-
+router.get(
+  "/hod/subject/:subjectId",
+  tokenValidation,
+  HODAuthorization,
+  getByID
+);
+router.get("/student/subject/:subjectId", tokenValidation, getByIDStudent);
 router.patch(
   "/hod/subject/:subjectId",
   tokenValidation,

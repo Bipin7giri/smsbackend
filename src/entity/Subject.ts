@@ -14,7 +14,7 @@ import { Reports } from "./Reports";
 import { Semester } from "./Semester";
 import { SoftDelete } from "./SoftDelete";
 import { User } from "./User";
-import {Notes} from "./Notes";
+import { Notes } from "./Notes";
 
 @Entity()
 export class Subjects extends SoftDelete {
@@ -45,10 +45,10 @@ export class Subjects extends SoftDelete {
   reports: Reports[];
 
   @OneToMany(() => Present, (p) => p.subjectId)
-    presentId: Present[];
+  presentId: Present[];
 
-    @OneToMany(() => Absent, (a) => a.subjectId)
-    absentId: Absent[];
+  @OneToMany(() => Absent, (a) => a.subjectId)
+  absentId: Absent[];
 
   @OneToMany(() => Assignment, (a) => a.subjectId)
   assignment: Class[];

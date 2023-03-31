@@ -6,6 +6,11 @@ import api from "./src/api/api";
 import { connectMongoDB } from "./src/MongoDB/connection";
 import * as cors from "cors";
 dotenv.config();
+connectDb();
+
+// connect mongodb
+
+connectMongoDB();
 const bodyParser = require("body-parser");
 const cloudinary = require("cloudinary");
 // const ri = require('./src/routers')
@@ -24,11 +29,6 @@ app.use(cors());
 const port = process.env.PORT;
 const project = process.env?.PROJECT;
 app.use("/api", api);
-connectDb();
-
-// connect mongodb
-
-connectMongoDB();
 
 const swaggerDefinition = {
   info: {

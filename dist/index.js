@@ -8,6 +8,9 @@ var api_1 = require("./src/api/api");
 var connection_1 = require("./src/MongoDB/connection");
 var cors = require("cors");
 dotenv.config();
+(0, scriptdb_1.connectDb)();
+// connect mongodb
+(0, connection_1.connectMongoDB)();
 var bodyParser = require("body-parser");
 var cloudinary = require("cloudinary");
 // const ri = require('./src/routers')
@@ -24,9 +27,6 @@ app.use(cors());
 var port = process.env.PORT;
 var project = (_a = process.env) === null || _a === void 0 ? void 0 : _a.PROJECT;
 app.use("/api", api_1.default);
-(0, scriptdb_1.connectDb)();
-// connect mongodb
-(0, connection_1.connectMongoDB)();
 var swaggerDefinition = {
     info: {
         title: "School Management System",

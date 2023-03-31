@@ -15,6 +15,7 @@ import { sendNotification } from "../Notification/PushNotification";
 import { DATA, NotificationResult } from "../Interface/SubjectInterface";
 import { MAILDATA } from "../Interface/NodeMailerInterface";
 import { NotificationSchemaTeacher } from "../schema/notificationSchema";
+import { Not } from "typeorm";
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -86,8 +87,6 @@ export const get = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-
-
 export const getByID = async (req: Request, res: Response): Promise<void> => {
   try {
     let authHeader = req.headers["authorization"];
@@ -97,12 +96,12 @@ export const getByID = async (req: Request, res: Response): Promise<void> => {
     }
     const currentUser: any = getCurrentUser(authHeader || "");
     const repo = AppDataSource.getRepository(Subjects);
-    const  subjectId:any  = req.params.subjectId;
+    const subjectId: any = req.params.subjectId;
     const subjects = await repo.findOne({
-      where:{
-        id:subjectId
+      where: {
+        id: subjectId,
       },
-      relations: ["classId", "classId.studentId","teacherId"],
+      relations: ["classId", "classId.studentId", "teacherId"],
     });
     console.log(subjects);
     // user?.password = null;
@@ -116,6 +115,44 @@ export const getByID = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+export const getByIDStudent = async (req: Request, res: Response) => {
+  try {
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = getCurrentUser(authHeader || "");
+    const repo = AppDataSource.getRepository(Subjects);
+    const subjectId: any = req.params.subjectId;
+    const subjects = await repo.findOne({
+      where: {
+        id: subjectId,
+        // classId: {
+        //   studentId: {
+        //     id: Not(currentUser.id),
+        //   },
+        // },
+      },
+      relations: ["classId", "classId.studentId", "teacherId"],
+    });
+    console.log(subjects);
+    // user?.password = null;
+    if (subjects) {
+      res.json(subjects);
+    } else {
+      res.status(404).send("No subjects found");
+    }
+  } catch (err: any) {
+    res.status(404).send({ error: true, message: err.message });
+  }
+
+  // classId: {
+  //   studentId: {
+  //     id: Not(currentUser.id),
+  //   },
+  // },
+};
 export const update = async (req: Request, res: Response): Promise<void> => {
   try {
     let authHeader = req.headers["authorization"];
@@ -124,12 +161,12 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       authHeader = authHeader.slice(7, authHeader.length);
     }
     const currentUser: any = getCurrentUser(authHeader || "");
-    const  subjectId:any  = req.params.subjectId;
+    const subjectId: any = req.params.subjectId;
     const validate = await SubjectPathSchema.validateAsync(req.body);
     const repo = AppDataSource.getRepository(Subjects);
     console.table(validate);
-    const test  = await  repo.find(subjectId)
-    console.log(test)
+    const test = await repo.find(subjectId);
+    console.log(test);
     const updateSubject = await repo.update(subjectId, validate);
     if (updateSubject) {
       res.json(updateSubject);
@@ -205,7 +242,7 @@ export const pushNotification = async (
     //   after exam
 
     // get all device id from database of the student that are in this class
-    const deviceID: String[] = deviceIDs
+    const deviceID: String[] = deviceIDs;
     let data: DATA = {
       to: deviceID,
       sound: "default",

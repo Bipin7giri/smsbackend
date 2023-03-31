@@ -381,10 +381,7 @@ function login(req, res, next) {
                             },
                             where: {
                                 email: validate.email,
-                                blocked: false,
-                                roleId: {
-                                    name: RoleEnum_1.roles.TEACHER
-                                }
+                                blocked: false
                             },
                         })];
                 case 3:
