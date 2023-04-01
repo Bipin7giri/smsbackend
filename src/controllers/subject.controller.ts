@@ -17,7 +17,6 @@ import { MAILDATA } from "../Interface/NodeMailerInterface";
 import { NotificationSchemaTeacher } from "../schema/notificationSchema";
 import { createMeetingApi } from "../services/zoommeeting";
 import { Meeting } from "../entity/Meeting";
-import { isTypedArray } from "util/types";
 
 const meetingRepo = AppDataSource.getRepository(Meeting);
 const subjectRepo = AppDataSource.getRepository(Subjects);
@@ -138,6 +137,10 @@ export const getAssignSubject = async (req: Request, res: Response) => {
           },
           deleted: false,
         },
+      },
+      relations: {
+        assignment: true,
+        noteId: true,
       },
     });
     if (subjects) {
@@ -295,7 +298,7 @@ export const createMeeting = async (req: Request, res: Response) => {
 
     const mailData: MAILDATA = {
       to: studentEmail, // list of receivers
-      subject: "[SMS] Account Verification Request",
+      subject: "[SMS] JOIN MEETING",
       html: `<div>
             <p>Hello,</p>
             <p style="color: green;">Please join the meeting link: ${meetingUrl.join_url}</p>
@@ -309,7 +312,7 @@ export const createMeeting = async (req: Request, res: Response) => {
       if (err) console.log(err);
       else console.log("ok");
     });
-    res.send(saveDb);
+    res.json(saveDb);
   } catch (err: any) {
     res.json(err);
   }

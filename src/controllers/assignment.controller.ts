@@ -178,3 +178,37 @@ export const getPdf = async (req: Request, res: Response) => {
     res.json(err);
   }
 };
+
+// export const getAllAssignemnt = async (req: Request, res: Response) => {
+//   try {
+//     let authHeader = req.headers["authorization"];
+//     if (authHeader && authHeader.startsWith("Bearer ")) {
+//       // Remove "Bearer " from the authHeader
+//       authHeader = authHeader.slice(7, authHeader.length);
+//     }
+//     const currentUser: any = await getCurrentUser(authHeader || "");
+//     const subjectId: any = await classRepo.find({
+//       where: {
+//         studentId: {
+//           id: currentUser.id,
+//         },
+//         deleted: false,
+//       },
+//       relations: {
+//         subjectId: true,
+//       },
+//     });
+//     let assigmnment: string[] = [];
+
+//     const assignments = assigmnmentRepo.find({
+//       where: {
+//         deleted: false,
+//         subjectId: {
+//           id: subjectId?.subjectId,
+//         },
+//       },
+//     });
+//     console.log(subjectId);
+//     res.json(subjectId);
+//   } catch (err) {}
+// };
