@@ -144,6 +144,7 @@ export const submitAssigment = async (
 ): Promise<void> => {
   try {
     const validate = await SubmitAssigment.validateAsync(req.body);
+    const { assignmentId } = req.params;
     let authHeader = req.headers["authorization"];
     if (authHeader && authHeader.startsWith("Bearer ")) {
       // Remove "Bearer " from the authHeader
@@ -151,16 +152,20 @@ export const submitAssigment = async (
     }
     const currentUser: any = getCurrentUser(authHeader || "");
     validate.studentId = currentUser.id;
-
+    validate.assigmnmentId = +assignmentId;
     if (req?.file) {
       console.log(req.file);
       const imageUrl = await uploadFile(req.file.path);
       validate.submission = imageUrl;
     }
 
-    await assigmnmentSubmitRepo.insert(validate);
+    console.log(validate);
+    const data = await assigmnmentSubmitRepo.save({
+      ...validate,
+      assignmentId: +assignmentId,
+    });
 
-    res.status(202).json({ message: "created assignment", status: 202 });
+    res.status(202).json({ message: data, status: 202 });
   } catch (err: any) {
     res.status(422).json(err);
   }
@@ -179,36 +184,53 @@ export const getPdf = async (req: Request, res: Response) => {
   }
 };
 
-// export const getAllAssignemnt = async (req: Request, res: Response) => {
-//   try {
-//     let authHeader = req.headers["authorization"];
-//     if (authHeader && authHeader.startsWith("Bearer ")) {
-//       // Remove "Bearer " from the authHeader
-//       authHeader = authHeader.slice(7, authHeader.length);
-//     }
-//     const currentUser: any = await getCurrentUser(authHeader || "");
-//     const subjectId: any = await classRepo.find({
-//       where: {
-//         studentId: {
-//           id: currentUser.id,
-//         },
-//         deleted: false,
-//       },
-//       relations: {
-//         subjectId: true,
-//       },
-//     });
-//     let assigmnment: string[] = [];
+export const getSubmitedAssignemnt = async (req: Request, res: Response) => {
+  try {
+    const { subjectId } = req.params;
+    const getAssignemtSumbitedList = await assigmnmentSubmitRepo.find({
+      where: {
+        assigmnmentId: {
+          subjectId: {
+            id: +subjectId,
+          },
+        },
+      },
+    });
+    console.log(getAssignemtSumbitedList);
+    res.json(getAssignemtSumbitedList);
+  } catch (err) {
+    res.json(err);
+  }
+};
 
-//     const assignments = assigmnmentRepo.find({
-//       where: {
-//         deleted: false,
-//         subjectId: {
-//           id: subjectId?.subjectId,
-//         },
-//       },
-//     });
-//     console.log(subjectId);
-//     res.json(subjectId);
-//   } catch (err) {}
-// };
+export const getAllAssignment = async (req: Request, res: Response) => {
+  try {
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = await getCurrentUser(authHeader || "");
+    const subjects = await assigmnmentRepo.find({
+      where: {
+        deleted: false,
+        subjectId: {
+          classId: {
+            studentId: {
+              id: currentUser.id,
+            },
+          },
+        },
+      },
+      order: {
+        createdAt: "DESC",
+      },
+      relations: {
+        subjectId: true,
+      },
+    });
+    res.json(subjects);
+  } catch (err: any) {
+    res.json(err.message);
+  }
+};

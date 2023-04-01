@@ -29,10 +29,14 @@ export class Assignment extends SoftDelete {
   })
   deadLine!: Date;
 
+  // @Column({ nullable: true })
+  // rating!: string;
+
   @ManyToOne(() => Subjects, (sub) => sub.assignment)
   @JoinColumn({ name: "subject_id" })
   subjectId: Subjects;
 
   @OneToMany(() => AssignmentSubmission, (a) => a.assigmnmentId)
-  classId: AssignmentSubmission[];
+  @JoinColumn({ name: "assignement_submission_id" })
+  assignemtSubmission: AssignmentSubmission[];
 }

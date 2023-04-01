@@ -6,7 +6,6 @@ export const CreateAssignment = Joi.object({
 });
 
 export const SubmitAssigment = Joi.object({
-    assigmnmentId: Joi.string().required(),
-    submission: Joi.string(),
-  });
-  
+  assigmnmentId: Joi.string(),
+  submission: Joi.string(),
+});

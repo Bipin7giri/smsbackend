@@ -116,3 +116,35 @@ export const get = async (req: Request, res: Response): Promise<void> => {
     res.status(404).send({ error: true, message: err.message });
   }
 };
+
+export const getAllNotes = async (req: Request, res: Response) => {
+  try {
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = await getCurrentUser(authHeader || "");
+    const notes = await noteRepo.find({
+      where: {
+        deleted: false,
+        subjectId: {
+          classId: {
+            studentId: {
+              id: currentUser.id,
+            },
+          },
+        },
+      },
+      order: {
+        createdAt: "DESC",
+      },
+      relations: {
+        subjectId: true,
+      },
+    });
+    res.json(notes);
+  } catch (err: any) {
+    res.json(err.message);
+  }
+};

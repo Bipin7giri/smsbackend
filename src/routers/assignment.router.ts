@@ -1,7 +1,9 @@
 import {
   create,
   get,
+  getAllAssignment,
   getPdf,
+  getSubmitedAssignemnt,
   submitAssigment,
 } from "../controllers/assignment.controller";
 import * as express from "express";
@@ -25,7 +27,7 @@ router.post(
 
 router.get("/getpdf", getPdf);
 router.post(
-  "/student/assignment",
+  "/student/assignment/:assignmentId",
   tokenValidation,
   StudentAuthorization,
   upload.single("submission"),
@@ -37,6 +39,19 @@ router.get(
   tokenValidation,
   StudentAuthorization,
   get
+);
+
+router.get(
+  "/student/assignment/",
+  tokenValidation,
+  // StudentAuthorization,
+  getAllAssignment
+);
+router.get(
+  "/teacher/assignmentsubmited/:subjectId",
+  tokenValidation,
+  // StudentAuthorization,
+  getSubmitedAssignemnt
 );
 
 export default router;
