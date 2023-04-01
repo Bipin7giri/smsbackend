@@ -1,4 +1,4 @@
-import { create, get } from "../controllers/notes.controller";
+import { create, get, getAllNotes } from "../controllers/notes.controller";
 import * as express from "express";
 import {
   StudentAuthorization,
@@ -28,7 +28,7 @@ router.get(
   "/student/notes/",
   tokenValidation,
   // StudentAuthorization,
-  getAllAssignment
+  getAllNotes
 );
 
 export default router;

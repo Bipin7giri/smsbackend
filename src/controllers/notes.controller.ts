@@ -143,6 +143,7 @@ export const getAllNotes = async (req: Request, res: Response) => {
         subjectId: true,
       },
     });
+    console.log(notes);
     res.json(notes);
   } catch (err: any) {
     res.json(err.message);
