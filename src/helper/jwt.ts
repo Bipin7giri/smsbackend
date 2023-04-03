@@ -15,7 +15,7 @@ export async function generateToken(user: any, expire?: any): Promise<any> {
       },
       "json_web_token_pw",
       {
-        expiresIn: "10h",
+        expiresIn: "11h",
       }
     );
   } catch (err: any) {
