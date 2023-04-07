@@ -10,7 +10,7 @@ const absentRepo = AppDataSource.getRepository(Absent);
 const presentRepo = AppDataSource.getRepository(Present);
 const reportsRepo = AppDataSource.getRepository(Reports);
 const subjectRepo = AppDataSource.getRepository(Subjects);
-
+const manager = AppDataSource.manager;
 export const create = async (req: any, res: Response): Promise<void> => {
   try {
     const validate = await AttendanceSchema.validateAsync(req.body);
@@ -20,7 +20,7 @@ export const create = async (req: any, res: Response): Promise<void> => {
       authHeader = authHeader.slice(7, authHeader.length);
     }
     const currentUser: any = await getCurrentUser(authHeader || "");
-
+    console.log(currentUser);
     const classId: any = await subjectRepo.findOne({
       where: {
         teacherId: {
@@ -29,7 +29,7 @@ export const create = async (req: any, res: Response): Promise<void> => {
       },
       relations: ["semesterId"],
     });
-
+    console.log(classId);
     if (validate.isPresent === true) {
       const result: any = await presentRepo.save({
         studentId: validate.studentId,
@@ -40,7 +40,6 @@ export const create = async (req: any, res: Response): Promise<void> => {
         presentId: result.id,
         subjectId: classId.id,
         studentId: validate.studentId,
-        totalAbsent: 1,
       });
       res.status(202).json({ result, status: 202 });
     } else {
@@ -48,7 +47,6 @@ export const create = async (req: any, res: Response): Promise<void> => {
         studentId: validate.studentId,
         subjectId: classId?.id,
       });
-
       await reportsRepo.save({
         semesterId: classId.semesterId.id,
         absentId: result.id,
@@ -62,7 +60,7 @@ export const create = async (req: any, res: Response): Promise<void> => {
 
     console.log(currentUser.id);
   } catch (err: any) {
-    res.status(422).json(err);
+    res.status(422).json(err.messagea);
   }
 };
 
@@ -74,6 +72,15 @@ export const get = async (req: any, res: Response): Promise<void> => {
       authHeader = authHeader.slice(7, authHeader.length);
     }
     const currentUser: any = await getCurrentUser(authHeader || "");
+
+    let startDate = "";
+    const result = await manager.query(
+      "SELECT * FROM reports WHERE date(created_at) BETWEEN $1 AND $2",
+      ["2023-02-01", "2023-03-30"]
+    );
+    res.json(result);
+
+    console.log(result);
 
     console.log(currentUser.id);
   } catch (err: any) {

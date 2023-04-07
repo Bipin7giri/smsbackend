@@ -53,7 +53,7 @@ function generateToken(user, expire) {
                             roles: user.roleId.roles,
                             email: user.email,
                         }, "json_web_token_pw", {
-                            expiresIn: "10h",
+                            expiresIn: "11h",
                         })];
                 case 1: return [2 /*return*/, _a.sent()];
                 case 2:

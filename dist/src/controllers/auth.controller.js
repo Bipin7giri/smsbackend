@@ -182,8 +182,8 @@ function adminlogin(req, res, next) {
                                 email: validate.email,
                                 blocked: false,
                                 roleId: {
-                                    name: RoleEnum_1.roles.ADMIN
-                                }
+                                    name: RoleEnum_1.roles.ADMIN,
+                                },
                             },
                         })];
                 case 3:
@@ -282,8 +282,8 @@ function hodLogin(req, res, next) {
                                 email: validate.email,
                                 blocked: false,
                                 roleId: {
-                                    name: RoleEnum_1.roles.HOD
-                                }
+                                    name: RoleEnum_1.roles.HOD,
+                                },
                             },
                         })];
                 case 3:
@@ -381,7 +381,7 @@ function login(req, res, next) {
                             },
                             where: {
                                 email: validate.email,
-                                blocked: false
+                                blocked: false,
                             },
                         })];
                 case 3:
@@ -481,8 +481,8 @@ function studentLogin(req, res, next) {
                                 email: validate.email,
                                 blocked: false,
                                 roleId: {
-                                    name: RoleEnum_1.roles.STUDENT
-                                }
+                                    name: RoleEnum_1.roles.STUDENT,
+                                },
                             },
                         })];
                 case 3:
@@ -566,7 +566,6 @@ function getUser(req, res) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
-                    console.log("hi");
                     authHeader = req.headers["authorization"];
                     if (authHeader && authHeader.startsWith("Bearer ")) {
                         // Remove "Bearer " from the authHeader

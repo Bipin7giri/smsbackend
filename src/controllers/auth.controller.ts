@@ -18,7 +18,7 @@ import { transporter } from "../helper/nodeMailer";
 import { Like } from "typeorm";
 import { UpdateUserRole } from "../schema/roleSchema";
 import { MAILDATA } from "../Interface/NodeMailerInterface";
-import {roles} from "../ENUMS/RoleEnum";
+import { roles } from "../ENUMS/RoleEnum";
 
 const userModel = require("../MongoDB/Schema/UserSchema");
 let nodemailer = require("nodemailer");
@@ -140,9 +140,9 @@ export async function adminlogin(
         where: {
           email: validate.email,
           blocked: false,
-          roleId:{
-            name:roles.ADMIN
-          }
+          roleId: {
+            name: roles.ADMIN,
+          },
         },
       });
 
@@ -207,12 +207,10 @@ export async function adminlogin(
   }
 }
 
-
-
 export async function hodLogin(
-    req: Request,
-    res: Response,
-    next: any
+  req: Request,
+  res: Response,
+  next: any
 ): Promise<void> {
   try {
     const validate = await RegisterSchema.validateAsync(req.body);
@@ -225,22 +223,22 @@ export async function hodLogin(
         where: {
           email: validate.email,
           blocked: false,
-          roleId:{
-            name:roles.HOD
-          }
+          roleId: {
+            name: roles.HOD,
+          },
         },
       });
 
       if (user) {
         const checkPassword: Boolean = await comparePassword(
-            user.password,
-            validate.password
+          user.password,
+          validate.password
         );
         if (checkPassword) {
           if (user?.isEmailVerified === false) {
             res.json({
               message:
-                  "Not verified Email please check our email for verification",
+                "Not verified Email please check our email for verification",
             });
             return;
           }
@@ -293,91 +291,9 @@ export async function hodLogin(
 }
 
 export async function login(
-    req: Request,
-    res: Response,
-    next: any
-): Promise<void> {
-  try {
-    const validate = await RegisterSchema.validateAsync(req.body);
-    try {
-      const repo = AppDataSource.getRepository(User);
-      const user: any = await repo.findOne({
-        relations: {
-          roleId: true,
-        },
-        where: {
-          email: validate.email,
-          blocked: false
-        },
-      });
-
-      if (user) {
-        const checkPassword: Boolean = await comparePassword(
-            user.password,
-            validate.password
-        );
-        if (checkPassword) {
-          if (user?.isEmailVerified === false) {
-            res.json({
-              message:
-                  "Not verified Email please check our email for verification",
-            });
-            return;
-          }
-          const accessToken: any = await generateToken(user);
-
-          const result = await repo.update(user.id, {
-            deviceId: validate.deviceId,
-          });
-
-          const checkIfAlreadyExist = await userModel.findOne({
-            username: user.email,
-          });
-          console.log(checkIfAlreadyExist);
-          if (validate.deviceId) {
-            console.log(validate.deviceId);
-            if (!checkIfAlreadyExist) {
-              const chatUser = await userModel.create({
-                username: user.email,
-                displayName: user.firstName,
-                deviceId: validate.deviceId,
-              });
-              console.log(chatUser);
-            }
-          }
-
-          res.json({
-            access_token: accessToken,
-            message: "Login successful !!",
-            role:user.roleId?.name,
-            status: 200,
-          });
-        } else {
-          res.status(401).json({
-            message: "Invalid password !!",
-            status: 404,
-          });
-        }
-      } else {
-        res.status(401).json({
-          message: "No email found or Blocked",
-          status: 404,
-        });
-      }
-    } catch (err: any) {
-      throw err;
-      // res.status(422).send({ error: true, message: err.message });;
-    }
-  } catch (err: any) {
-    res.status(422).send({ error: true, message: err.message, status: 422 });
-  }
-}
-
-
-export async function studentLogin(
-    req: Request,
-    res: Response,
-    next: any
+  req: Request,
+  res: Response,
+  next: any
 ): Promise<void> {
   try {
     const validate = await RegisterSchema.validateAsync(req.body);
@@ -390,22 +306,103 @@ export async function studentLogin(
         where: {
           email: validate.email,
           blocked: false,
-          roleId:{
-            name:roles.STUDENT
-          }
         },
       });
 
       if (user) {
         const checkPassword: Boolean = await comparePassword(
-            user.password,
-            validate.password
+          user.password,
+          validate.password
         );
         if (checkPassword) {
           if (user?.isEmailVerified === false) {
             res.json({
               message:
-                  "Not verified Email please check our email for verification",
+                "Not verified Email please check our email for verification",
+            });
+            return;
+          }
+          const accessToken: any = await generateToken(user);
+
+          const result = await repo.update(user.id, {
+            deviceId: validate.deviceId,
+          });
+
+          const checkIfAlreadyExist = await userModel.findOne({
+            username: user.email,
+          });
+          console.log(checkIfAlreadyExist);
+          if (validate.deviceId) {
+            console.log(validate.deviceId);
+            if (!checkIfAlreadyExist) {
+              const chatUser = await userModel.create({
+                username: user.email,
+                displayName: user.firstName,
+                deviceId: validate.deviceId,
+              });
+              console.log(chatUser);
+            }
+          }
+
+          res.json({
+            access_token: accessToken,
+            message: "Login successful !!",
+            role: user.roleId?.name,
+            status: 200,
+          });
+        } else {
+          res.status(401).json({
+            message: "Invalid password !!",
+            status: 404,
+          });
+        }
+      } else {
+        res.status(401).json({
+          message: "No email found or Blocked",
+          status: 404,
+        });
+      }
+    } catch (err: any) {
+      throw err;
+      // res.status(422).send({ error: true, message: err.message });;
+    }
+  } catch (err: any) {
+    res.status(422).send({ error: true, message: err.message, status: 422 });
+  }
+}
+
+export async function studentLogin(
+  req: Request,
+  res: Response,
+  next: any
+): Promise<void> {
+  try {
+    const validate = await RegisterSchema.validateAsync(req.body);
+    try {
+      const repo = AppDataSource.getRepository(User);
+      const user: any = await repo.findOne({
+        relations: {
+          roleId: true,
+        },
+        where: {
+          email: validate.email,
+          blocked: false,
+          roleId: {
+            name: roles.STUDENT,
+          },
+        },
+      });
+
+      if (user) {
+        const checkPassword: Boolean = await comparePassword(
+          user.password,
+          validate.password
+        );
+        if (checkPassword) {
+          if (user?.isEmailVerified === false) {
+            res.json({
+              message:
+                "Not verified Email please check our email for verification",
             });
             return;
           }
@@ -457,10 +454,8 @@ export async function studentLogin(
   }
 }
 
-
 export async function getUser(req: Request, res: Response): Promise<void> {
   try {
-    console.log("hi");
     let authHeader = req.headers["authorization"];
     if (authHeader && authHeader.startsWith("Bearer ")) {
       // Remove "Bearer " from the authHeader
