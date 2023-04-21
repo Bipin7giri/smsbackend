@@ -2,6 +2,7 @@ import {
   create,
   get,
   getAllAssignment,
+  getAssigmnmentReport,
   getPdf,
   getSubmitedAssignemnt,
   rateSubmitedAssignment,
@@ -62,6 +63,21 @@ router.get(
   tokenValidation,
   // StudentAuthorization,
   getSubmitedAssignemnt
+);
+
+// get assignmentReports
+// router.get(
+//   "/assignment/reports/:studentId",
+//   tokenValidation,
+//   // StudentAuthorization,
+//   getAssigmnmentReport
+// );
+
+router.post(
+  "/assignment/reports/",
+  tokenValidation,
+  // StudentAuthorization,
+  getAssigmnmentReport
 );
 
 export default router;

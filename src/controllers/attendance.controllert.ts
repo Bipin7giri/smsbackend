@@ -6,12 +6,14 @@ import { Absent } from "../entity/Absent";
 import { Present } from "../entity/Present";
 import { Reports } from "../entity/Reports";
 import { AttendanceSchema } from "../schema/attendanceSchema";
+import { Class } from "../entity/Classes";
 const absentRepo = AppDataSource.getRepository(Absent);
 const presentRepo = AppDataSource.getRepository(Present);
 const reportsRepo = AppDataSource.getRepository(Reports);
 const subjectRepo = AppDataSource.getRepository(Subjects);
+const classRepo = AppDataSource.getRepository(Class);
 const manager = AppDataSource.manager;
-export const create = async (req: any, res: Response): Promise<void> => {
+export const create = async (req: any, res: Response): Promise<any> => {
   try {
     const validate = await AttendanceSchema.validateAsync(req.body);
     let authHeader = req.headers["authorization"];
@@ -29,28 +31,27 @@ export const create = async (req: any, res: Response): Promise<void> => {
       },
       relations: ["semesterId"],
     });
-    console.log(classId);
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, "0");
     const day = String(today.getDate()).padStart(2, "0");
     const formattedDate: any = `${year}-${month}-${day}`;
-    // console.log(formattedDate); // outputs "2023-04-21"
-    // const checkIfAlreadyAttendanceAdded = await reportsRepo.find({
-    //   where: {
-    //     subjectId: {
-    //       id: classId.id,
-    //     },
-    //     createdAt: formattedDate,
-    //   },
-    // });
-    // const result = await manager.query(
-    //   `SELECT * FROM reports WHERE date(created_at) = '${formattedDate}'`
-    // );
-    // console.log(result);
-
-    // res.json(result);
-    // return;
+    console.log(formattedDate); // outputs "2023-04-21"
+    const totalNumberOfStudent = await classRepo.find({
+      where: {
+        subjectId: {
+          id: classId.id,
+        },
+      },
+    });
+    const result = await manager.query(
+      `SELECT * FROM reports WHERE date(created_at) = '${"2023-04-22"}'`
+    );
+    console.log(totalNumberOfStudent.length);
+    console.log(result.length);
+    if (totalNumberOfStudent.length < result.length) {
+      res.json({ message: "Already Attedndace added" });
+    }
     if (validate.isPresent === true) {
       const result: any = await presentRepo.save({
         studentId: validate.studentId,
@@ -75,13 +76,9 @@ export const create = async (req: any, res: Response): Promise<void> => {
         studentId: validate.studentId,
         // totalAbsent: 1,
       });
-
-      res.status(202).json({ result, status: 202 });
     }
-
     console.log(currentUser.id);
   } catch (err: any) {
-    throw err;
     res.status(422).json(err.messagea);
   }
 };

@@ -4,6 +4,7 @@ import { Class } from "../entity/Classes";
 import { Subjects } from "../entity/Subject";
 import { getCurrentUser } from "../helper/jwt";
 import {
+  AssignmentReports,
   CreateAssignment,
   RateSubmitedAssignment,
   SubmitAssignment,
@@ -18,6 +19,7 @@ import { sendNotification } from "../Notification/PushNotification";
 import { Storage } from "megajs";
 import { File } from "megajs";
 import { update } from "./subject.controller";
+import { type } from "os";
 const fs = require("fs");
 const mega = require("mega");
 const assigmnmentRepo = AppDataSource.getRepository(Assignment);
@@ -239,5 +241,38 @@ export const getAllAssignment = async (req: Request, res: Response) => {
     res.json(subjects);
   } catch (err: any) {
     res.json(err.message);
+  }
+};
+
+export const getAssigmnmentReport = async (req: Request, res: Response) => {
+  try {
+    const validate = await AssignmentReports.validateAsync(req.body);
+    const getAssignemtSumbitedList = await assigmnmentSubmitRepo.find({
+      where: {
+        studentId: {
+          id: validate.studentId,
+        },
+        assigmnmentId: {
+          subjectId: {
+            id: validate.subjectId,
+          },
+        },
+      },
+    });
+    const rating: Number[] = getAssignemtSumbitedList.map((item: any) => {
+      return parseFloat(item.rating);
+    });
+    let total = 0;
+    let totalRating: any = 0;
+    for (let i = 0; i < rating.length; i++) {
+      totalRating = totalRating + rating[i];
+      total = total + 5;
+    }
+    const percentage = (totalRating / total) * 100;
+    res.json({ performance: percentage });
+  } catch (err: any) {
+    res.status(500).json({
+      message: err.message,
+    });
   }
 };
