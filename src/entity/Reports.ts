@@ -19,8 +19,6 @@ export class Reports extends SoftDelete {
   @PrimaryGeneratedColumn()
   id: number;
 
-  
-
   @ManyToOne(() => Semester, (s) => s.reports)
   @JoinColumn({ name: "semester_id" })
   semesterId: Semester;
@@ -30,7 +28,7 @@ export class Reports extends SoftDelete {
   presentId: Present;
 
   @ManyToOne(() => Absent, (a) => a.reports)
-  @JoinColumn({  name: "absent_id" })
+  @JoinColumn({ name: "absent_id" })
   absentId: Absent;
 
   @ManyToOne(() => Subjects, (sub) => sub.reports)
@@ -41,6 +39,6 @@ export class Reports extends SoftDelete {
   @JoinColumn({ name: "student_id" })
   studentId: User;
 
-  @Column({ name: "total_absent" })
-  totalAbsent:Number;
+  // @Column({ name: "total_absent" })
+  // totalAbsent:Number;
 }

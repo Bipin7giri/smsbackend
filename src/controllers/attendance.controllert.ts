@@ -52,7 +52,7 @@ export const create = async (req: any, res: Response): Promise<void> => {
         absentId: result.id,
         subjectId: classId.id,
         studentId: validate.studentId,
-        totalAbsent: 1,
+        // totalAbsent: 1,
       });
 
       res.status(202).json({ result, status: 202 });
@@ -60,6 +60,7 @@ export const create = async (req: any, res: Response): Promise<void> => {
 
     console.log(currentUser.id);
   } catch (err: any) {
+    throw err;
     res.status(422).json(err.messagea);
   }
 };
