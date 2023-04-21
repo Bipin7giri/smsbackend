@@ -45,7 +45,7 @@ export const create = async (req: any, res: Response): Promise<any> => {
       },
     });
     const result = await manager.query(
-      `SELECT * FROM reports WHERE date(created_at) = '${"2023-04-22"}'`
+      `SELECT * FROM reports WHERE date(created_at) = '${formattedDate}'`
     );
     console.log(totalNumberOfStudent.length);
     console.log(result.length);
