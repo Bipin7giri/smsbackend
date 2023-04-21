@@ -23,6 +23,9 @@ export class AssignmentSubmission extends SoftDelete {
   @Column()
   submission?: string;
 
+  @Column({ nullable: true })
+  rating?: string;
+
   @ManyToOne(() => Assignment, (sub) => sub.assignemtSubmission)
   @JoinColumn({ name: "assignment_id" })
   assigmnmentId: Assignment;

@@ -3,7 +3,11 @@ import { AppDataSource } from "../PGDB/data-source";
 import { Class } from "../entity/Classes";
 import { Subjects } from "../entity/Subject";
 import { getCurrentUser } from "../helper/jwt";
-import { CreateAssignment, SubmitAssigment } from "../schema/assignmentSchema";
+import {
+  CreateAssignment,
+  RateSubmitedAssignment,
+  SubmitAssignment,
+} from "../schema/assignmentSchema";
 import { Assignment } from "../entity/Assignment";
 import { uploadFile } from "../helper/imageupload";
 import { AssignmentSubmission } from "../entity/AssignmentSubmission";
@@ -13,6 +17,7 @@ import { DATA, NotificationResult } from "../Interface/SubjectInterface";
 import { sendNotification } from "../Notification/PushNotification";
 import { Storage } from "megajs";
 import { File } from "megajs";
+import { update } from "./subject.controller";
 const fs = require("fs");
 const mega = require("mega");
 const assigmnmentRepo = AppDataSource.getRepository(Assignment);
@@ -22,6 +27,7 @@ const classRepo = AppDataSource.getRepository(Class);
 
 export const create = async (req: any, res: Response): Promise<void> => {
   try {
+    console.log(req.body);
     const validate = await CreateAssignment.validateAsync(req.body);
     let authHeader = req.headers["authorization"];
     if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -39,24 +45,6 @@ export const create = async (req: any, res: Response): Promise<void> => {
     validate.subjectId = subjectId.id;
     console.log(req.file);
     if (req?.file) {
-      // const storage = await new Storage({
-      //   email: "giribipin04@gmail.com",
-      //   password: "!vrzLgfMXt5vqqw",
-      // }).ready;
-      // fs.readFile(req.file.path, async (err: any, data: any) => {
-      //   if (err) {
-      //     console.error(err);
-      //     return res.status(500).send("Error uploading file");
-      //   }
-      //   console.log(data);
-      //   const file = await storage.upload(`${req.file.filename}.pdf`, data)
-      //     .complete;
-      //   // console.log(file);
-      //   console.log(data);
-      //   validate.pdf = data;
-      //   // Send buffer data to client
-      // });
-
       const imageUrl = await uploadFile(req.file.path);
       validate.pdf = imageUrl;
     }
@@ -143,7 +131,7 @@ export const submitAssigment = async (
   res: Response
 ): Promise<void> => {
   try {
-    const validate = await SubmitAssigment.validateAsync(req.body);
+    const validate = await SubmitAssignment.validateAsync(req.body);
     const { assignmentId } = req.params;
     let authHeader = req.headers["authorization"];
     if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -195,10 +183,29 @@ export const getSubmitedAssignemnt = async (req: Request, res: Response) => {
           },
         },
       },
+      relations: {
+        studentId: true,
+        assigmnmentId: true,
+      },
     });
     console.log(getAssignemtSumbitedList);
     res.json(getAssignemtSumbitedList);
   } catch (err) {
+    res.json(err);
+  }
+};
+
+export const rateSubmitedAssignment = async (req: Request, res: Response) => {
+  try {
+    const validate = await RateSubmitedAssignment.validateAsync(req.body);
+    await assigmnmentSubmitRepo.update(
+      { id: validate.submitedAssignmentId },
+      {
+        rating: validate.rating,
+      }
+    );
+    res.status(204).json({ message: "Rating added" });
+  } catch (err: any) {
     res.json(err);
   }
 };

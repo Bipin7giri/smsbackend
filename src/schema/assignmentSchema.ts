@@ -5,7 +5,12 @@ export const CreateAssignment = Joi.object({
   deadLine: Joi.date().required(),
 });
 
-export const SubmitAssigment = Joi.object({
-  assigmnmentId: Joi.string(),
+export const SubmitAssignment = Joi.object({
+  assignmentId: Joi.string(),
   submission: Joi.string(),
+});
+
+export const RateSubmitedAssignment = Joi.object({
+  submitedAssignmentId: Joi.number().required(),
+  rating: Joi.number().max(5).min(0).required(),
 });

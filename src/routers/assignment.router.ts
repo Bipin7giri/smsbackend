@@ -4,6 +4,7 @@ import {
   getAllAssignment,
   getPdf,
   getSubmitedAssignemnt,
+  rateSubmitedAssignment,
   submitAssigment,
 } from "../controllers/assignment.controller";
 import * as express from "express";
@@ -32,6 +33,15 @@ router.post(
   StudentAuthorization,
   upload.single("submission"),
   submitAssigment
+);
+
+// rate assignment
+
+router.patch(
+  "/teacher/rateassignment",
+  tokenValidation,
+  TeacherAuthorization,
+  rateSubmitedAssignment
 );
 
 router.get(
