@@ -3,6 +3,8 @@ import {
   get,
   getAllAssignment,
   getAssigmnmentReport,
+  getAssigmnmentReportForTeacher,
+  getAssignmentListTeacher,
   getPdf,
   getSubmitedAssignemnt,
   rateSubmitedAssignment,
@@ -73,11 +75,30 @@ router.get(
 //   getAssigmnmentReport
 // );
 
+// for student
 router.post(
   "/assignment/reports/",
   tokenValidation,
   // StudentAuthorization,
   getAssigmnmentReport
+);
+
+//for teacher
+
+router.get(
+  "/teacher/assignment/reports/:studentId",
+  tokenValidation,
+  TeacherAuthorization,
+  getAssigmnmentReportForTeacher
+);
+
+// getAssignmentListTeacher
+
+router.get(
+  "/teacher/assignment",
+  tokenValidation,
+  TeacherAuthorization,
+  getAssignmentListTeacher
 );
 
 export default router;

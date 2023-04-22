@@ -48,7 +48,7 @@ export const create = async (req: any, res: Response): Promise<void> => {
     console.log(req.file);
     if (req?.file) {
       const imageUrl = await uploadFile(req.file.path);
-      validate.pdf = imageUrl;
+      validate.assignment = imageUrl;
     }
 
     const result = await assigmnmentRepo.insert(validate);
@@ -274,5 +274,84 @@ export const getAssigmnmentReport = async (req: Request, res: Response) => {
     res.status(500).json({
       message: err.message,
     });
+  }
+};
+
+export const getAssigmnmentReportForTeacher = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    // const validate = await AssignmentReports.validateAsync(req.body);
+
+    const studentId: any = req.params.studentId;
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = await getCurrentUser(authHeader || "");
+
+    const subjectId: any = await subjectRepo.findOne({
+      where: {
+        teacherId: {
+          id: currentUser?.id,
+        },
+      },
+    });
+    const getAssignemtSumbitedList = await assigmnmentSubmitRepo.find({
+      where: {
+        studentId: {
+          id: studentId,
+        },
+        assigmnmentId: {
+          subjectId: {
+            id: subjectId.subjectId,
+          },
+        },
+      },
+    });
+    const rating: Number[] = getAssignemtSumbitedList.map((item: any) => {
+      return parseFloat(item.rating);
+    });
+    let total = 0;
+    let totalRating: any = 0;
+    for (let i = 0; i < rating.length; i++) {
+      totalRating = totalRating + rating[i];
+      total = total + 5;
+    }
+    const percentage = (totalRating / total) * 100;
+    res.json({ performance: percentage });
+  } catch (err: any) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+};
+
+export const getAssignmentListTeacher = async (req: Request, res: Response) => {
+  try {
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = await getCurrentUser(authHeader || "");
+    const subjects = await assigmnmentRepo.find({
+      where: {
+        deleted: false,
+        subjectId: {
+          teacherId: {
+            id: currentUser.id,
+          },
+        },
+      },
+      order: {
+        createdAt: "DESC",
+      },
+    });
+    res.json(subjects);
+  } catch (err: any) {
+    res.status(422).json({ message: err.message });
   }
 };

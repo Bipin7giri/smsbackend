@@ -1,6 +1,6 @@
 import * as Joi from "joi";
 export const CreateAssignment = Joi.object({
-  pdf: Joi.string(),
+  assignment: Joi.string(),
   word: Joi.string(),
   deadLine: Joi.date().required(),
 });
