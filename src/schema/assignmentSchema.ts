@@ -2,7 +2,7 @@ import * as Joi from "joi";
 export const CreateAssignment = Joi.object({
   assignment: Joi.string(),
   word: Joi.string(),
-  deadLine: Joi.date().required(),
+  deadLine: Joi.date(),
 });
 
 export const SubmitAssignment = Joi.object({
