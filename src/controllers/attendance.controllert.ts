@@ -7,12 +7,13 @@ import { Present } from "../entity/Present";
 import { Reports } from "../entity/Reports";
 import { AttendanceSchema } from "../schema/attendanceSchema";
 import { Class } from "../entity/Classes";
-const absentRepo = AppDataSource.getRepository(Absent);
-const presentRepo = AppDataSource.getRepository(Present);
-const reportsRepo = AppDataSource.getRepository(Reports);
-const subjectRepo = AppDataSource.getRepository(Subjects);
-const classRepo = AppDataSource.getRepository(Class);
-const manager = AppDataSource.manager;
+import { EntityManager, Repository } from "typeorm";
+const absentRepo: Repository<Absent> = AppDataSource.getRepository(Absent);
+const presentRepo: Repository<Present> = AppDataSource.getRepository(Present);
+const reportsRepo: Repository<Reports> = AppDataSource.getRepository(Reports);
+const subjectRepo: Repository<Subjects> = AppDataSource.getRepository(Subjects);
+const classRepo: Repository<Class> = AppDataSource.getRepository(Class);
+const manager: EntityManager = AppDataSource.manager;
 export const create = async (req: any, res: Response): Promise<any> => {
   try {
     const validate = await AttendanceSchema.validateAsync(req.body);
@@ -31,10 +32,10 @@ export const create = async (req: any, res: Response): Promise<any> => {
       },
       relations: ["semesterId"],
     });
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
+    const today: Date = new Date();
+    const year: number = today.getFullYear();
+    const month: string = String(today.getMonth() + 1).padStart(2, "0");
+    const day: string = String(today.getDate()).padStart(2, "0");
     const formattedDate: any = `${year}-${month}-${day}`;
     console.log(formattedDate); // outputs "2023-04-21"
     const totalNumberOfStudent = await classRepo.find({
@@ -49,7 +50,7 @@ export const create = async (req: any, res: Response): Promise<any> => {
     );
     console.log(totalNumberOfStudent.length);
     console.log(result.length);
-    if (totalNumberOfStudent.length < result.length) {
+    if (totalNumberOfStudent.length === result.length) {
       res.json({ message: "Already Attedndace added" });
     }
     if (validate.isPresent === true) {
@@ -104,7 +105,7 @@ export const getAttendanceReportByStudentId = async (
       },
     });
 
-    const getAttendanceReports = await reportsRepo.find({
+    const getAttendanceReports: Reports[] = await reportsRepo.find({
       where: {
         studentId: {
           id: studentId,
@@ -155,7 +156,7 @@ export const get = async (req: any, res: Response): Promise<void> => {
     }
     const currentUser: any = await getCurrentUser(authHeader || "");
 
-    let startDate = "";
+    let startDate: string = "";
     const result = await manager.query(
       "SELECT * FROM reports WHERE date(created_at) BETWEEN $1 AND $2",
       ["2023-02-01", "2023-03-30"]

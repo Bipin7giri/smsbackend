@@ -17,10 +17,11 @@ import { MAILDATA } from "../Interface/NodeMailerInterface";
 import { NotificationSchemaTeacher } from "../schema/notificationSchema";
 import { createMeetingApi } from "../services/zoommeeting";
 import { Meeting } from "../entity/Meeting";
+import { Repository } from "typeorm";
 
-const meetingRepo = AppDataSource.getRepository(Meeting);
-const subjectRepo = AppDataSource.getRepository(Subjects);
-const classRepo = AppDataSource.getRepository(Class);
+const meetingRepo: Repository<Meeting> = AppDataSource.getRepository(Meeting);
+const subjectRepo: Repository<Subjects> = AppDataSource.getRepository(Subjects);
+const classRepo: Repository<Class> = AppDataSource.getRepository(Class);
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const validate = await SubjectAndClassShcema.validateAsync(req.body);
@@ -68,7 +69,7 @@ export const get = async (req: Request, res: Response): Promise<void> => {
     }
     const currentUser: any = getCurrentUser(authHeader || "");
     const repo = AppDataSource.getRepository(Department);
-    const subjects = await repo.find({
+    const subjects: any = await repo.find({
       where: {
         ["hod"]: currentUser.id,
         semesterId: {
