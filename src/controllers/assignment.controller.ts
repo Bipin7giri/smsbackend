@@ -51,7 +51,11 @@ export const create = async (req: any, res: Response): Promise<void> => {
       validate.assignment = imageUrl;
     }
 
-    const result = await assigmnmentRepo.insert(validate);
+    const result = await assigmnmentRepo.insert({
+      deadLine: validate?.deadLine,
+      pdf: validate?.assigmnment,
+      word: validate?.word,
+    });
 
     const getAllStudent: any = await classRepo.find({
       relations: ["studentId"],
