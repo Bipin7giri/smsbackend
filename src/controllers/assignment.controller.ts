@@ -27,9 +27,11 @@ const subjectRepo = AppDataSource.getRepository(Subjects);
 const assigmnmentSubmitRepo = AppDataSource.getRepository(AssignmentSubmission);
 const classRepo = AppDataSource.getRepository(Class);
 
-export const create = async (req: any, res: Response): Promise<void> => {
+export const createAssignment = async (
+  req: any,
+  res: Response
+): Promise<void> => {
   try {
-    console.log(req.body);
     const validate = await CreateAssignment.validateAsync(req.body);
     let authHeader = req.headers["authorization"];
     if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -46,14 +48,14 @@ export const create = async (req: any, res: Response): Promise<void> => {
     });
     validate.subjectId = subjectId.id;
     console.log(req.file);
+    let imageUrl = "";
     if (req?.file) {
-      const imageUrl = await uploadFile(req.file.path);
-      validate.assignment = imageUrl;
+      imageUrl = await uploadFile(req.file.path);
     }
 
     const result = await assigmnmentRepo.insert({
       deadLine: validate?.deadLine,
-      pdf: validate?.assigmnment,
+      pdf: imageUrl,
       word: validate?.word,
     });
 
@@ -85,21 +87,21 @@ export const create = async (req: any, res: Response): Promise<void> => {
       return item.studentId.deviceId;
     });
 
-    const deviceID: String[] = deviceIDs;
-    let data: DATA = {
-      to: deviceID,
-      sound: "default",
-      title: "Assignment Alert!!!",
-      body: "please check your App for " + subjectId.subject_name,
-      data: {
-        wha: "qokq",
-        flakdjlaw: "dlwaldjwalk",
-      },
-    };
+    // const deviceID: String[] = deviceIDs;
+    // let data: DATA = {
+    //   to: deviceID,
+    //   sound: "default",
+    //   title: "Assignment Alert!!!",
+    //   body: "please check your App for " + subjectId.subject_name,
+    //   data: {
+    //     wha: "qokq",
+    //     flakdjlaw: "dlwaldjwalk",
+    //   },
+    // };
 
-    const results: NotificationResult = await sendNotification(data);
-    // console.log(results)
-    // }
+    // const results: NotificationResult = await sendNotification(data);
+    // // console.log(results)
+    // // }
     res.status(202).json({ message: "created assignment", status: 202 });
   } catch (err: any) {
     res.status(422).json(err);

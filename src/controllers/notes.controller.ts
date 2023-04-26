@@ -10,12 +10,14 @@ import { sendNotification } from "../Notification/PushNotification";
 import { CreateNotes } from "../schema/notesSchema";
 import { Notes } from "../entity/Notes";
 import { uploadFile } from "../helper/imageupload";
+import { copyFileSync } from "fs";
 const noteRepo = AppDataSource.getRepository(Notes);
 const subjectRepo = AppDataSource.getRepository(Subjects);
 const classRepo = AppDataSource.getRepository(Class);
 const Mega = require("mega");
 export const create = async (req: any, res: Response): Promise<void> => {
   try {
+    console.log(req.file);
     const validate = await CreateNotes.validateAsync(req.body);
     let authHeader = req.headers["authorization"];
     if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -34,12 +36,12 @@ export const create = async (req: any, res: Response): Promise<void> => {
     console.log(subjectId);
     validate.subjectId = subjectId.id;
 
+    console.log(req.file);
     if (req?.file) {
       const imageUrl = await uploadFile(req.file.path);
       validate.pdf = imageUrl;
       console.log(req.file);
     }
-
     const result = await noteRepo.insert(validate);
 
     const getAllStudent: any = await classRepo.find({

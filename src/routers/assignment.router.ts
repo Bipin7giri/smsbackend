@@ -1,5 +1,5 @@
 import {
-  create,
+  createAssignment,
   get,
   getAllAssignment,
   getAssigmnmentReport,
@@ -25,8 +25,8 @@ router.post(
   "/teacher/assignment",
   tokenValidation,
   TeacherAuthorization,
-  upload.single("assignment"),
-  create
+  upload.single("note"),
+  createAssignment
 );
 
 router.get("/getpdf", getPdf);
