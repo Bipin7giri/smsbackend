@@ -50,8 +50,8 @@ export const create = async (req: any, res: Response): Promise<any> => {
     );
     console.log(totalNumberOfStudent.length);
     console.log(result.length);
-    if (totalNumberOfStudent.length === result.length) {
-      res.json({ message: "Already Attedndace added" });
+    if (totalNumberOfStudent.length <= result.length) {
+      return res.json({ message: "Already Attedndace added" });
     }
     if (validate.isPresent === true) {
       const result: any = await presentRepo.save({
@@ -77,10 +77,11 @@ export const create = async (req: any, res: Response): Promise<any> => {
         studentId: validate.studentId,
         // totalAbsent: 1,
       });
+      res.status(202).json({ result, status: 202 });
     }
     console.log(currentUser.id);
   } catch (err: any) {
-    res.status(422).json(err.messagea);
+    res.status(422).json(err.message);
   }
 };
 
@@ -156,6 +157,15 @@ export const get = async (req: any, res: Response): Promise<void> => {
     }
     const currentUser: any = await getCurrentUser(authHeader || "");
 
+    const today: Date = new Date();
+    const year: number = today.getFullYear();
+    const month: string = String(today.getMonth() + 1).padStart(2, "0");
+    const day: string = String(today.getDate()).padStart(2, "0");
+    const formattedDate: any = `${year}-${month}-${day}`;
+    console.log(formattedDate);
+
+    // const result = await
+    // const resul
     let startDate: string = "";
     const result = await manager.query(
       "SELECT * FROM reports WHERE date(created_at) BETWEEN $1 AND $2",

@@ -14,12 +14,7 @@ import { uploadFile } from "../helper/imageupload";
 import { AssignmentSubmission } from "../entity/AssignmentSubmission";
 import { MAILDATA } from "../Interface/NodeMailerInterface";
 import { transporter } from "../helper/nodeMailer";
-import { DATA, NotificationResult } from "../Interface/SubjectInterface";
-import { sendNotification } from "../Notification/PushNotification";
-import { Storage } from "megajs";
 import { File } from "megajs";
-import { update } from "./subject.controller";
-import { type } from "os";
 const fs = require("fs");
 const mega = require("mega");
 const assigmnmentRepo = AppDataSource.getRepository(Assignment);
@@ -88,22 +83,6 @@ export const createAssignment = async (
     const deviceIDs = getAllStudent.map((item: any, id: any) => {
       return item.studentId.deviceId;
     });
-
-    // const deviceID: String[] = deviceIDs;
-    // let data: DATA = {
-    //   to: deviceID,
-    //   sound: "default",
-    //   title: "Assignment Alert!!!",
-    //   body: "please check your App for " + subjectId.subject_name,
-    //   data: {
-    //     wha: "qokq",
-    //     flakdjlaw: "dlwaldjwalk",
-    //   },
-    // };
-
-    // const results: NotificationResult = await sendNotification(data);
-    // // console.log(results)
-    // // }
     res.status(202).json({ message: "created assignment", status: 202 });
   } catch (err: any) {
     res.status(422).json(err);
