@@ -3,6 +3,7 @@ export const CreateAssignment = Joi.object({
   assignment: Joi.string(),
   word: Joi.string(),
   deadLine: Joi.date(),
+  title: Joi.string(),
 });
 
 export const SubmitAssignment = Joi.object({

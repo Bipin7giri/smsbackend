@@ -57,6 +57,8 @@ export const createAssignment = async (
       deadLine: validate?.deadLine,
       pdf: imageUrl,
       word: validate?.word,
+      subjectId: subjectId?.id,
+      title: validate.title,
     });
 
     const getAllStudent: any = await classRepo.find({

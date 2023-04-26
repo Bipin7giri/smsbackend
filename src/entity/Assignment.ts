@@ -22,6 +22,8 @@ export class Assignment extends SoftDelete {
   @Column({ nullable: true })
   word?: string;
 
+  @Column({ nullable: true })
+  title?: string;
   @Column({
     name: "dead_line",
     type: "timestamp",
