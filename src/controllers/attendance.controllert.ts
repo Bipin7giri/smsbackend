@@ -5,7 +5,7 @@ import { getCurrentUser } from "../helper/jwt";
 import { Absent } from "../entity/Absent";
 import { Present } from "../entity/Present";
 import { Reports } from "../entity/Reports";
-import { AttendanceSchema } from "../schema/attendanceSchema";
+import { AttedanceByDate, AttendanceSchema } from "../schema/attendanceSchema";
 import { Class } from "../entity/Classes";
 import { EntityManager, Repository } from "typeorm";
 const absentRepo: Repository<Absent> = AppDataSource.getRepository(Absent);
@@ -157,25 +157,62 @@ export const get = async (req: any, res: Response): Promise<void> => {
     }
     const currentUser: any = await getCurrentUser(authHeader || "");
 
-    const today: Date = new Date();
-    const year: number = today.getFullYear();
-    const month: string = String(today.getMonth() + 1).padStart(2, "0");
-    const day: string = String(today.getDate()).padStart(2, "0");
-    const formattedDate: any = `${year}-${month}-${day}`;
-    console.log(formattedDate);
+    const subjectId: any = await subjectRepo.findOne({
+      where: {
+        teacherId: {
+          id: currentUser.id,
+        },
+      },
+    });
+    const result = await manager.query(
+        `SELECT sms.public.user.email, reports.present_id, reports.absent_id,reports.created_at 
+FROM reports
+INNER JOIN sms.public.user ON sms.public.user.id = reports.student_id
+WHERE subject_id = ${subjectId.id} ORDER BY reports.created_at DESC`
+    );
+    res.json(result);
+  } catch (err: any) {
+    res.status(422).json(err);
+  }
+};
+
+export const getByDate = async (req: any, res: Response): Promise<void> => {
+  try {
+    const validate = await AttedanceByDate.validateAsync(req.body);
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const date = req.params.date;
+    const currentUser: any = await getCurrentUser(authHeader || "");
+
+    const subjectId: any = await subjectRepo.findOne({
+      where: {
+        teacherId: {
+          id: currentUser.id,
+        },
+      },
+    });
+    console.log(date);
 
     // const result = await
     // const resul
-    let startDate: string = "";
+    let startDate: string = "Wed Apr 26 2023 00:00:00 GMT+0545 (Nepal Time)";
+
+    const formattedStartDate: any = new Date(validate.date)
+      .toISOString()
+      .substr(0, 10);
+
+    console.log(formattedStartDate);
+
     const result = await manager.query(
-      "SELECT * FROM reports WHERE date(created_at) BETWEEN $1 AND $2",
-      ["2023-02-01", "2023-03-30"]
+        `SELECT sms.public.user.email, reports.present_id, reports.absent_id,reports.created_at 
+FROM reports
+INNER JOIN sms.public.user ON sms.public.user.id = reports.student_id
+WHERE DATE(reports.created_at) = '${formattedStartDate}' AND subject_id = ${subjectId.id}`
     );
     res.json(result);
-
-    console.log(result);
-
-    console.log(currentUser.id);
   } catch (err: any) {
     res.status(422).json(err);
   }

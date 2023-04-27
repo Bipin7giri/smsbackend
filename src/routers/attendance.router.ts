@@ -2,6 +2,7 @@ import {
   create,
   get,
   getAttendanceReportByStudentId,
+  getByDate,
 } from "../controllers/attendance.controllert";
 import * as express from "express";
 import {
@@ -21,6 +22,12 @@ router.get(
   tokenValidation,
   TeacherAuthorization,
   getAttendanceReportByStudentId
+);
+router.post(
+  "/attendancebydate",
+  tokenValidation,
+  TeacherAuthorization,
+  getByDate
 );
 
 // router.get(
