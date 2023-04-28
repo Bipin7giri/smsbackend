@@ -4,5 +4,6 @@ export const AttendanceSchema = Joi.object({
   studentId: Joi.number().required(),
 });
 export const AttedanceByDate = Joi.object({
-  date: Joi.date().required(),
+  startDate: Joi.date().required(),
+  endDate: Joi.date().required(),
 });

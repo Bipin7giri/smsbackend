@@ -202,19 +202,31 @@ export const getByDate = async (req: any, res: Response): Promise<void> => {
     // const resul
     let startDate: string = "Wed Apr 26 2023 00:00:00 GMT+0545 (Nepal Time)";
 
-    const formattedStartDate: any = new Date(validate.date)
+    const formattedStartDate: any = new Date(validate.startDate)
       .toISOString()
       .substr(0, 10);
-
-    console.log(formattedStartDate);
-
+    const formattedEndDate: any = new Date(validate.endDate)
+      .toISOString()
+      .substr(0, 10);
     const result = await manager.query(
-      `SELECT sms.public.user.email, reports.present_id, reports.absent_id,reports.created_at 
-FROM reports
-INNER JOIN sms.public.user ON sms.public.user.id = reports.student_id
-WHERE DATE(reports.created_at) = '${formattedStartDate}' AND subject_id = ${subjectId.id}`
+      `SELECT sms.public.user.email, reports.present_id, reports.absent_id, reports.created_at 
+      FROM reports
+      INNER JOIN sms.public.user ON sms.public.user.id = reports.student_id
+      WHERE DATE(reports.created_at) BETWEEN '${formattedStartDate}' AND '${formattedEndDate}' 
+        AND subject_id = ${subjectId.id}`
     );
-    res.json(result);
+
+    const emailData: any = {};
+
+    result.forEach((entry: { email: any }) => {
+      const email = entry.email;
+      if (!emailData[email]) {
+        emailData[email] = [];
+      }
+      emailData[email].push(entry);
+    });
+
+    res.json(emailData);
   } catch (err: any) {
     res.status(422).json(err);
   }
