@@ -139,15 +139,6 @@ export const getAttendanceReportByStudentId = async (
   }
 };
 
-// const getTodayAttendanceReport =async (req:Request,res:Response) => {
-//   try{
-
-//   }
-//   catch(err){
-
-//   }
-// }
-
 export const get = async (req: any, res: Response): Promise<void> => {
   try {
     let authHeader = req.headers["authorization"];
@@ -165,12 +156,23 @@ export const get = async (req: any, res: Response): Promise<void> => {
       },
     });
     const result = await manager.query(
-        `SELECT sms.public.user.email, reports.present_id, reports.absent_id,reports.created_at 
+      `SELECT sms.public.user.email, reports.present_id, reports.absent_id,reports.created_at 
 FROM reports
 INNER JOIN sms.public.user ON sms.public.user.id = reports.student_id
 WHERE subject_id = ${subjectId.id} ORDER BY reports.created_at DESC`
     );
-    res.json(result);
+
+    const emailData: any = {};
+
+    result.forEach((entry: { email: any }) => {
+      const email = entry.email;
+      if (!emailData[email]) {
+        emailData[email] = [];
+      }
+      emailData[email].push(entry);
+    });
+
+    res.json(emailData);
   } catch (err: any) {
     res.status(422).json(err);
   }
@@ -207,7 +209,7 @@ export const getByDate = async (req: any, res: Response): Promise<void> => {
     console.log(formattedStartDate);
 
     const result = await manager.query(
-        `SELECT sms.public.user.email, reports.present_id, reports.absent_id,reports.created_at 
+      `SELECT sms.public.user.email, reports.present_id, reports.absent_id,reports.created_at 
 FROM reports
 INNER JOIN sms.public.user ON sms.public.user.id = reports.student_id
 WHERE DATE(reports.created_at) = '${formattedStartDate}' AND subject_id = ${subjectId.id}`
