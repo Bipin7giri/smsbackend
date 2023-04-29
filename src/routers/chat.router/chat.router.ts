@@ -1,6 +1,7 @@
 import {
   create,
   findChat,
+  getAllUserForChat,
   userChats,
 } from "../../controllers/chat/chat.controller";
 import * as express from "express";
@@ -21,6 +22,7 @@ router.post(
   create
 );
 
+router.get("/alluser", getAllUserForChat);
 router.get("/:userId", userChats);
 router.get("/find/:firstId/:secondId", findChat);
 

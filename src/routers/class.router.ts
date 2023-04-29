@@ -43,4 +43,5 @@ router.post(
   TeacherAuthorization,
   addStudent
 );
+
 export default router;

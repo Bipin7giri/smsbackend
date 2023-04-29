@@ -5,6 +5,11 @@ import { connectDb } from "./src/scriptdb";
 import api from "./src/api/api";
 import { connectMongoDB } from "./src/MongoDB/connection";
 import * as cors from "cors";
+import * as http from "http";
+import { Server } from "socket.io";
+import { JoinRoom, StartChart } from "./src/controllers/chat/chat.controller";
+import RoomModel from "./src/MongoDB/Schema/Room";
+
 dotenv.config();
 connectDb();
 
@@ -26,10 +31,49 @@ const swaggerUi = require("swagger-ui-express");
 const app: Express = express();
 app.use(bodyParser.json());
 app.use(cors());
+
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
+});
+
 const port = process.env.PORT;
 const project = process.env?.PROJECT;
 app.use("/api", api);
+io.on("connection", async (socket) => {
+  console.log(`user connected: ${socket.id}`);
 
+  let receiver = "";
+  let sender = "";
+  socket.on("join_room", ({ receiver, room, sender }) => {
+    socket.join(room);
+    receiver = receiver;
+    sender = sender;
+    JoinRoom(receiver, room, sender);
+
+    console.log(
+      `user with id : ${socket.id} wants to chat with ${receiver} joined room :${room}`
+    );
+  });
+  const roomId: any = await RoomModel.find({
+    $and: [{ sender: sender }, { receiver: receiver }],
+  });
+
+  io.emit("get_chat_id", roomId);
+  socket.on("send_message", async (message) => {
+    console.log(message.roomId);
+    console.log(message.roomId + "is your room id");
+    socket.to(message?.roomId).emit("receive_message", message);
+    console.log(message);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("user disconnected", socket.id);
+  });
+});
 const swaggerDefinition = {
   info: {
     title: "School Management System",
@@ -63,10 +107,10 @@ const options = {
 const specs = swaggerJsdoc(options);
 app.use("/", swaggerUi.serve, swaggerUi.setup(specs));
 
-// app.get("/", (req: Request, res: Response) => {
-//   res.send("School management system");
-// });
+app.get("/", (req: Request, res: Response) => {
+  res.send("School management system");
+});
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
 });
