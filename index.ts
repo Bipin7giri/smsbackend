@@ -9,7 +9,7 @@ import * as http from "http";
 import { Server } from "socket.io";
 import { JoinRoom, StartChart } from "./src/controllers/chat/chat.controller";
 import RoomModel from "./src/MongoDB/Schema/Room";
-
+var logger = require("morgan");
 dotenv.config();
 connectDb();
 
@@ -29,13 +29,14 @@ const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
 const app: Express = express();
+app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(cors());
 
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
 });
@@ -43,35 +44,29 @@ const io = new Server(server, {
 const port = process.env.PORT;
 const project = process.env?.PROJECT;
 app.use("/api", api);
-io.on("connection", async (socket) => {
-  console.log(`user connected: ${socket.id}`);
+let users: any = [];
 
-  let receiver = "";
-  let sender = "";
-  socket.on("join_room", ({ receiver, room, sender }) => {
-    socket.join(room);
-    receiver = receiver;
-    sender = sender;
-    JoinRoom(receiver, room, sender);
-
-    console.log(
-      `user with id : ${socket.id} wants to chat with ${receiver} joined room :${room}`
-    );
-  });
-  const roomId: any = await RoomModel.find({
-    $and: [{ sender: sender }, { receiver: receiver }],
+io.on("connection", (socket: any) => {
+  console.log(`⚡: ${socket.id} user just connected!`);
+  socket.on("message", (data: any) => {
+    console.log(`⚡: ${data} message`);
+    io.emit("messageResponse", data);
   });
 
-  io.emit("get_chat_id", roomId);
-  socket.on("send_message", async (message) => {
-    console.log(message.roomId);
-    console.log(message.roomId + "is your room id");
-    socket.to(message?.roomId).emit("receive_message", message);
-    console.log(message);
+  socket.on("typing", (data: any) =>
+    socket.broadcast.emit("typingResponse", data)
+  );
+
+  socket.on("newUser", (data: any) => {
+    users.push(data);
+    io.emit("newUserResponse", users);
   });
 
   socket.on("disconnect", () => {
-    console.log("user disconnected", socket.id);
+    console.log("🔥: A user disconnected");
+    users = users.filter((user: any) => user.socketID !== socket.id);
+    io.emit("newUserResponse", users);
+    socket.disconnect();
   });
 });
 const swaggerDefinition = {
@@ -107,9 +102,9 @@ const options = {
 const specs = swaggerJsdoc(options);
 app.use("/", swaggerUi.serve, swaggerUi.setup(specs));
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("School management system");
-});
+// app.get("/", (req: Request, res: Response) => {
+//   res.send("School management system");
+// });
 
 server.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
