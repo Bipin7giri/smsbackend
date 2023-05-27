@@ -5,8 +5,13 @@ exports.VerifyOTP = exports.BlockUser = exports.ResetPassword = exports.ForgetPa
 var Joi = require("joi");
 exports.RegisterSchema = Joi.object({
     password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).required(),
-    email: Joi.string().required(),
-    deviceId: Joi.string()
+    email: Joi.string()
+        .email({
+        minDomainSegments: 2,
+        tlds: { allow: ["com", "net"] },
+    })
+        .required(),
+    deviceId: Joi.string(),
 });
 exports.StudentRegisterSchema = Joi.object({
     password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).required(),
@@ -37,9 +42,9 @@ exports.ResetPassword = Joi.object({
     password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).required(),
 });
 exports.BlockUser = Joi.object({
-    userId: Joi.number().required()
+    userId: Joi.number().required(),
 });
 exports.VerifyOTP = Joi.object({
-    otp: Joi.string().required()
+    otp: Joi.string().required(),
 });
 //# sourceMappingURL=registerSchema.js.map

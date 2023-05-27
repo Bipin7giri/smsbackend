@@ -20,7 +20,6 @@ router.get("/attendance", tokenValidation, TeacherAuthorization, get);
 router.get(
   "/attendance/reports/:studentId",
   tokenValidation,
-  TeacherAuthorization,
   getAttendanceReportByStudentId
 );
 router.post(

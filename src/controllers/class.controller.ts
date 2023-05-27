@@ -87,7 +87,7 @@ export const get = async (req: Request, res: Response): Promise<void> => {
       where: {
         subjectId: {
           teacherId: {
-            id: currentUser.id,
+            id: 1,
           },
         },
       },

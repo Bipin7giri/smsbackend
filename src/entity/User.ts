@@ -19,6 +19,7 @@ import { Role } from "./Role";
 import { Semester } from "./Semester";
 import { SoftDelete } from "./SoftDelete";
 import { TimeStamp } from "./TimeStamp";
+import { Financial } from "./Financial";
 
 @Entity()
 export class User extends SoftDelete {
@@ -61,8 +62,6 @@ export class User extends SoftDelete {
   @Column({ nullable: true, name: "is_email_verified", default: false })
   isEmailVerified?: boolean;
 
-
-
   // @OneToOne(({}) => Role)
   // @JoinColumn({name: 'role_id'})
   // roleId: Role
@@ -86,6 +85,9 @@ export class User extends SoftDelete {
 
   @OneToMany(() => Reports, (r) => r.studentId)
   reports: Reports[];
+
+  @OneToMany(() => Financial, (f) => f.studentId)
+  financial: Financial;
 
   @OneToMany(() => Department, (dep) => dep.hod)
   hod: Department[];

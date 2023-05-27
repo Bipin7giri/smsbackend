@@ -2,8 +2,13 @@
 import * as Joi from "joi";
 export const RegisterSchema = Joi.object({
   password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).required(),
-  email: Joi.string().required(),
-  deviceId:Joi.string()
+  email: Joi.string()
+    .email({
+      minDomainSegments: 2,
+      tlds: { allow: ["com", "net"] },
+    })
+    .required(),
+  deviceId: Joi.string(),
 });
 
 export const StudentRegisterSchema = Joi.object({
@@ -39,11 +44,10 @@ export const ResetPassword = Joi.object({
   password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).required(),
 });
 
-
 export const BlockUser = Joi.object({
-userId:Joi.number().required()
+  userId: Joi.number().required(),
 });
 
 export const VerifyOTP = Joi.object({
-  otp:Joi.string().required()
+  otp: Joi.string().required(),
 });

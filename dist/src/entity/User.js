@@ -33,6 +33,7 @@ var Present_1 = require("./Present");
 var Reports_1 = require("./Reports");
 var Role_1 = require("./Role");
 var SoftDelete_1 = require("./SoftDelete");
+var Financial_1 = require("./Financial");
 var User = /** @class */ (function (_super) {
     __extends(User, _super);
     function User() {
@@ -116,6 +117,10 @@ var User = /** @class */ (function (_super) {
         (0, typeorm_1.OneToMany)(function () { return Reports_1.Reports; }, function (r) { return r.studentId; }),
         __metadata("design:type", Array)
     ], User.prototype, "reports", void 0);
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return Financial_1.Financial; }, function (f) { return f.studentId; }),
+        __metadata("design:type", Financial_1.Financial)
+    ], User.prototype, "financial", void 0);
     __decorate([
         (0, typeorm_1.OneToMany)(function () { return Department_1.Department; }, function (dep) { return dep.hod; }),
         __metadata("design:type", Array)
