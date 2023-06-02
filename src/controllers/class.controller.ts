@@ -82,12 +82,11 @@ export const get = async (req: Request, res: Response): Promise<void> => {
     const currentUser: any = getCurrentUser(authHeader || "");
     const repo = AppDataSource.getRepository(Class);
     console.log(currentUser);
-    const id: any = 5;
     const subject = await repo.find({
       where: {
         subjectId: {
           teacherId: {
-            id: 1,
+            id: currentUser.id,
           },
         },
       },
