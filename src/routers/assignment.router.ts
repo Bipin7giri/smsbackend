@@ -61,7 +61,7 @@ router.get(
   getAllAssignment
 );
 router.get(
-  "/teacher/assignmentsubmited/:subjectId",
+  "/teacher/assignmentsubmited/:assignmentId",
   tokenValidation,
   // StudentAuthorization,
   getSubmitedAssignemnt

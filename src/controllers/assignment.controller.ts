@@ -141,7 +141,7 @@ export const submitAssigment = async (
     console.log(validate);
     const data = await assigmnmentSubmitRepo.save({
       // ...validate,
-      assigmnmentId: req.params.assigmnmentId,
+      assigmnmentId: assignmentId,
       studentId: validate.studentId,
       submission: validate.submission,
     });
@@ -167,24 +167,22 @@ export const getPdf = async (req: Request, res: Response) => {
 
 export const getSubmitedAssignemnt = async (req: Request, res: Response) => {
   try {
-    const { subjectId } = req.params;
+    const { assignmentId } = req.params;
+    console.log(assignmentId);
     const getAssignemtSumbitedList = await assigmnmentSubmitRepo.find({
       where: {
         assigmnmentId: {
-          subjectId: {
-            id: +subjectId,
-          },
+          id: +assignmentId,
         },
       },
       relations: {
         studentId: true,
-        assigmnmentId: true,
       },
     });
     console.log(getAssignemtSumbitedList);
     res.json(getAssignemtSumbitedList);
-  } catch (err) {
-    res.json(err);
+  } catch (err: any) {
+    res.json(err.message);
   }
 };
 
