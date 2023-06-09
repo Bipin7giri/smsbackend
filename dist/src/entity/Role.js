@@ -28,7 +28,7 @@ exports.Role = void 0;
 var typeorm_1 = require("typeorm");
 var SoftDelete_1 = require("./SoftDelete");
 var User_1 = require("./User");
-var Role = /** @class */ (function (_super) {
+var Role = exports.Role = /** @class */ (function (_super) {
     __extends(Role, _super);
     function Role() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -54,5 +54,4 @@ var Role = /** @class */ (function (_super) {
     ], Role);
     return Role;
 }(SoftDelete_1.SoftDelete));
-exports.Role = Role;
 //# sourceMappingURL=Role.js.map

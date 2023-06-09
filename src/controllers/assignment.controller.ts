@@ -122,6 +122,8 @@ export const submitAssigment = async (
   try {
     const validate = await SubmitAssignment.validateAsync(req.body);
     const { assignmentId } = req.params;
+    console.log(assignmentId);
+
     let authHeader = req.headers["authorization"];
     if (authHeader && authHeader.startsWith("Bearer ")) {
       // Remove "Bearer " from the authHeader
@@ -138,8 +140,10 @@ export const submitAssigment = async (
 
     console.log(validate);
     const data = await assigmnmentSubmitRepo.save({
-      ...validate,
-      assignmentId: +assignmentId,
+      // ...validate,
+      assigmnmentId: req.params.assigmnmentId,
+      studentId: validate.studentId,
+      submission: validate.submission,
     });
 
     res.status(202).json({ message: data, status: 202 });

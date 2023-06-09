@@ -27,7 +27,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SoftDelete = void 0;
 var typeorm_1 = require("typeorm");
 var TimeStamp_1 = require("./TimeStamp");
-var SoftDelete = /** @class */ (function (_super) {
+var SoftDelete = exports.SoftDelete = /** @class */ (function (_super) {
     __extends(SoftDelete, _super);
     function SoftDelete() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -49,5 +49,4 @@ var SoftDelete = /** @class */ (function (_super) {
     ], SoftDelete);
     return SoftDelete;
 }(TimeStamp_1.TimeStamp));
-exports.SoftDelete = SoftDelete;
 //# sourceMappingURL=SoftDelete.js.map

@@ -34,7 +34,7 @@ var Reports_1 = require("./Reports");
 var Role_1 = require("./Role");
 var SoftDelete_1 = require("./SoftDelete");
 var Financial_1 = require("./Financial");
-var User = /** @class */ (function (_super) {
+var User = exports.User = /** @class */ (function (_super) {
     __extends(User, _super);
     function User() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -130,5 +130,4 @@ var User = /** @class */ (function (_super) {
     ], User);
     return User;
 }(SoftDelete_1.SoftDelete));
-exports.User = User;
 //# sourceMappingURL=User.js.map

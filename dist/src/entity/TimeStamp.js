@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TimeStamp = void 0;
 var typeorm_1 = require("typeorm");
-var TimeStamp = /** @class */ (function () {
+var TimeStamp = exports.TimeStamp = /** @class */ (function () {
     function TimeStamp() {
     }
     __decorate([
@@ -27,5 +27,4 @@ var TimeStamp = /** @class */ (function () {
     ], TimeStamp);
     return TimeStamp;
 }());
-exports.TimeStamp = TimeStamp;
 //# sourceMappingURL=TimeStamp.js.map
