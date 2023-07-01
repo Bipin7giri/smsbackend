@@ -14,6 +14,7 @@ var notification_router_1 = require("../routers/notification.router");
 var notes_router_1 = require("../routers/notes.router");
 var stats_router_1 = require("../routers/stats.router");
 var message_router_1 = require("../routers/chat.router/message.router");
+var financial_router_1 = require("../routers/financial.router");
 router.use("/auth", auth_router_1.default);
 router.use("/", role_router_1.default);
 router.use("/", notes_router_1.default);
@@ -27,5 +28,6 @@ router.use("/message", message_router_1.default);
 router.use("/", attendance_router_1.default);
 router.use("/", notification_router_1.default);
 router.use("/stats", stats_router_1.default);
+router.use("/financial", financial_router_1.default);
 exports.default = router;
 //# sourceMappingURL=api.js.map

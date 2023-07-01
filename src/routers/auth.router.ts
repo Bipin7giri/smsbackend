@@ -14,6 +14,7 @@ import {
   hodLogin,
   studentLogin,
   login,
+  accountantlogin,
 } from "../controllers/auth.controller";
 import * as express from "express";
 import { AdminAuthorization, tokenValidation } from "../helper/jwt";
@@ -161,6 +162,7 @@ router.patch("/blockuser", tokenValidation, AdminAuthorization, blockUser);
 router.patch("/unblockuser", tokenValidation, AdminAuthorization, unBlockUser);
 
 router.get("/blockuser", tokenValidation, AdminAuthorization, viewBlockUser);
+router.post("/accountant/login", accountantlogin);
 
 router.post("/email/verification", verifyEmail);
 

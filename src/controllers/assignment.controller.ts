@@ -15,8 +15,6 @@ import { AssignmentSubmission } from "../entity/AssignmentSubmission";
 import { MAILDATA } from "../Interface/NodeMailerInterface";
 import { transporter } from "../helper/nodeMailer";
 import { File } from "megajs";
-const fs = require("fs");
-const mega = require("mega");
 const assigmnmentRepo = AppDataSource.getRepository(Assignment);
 const subjectRepo = AppDataSource.getRepository(Subjects);
 const assigmnmentSubmitRepo = AppDataSource.getRepository(AssignmentSubmission);

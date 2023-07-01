@@ -5,7 +5,6 @@ import { roles } from "../ENUMS/RoleEnum";
 
 export async function generateToken(user: any, expire?: any): Promise<any> {
   try {
-    console.log(user);
     return await jwt.sign(
       {
         // email: user.email,
@@ -28,9 +27,7 @@ export function tokenValidation(req: Request, res: Response, next: any) {
   if (authHeader && authHeader.startsWith("Bearer ")) {
     // Remove "Bearer " from the authHeader
     authHeader = authHeader.slice(7, authHeader.length);
-    console.log(authHeader);
   }
-  console.log(authHeader);
   if (!authHeader) {
     return res.status(401).json({
       message: "No access_token found",
@@ -66,7 +63,6 @@ export async function AdminAuthorization(
   if (authHeader && authHeader.startsWith("Bearer ")) {
     // Remove "Bearer " from the authHeader
     authHeader = authHeader.slice(7, authHeader.length);
-    console.log(authHeader);
   }
   const user = JSON.parse(
     Buffer.from(authHeader.split(".")[1], "base64").toString()
@@ -93,7 +89,6 @@ export async function StudentAuthorization(
   if (authHeader && authHeader.startsWith("Bearer ")) {
     // Remove "Bearer " from the authHeader
     authHeader = authHeader.slice(7, authHeader.length);
-    console.log(authHeader);
   }
   const user = JSON.parse(
     Buffer.from(authHeader.split(".")[1], "base64").toString()
@@ -120,7 +115,6 @@ export async function TeacherAuthorization(
   if (authHeader && authHeader.startsWith("Bearer ")) {
     // Remove "Bearer " from the authHeader
     authHeader = authHeader.slice(7, authHeader.length);
-    console.log(authHeader);
   }
   const user = JSON.parse(
     Buffer.from(authHeader.split(".")[1], "base64").toString()
@@ -149,7 +143,6 @@ export async function HODAuthorization(
   if (authHeader && authHeader.startsWith("Bearer ")) {
     // Remove "Bearer " from the authHeader
     authHeader = authHeader.slice(7, authHeader.length);
-    console.log(authHeader);
   }
   const user = JSON.parse(
     Buffer.from(authHeader.split(".")[1], "base64").toString()
@@ -166,5 +159,37 @@ export async function HODAuthorization(
     res.status(401).json({
       message: "unauthorized access you are not HOD!!",
     });
+  }
+}
+
+export async function AccountAuthorization(
+  req: Request,
+  res: Response,
+  next: any
+): Promise<void> {
+  try {
+    let authHeader: any = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const user = JSON.parse(
+      Buffer.from(authHeader.split(".")[1], "base64").toString()
+    );
+    let counter: number = 0;
+    for (let index = 0; index < user.roles.length; index++) {
+      counter = counter + 1;
+      if (user.roles[index] === roles.ACCOUNTANT) {
+        next();
+        return;
+      }
+    }
+    if (counter === user.roles.length) {
+      res.status(401).json({
+        message: "unauthorized access you are not HOD!!",
+      });
+    }
+  } catch (err: any) {
+    res.status(404).json({ message: err.message });
   }
 }

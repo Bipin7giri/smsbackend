@@ -12,6 +12,7 @@ import adminNotification from "../routers/notification.router";
 import notes from "../routers/notes.router";
 import stats from "../routers/stats.router";
 import message from "../routers/chat.router/message.router";
+import financial from "../routers/financial.router";
 router.use("/auth", auth);
 router.use("/", role);
 router.use("/", notes);
@@ -27,4 +28,5 @@ router.use("/", attendance);
 router.use("/", adminNotification);
 router.use("/stats", stats);
 
+router.use("/financial", financial);
 export default router;

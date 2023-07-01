@@ -24,10 +24,10 @@ export class Financial extends SoftDelete {
   @Column({ name: "clear_amount" })
   clearAmount: Number;
 
-  @Column({ name: "payment_status" })
+  @Column({ name: "payment_status",nullable:true })
   paymentStatus: PaymentStatus;
 
-  @Column({ name: "transaction_id" })
+  @Column({ name: "transaction_id",nullable:true })
   transcationId: String;
 
   @ManyToOne(() => User, (user) => user.financial)
@@ -41,7 +41,4 @@ export class Financial extends SoftDelete {
   })
   deadLine!: Date;
 
-  @ManyToOne(() => Department, (department) => department.notificationID)
-  @JoinColumn({ name: "department_id" })
-  departmentId: Department;
 }

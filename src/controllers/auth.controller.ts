@@ -8,7 +8,7 @@ import {
   UserUpdateSchema,
   VerifyOTP,
 } from "../schema/registerSchema";
-import { Express, Request, Response } from "express";
+import { Request, Response } from "express";
 const cloudinary = require("cloudinary");
 import { AppDataSource } from "../PGDB/data-source";
 import { User } from "../entity/User";
@@ -21,13 +21,10 @@ import { MAILDATA } from "../Interface/NodeMailerInterface";
 import { roles } from "../ENUMS/RoleEnum";
 
 const userModel = require("../MongoDB/Schema/UserSchema");
-let nodemailer = require("nodemailer");
-const mongoose = require("mongoose");
 type CurrentUser = {
   id: number;
 };
 const userRepo = AppDataSource.getRepository(User);
-const roleRepo = AppDataSource.getRepository(Role);
 
 export async function register(
   req: Request,
@@ -142,6 +139,88 @@ export async function adminlogin(
           blocked: false,
           roleId: {
             name: roles.ADMIN,
+          },
+        },
+      });
+
+      if (user) {
+        const checkPassword: Boolean = await comparePassword(
+          user.password,
+          validate.password
+        );
+        if (checkPassword) {
+          if (user?.isEmailVerified === false) {
+            res.json({
+              message:
+                "Not verified Email please check our email for verification",
+            });
+            return;
+          }
+          const accessToken: any = await generateToken(user);
+
+          const result = await repo.update(user.id, {
+            deviceId: validate.deviceId,
+          });
+
+          const checkIfAlreadyExist = await userModel.findOne({
+            username: user.email,
+          });
+          console.log(checkIfAlreadyExist);
+          if (validate.deviceId) {
+            console.log(validate.deviceId);
+            if (!checkIfAlreadyExist) {
+              const chatUser = await userModel.create({
+                username: user.email,
+                displayName: user.firstName,
+                deviceId: validate.deviceId,
+              });
+              console.log(chatUser);
+            }
+          }
+
+          res.json({
+            access_token: accessToken,
+            message: "Login successful !!",
+            status: 200,
+          });
+        } else {
+          res.status(401).json({
+            message: "Invalid password !!",
+            status: 404,
+          });
+        }
+      } else {
+        res.status(401).json({
+          message: "No email found or Blocked",
+          status: 404,
+        });
+      }
+    } catch (err: any) {
+      throw err;
+      // res.status(422).send({ error: true, message: err.message });;
+    }
+  } catch (err: any) {
+    res.status(422).send({ error: true, message: err.message, status: 422 });
+  }
+}
+export async function accountantlogin(
+  req: Request,
+  res: Response,
+  next: any
+): Promise<void> {
+  try {
+    const validate = await RegisterSchema.validateAsync(req.body);
+    try {
+      const repo = AppDataSource.getRepository(User);
+      const user: any = await repo.findOne({
+        relations: {
+          roleId: true,
+        },
+        where: {
+          email: validate.email,
+          blocked: false,
+          roleId: {
+            name: roles.ACCOUNTANT,
           },
         },
       });

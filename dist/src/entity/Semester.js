@@ -31,7 +31,7 @@ var Department_1 = require("./Department");
 var Reports_1 = require("./Reports");
 var SoftDelete_1 = require("./SoftDelete");
 var Subject_1 = require("./Subject");
-var Semester = exports.Semester = /** @class */ (function (_super) {
+var Semester = /** @class */ (function (_super) {
     __extends(Semester, _super);
     function Semester() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -66,4 +66,5 @@ var Semester = exports.Semester = /** @class */ (function (_super) {
     ], Semester);
     return Semester;
 }(SoftDelete_1.SoftDelete));
+exports.Semester = Semester;
 //# sourceMappingURL=Semester.js.map

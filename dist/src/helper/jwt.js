@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HODAuthorization = exports.TeacherAuthorization = exports.StudentAuthorization = exports.AdminAuthorization = exports.getCurrentUser = exports.tokenValidation = exports.generateToken = void 0;
+exports.AccountAuthorization = exports.HODAuthorization = exports.TeacherAuthorization = exports.StudentAuthorization = exports.AdminAuthorization = exports.getCurrentUser = exports.tokenValidation = exports.generateToken = void 0;
 var jwt = require("jsonwebtoken");
 var RoleEnum_1 = require("../ENUMS/RoleEnum");
 function generateToken(user, expire) {
@@ -46,7 +46,6 @@ function generateToken(user, expire) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
-                    console.log(user);
                     return [4 /*yield*/, jwt.sign({
                             // email: user.email,
                             id: user.id,
@@ -71,9 +70,7 @@ function tokenValidation(req, res, next) {
     if (authHeader && authHeader.startsWith("Bearer ")) {
         // Remove "Bearer " from the authHeader
         authHeader = authHeader.slice(7, authHeader.length);
-        console.log(authHeader);
     }
-    console.log(authHeader);
     if (!authHeader) {
         return res.status(401).json({
             message: "No access_token found",
@@ -107,7 +104,6 @@ function AdminAuthorization(req, res, next) {
             if (authHeader && authHeader.startsWith("Bearer ")) {
                 // Remove "Bearer " from the authHeader
                 authHeader = authHeader.slice(7, authHeader.length);
-                console.log(authHeader);
             }
             user = JSON.parse(Buffer.from(authHeader.split(".")[1], "base64").toString());
             for (index = 0; index < user.roles.length; index++) {
@@ -135,7 +131,6 @@ function StudentAuthorization(req, res, next) {
             if (authHeader && authHeader.startsWith("Bearer ")) {
                 // Remove "Bearer " from the authHeader
                 authHeader = authHeader.slice(7, authHeader.length);
-                console.log(authHeader);
             }
             user = JSON.parse(Buffer.from(authHeader.split(".")[1], "base64").toString());
             for (index = 0; index < user.roles.length; index++) {
@@ -163,7 +158,6 @@ function TeacherAuthorization(req, res, next) {
             if (authHeader && authHeader.startsWith("Bearer ")) {
                 // Remove "Bearer " from the authHeader
                 authHeader = authHeader.slice(7, authHeader.length);
-                console.log(authHeader);
             }
             user = JSON.parse(Buffer.from(authHeader.split(".")[1], "base64").toString());
             counter = 0;
@@ -192,7 +186,6 @@ function HODAuthorization(req, res, next) {
             if (authHeader && authHeader.startsWith("Bearer ")) {
                 // Remove "Bearer " from the authHeader
                 authHeader = authHeader.slice(7, authHeader.length);
-                console.log(authHeader);
             }
             user = JSON.parse(Buffer.from(authHeader.split(".")[1], "base64").toString());
             counter = 0;
@@ -213,4 +206,37 @@ function HODAuthorization(req, res, next) {
     });
 }
 exports.HODAuthorization = HODAuthorization;
+function AccountAuthorization(req, res, next) {
+    return __awaiter(this, void 0, void 0, function () {
+        var authHeader, user, counter, index;
+        return __generator(this, function (_a) {
+            try {
+                authHeader = req.headers["authorization"];
+                if (authHeader && authHeader.startsWith("Bearer ")) {
+                    // Remove "Bearer " from the authHeader
+                    authHeader = authHeader.slice(7, authHeader.length);
+                }
+                user = JSON.parse(Buffer.from(authHeader.split(".")[1], "base64").toString());
+                counter = 0;
+                for (index = 0; index < user.roles.length; index++) {
+                    counter = counter + 1;
+                    if (user.roles[index] === RoleEnum_1.roles.ACCOUNTANT) {
+                        next();
+                        return [2 /*return*/];
+                    }
+                }
+                if (counter === user.roles.length) {
+                    res.status(401).json({
+                        message: "unauthorized access you are not HOD!!",
+                    });
+                }
+            }
+            catch (err) {
+                res.status(404).json({ message: err.message });
+            }
+            return [2 /*return*/];
+        });
+    });
+}
+exports.AccountAuthorization = AccountAuthorization;
 //# sourceMappingURL=jwt.js.map
