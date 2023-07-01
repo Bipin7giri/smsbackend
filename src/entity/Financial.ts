@@ -12,6 +12,7 @@ import { Role } from "./Role";
 import { Department } from "./Department";
 import { User } from "./User";
 import { PaymentStatus } from "../ENUMS/PaymentEnum";
+import { FinancialHistory } from "./FinancialHistory";
 
 @Entity()
 export class Financial extends SoftDelete {
@@ -20,15 +21,6 @@ export class Financial extends SoftDelete {
 
   @Column({ name: "total_amount" })
   totalAmount: Number;
-
-  @Column({ name: "clear_amount" })
-  clearAmount: Number;
-
-  @Column({ name: "payment_status",nullable:true })
-  paymentStatus: PaymentStatus;
-
-  @Column({ name: "transaction_id",nullable:true })
-  transcationId: String;
 
   @ManyToOne(() => User, (user) => user.financial)
   @JoinColumn({ name: "student_id" })
@@ -41,4 +33,6 @@ export class Financial extends SoftDelete {
   })
   deadLine!: Date;
 
+  @OneToMany(() => FinancialHistory, (f) => f.financialId)
+  financialHistoryId: FinancialHistory;
 }

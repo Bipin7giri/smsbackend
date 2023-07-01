@@ -12,7 +12,10 @@ import * as xlsx from "xlsx";
 import { User } from "../entity/User";
 import { Role } from "../entity/Role";
 import { roles } from "../ENUMS/RoleEnum";
+import { FinancialHistory } from "../entity/FinancialHistory";
 const financialRepo = AppDataSource.getRepository(Financial);
+const financialHistoryRepo = AppDataSource.getRepository(FinancialHistory);
+
 const userRepo: Repository<User> = AppDataSource.getRepository(User);
 export class FinancialController {
   private finacialValidation: any;
@@ -35,7 +38,7 @@ export class FinancialController {
       return res.json(
         await financialRepo.find({
           where: { deleted: false },
-          relations: { studentId: true },
+          relations: { studentId: true, financialHistoryId: true },
         })
       );
     } catch (error: any) {
@@ -58,6 +61,7 @@ export class FinancialController {
       return res.json(
         await financialRepo.find({
           where: { studentId: { id: currentUser.id } },
+          relations: { financialHistoryId: true },
         })
       );
     } catch (error: any) {
@@ -84,18 +88,31 @@ export class FinancialController {
       });
 
       if (financial) {
-        validate.clearAmount = financial.totalAmount - validate.paidAmount;
-        delete validate.paidAmount;
-        res.json(
-          await financialRepo.update(
+        validate.totalAmount = financial.totalAmount - validate.paidAmount;
+        const financialId: any = await financialRepo.findOne({
+          where: {
+            studentId: { id: validate.studentId },
+          },
+        });
+
+        await financialRepo
+          .update(
             {
               studentId: {
                 id: validate.studentId,
               },
             },
-            validate
+            {
+              totalAmount: validate.totalAmount,
+            }
           )
-        );
+          .then(async () => {
+            await financialHistoryRepo.save({
+              ...validate,
+              financialId: financialId.id,
+            });
+          });
+        res.json();
       }
     } catch (error: any) {
       console.error(error);

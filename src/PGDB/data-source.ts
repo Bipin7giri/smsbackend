@@ -16,6 +16,7 @@ import { Notification } from "../entity/Notification";
 import { Notes } from "../entity/Notes";
 import { Meeting } from "../entity/Meeting";
 import { Financial } from "../entity/Financial";
+import { FinancialHistory } from "../entity/FinancialHistory";
 dotenv.config();
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -38,6 +39,7 @@ export const AppDataSource = new DataSource({
     Notes,
     Meeting,
     Financial,
+    FinancialHistory,
   ],
   migrations: [],
   subscribers: [],
