@@ -362,3 +362,39 @@ export const getAllMeetingList =async (req:Request,res:Response) => {
   }
   
 }
+
+export const getAllMeetingListTeacher =async (req:Request,res:Response) => {
+  try{
+    let authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      // Remove "Bearer " from the authHeader
+      authHeader = authHeader.slice(7, authHeader.length);
+    }
+    const currentUser: any = getCurrentUser(authHeader || "");
+    const subjectId: any = await subjectRepo.findOne({
+      where: {
+        teacherId: {
+          id: currentUser.id,
+        },
+        deleted: false,
+      },
+    });
+    const meetingUrl = await meetingRepo.find({
+      where: {
+        subjectId: {
+          id:+ subjectId.id,
+        },
+      },
+      order: {
+        updatedAt: "DESC",
+      },
+    });
+    res.json(meetingUrl)
+  }
+  catch(err:any){
+  res.sendStatus(500).json({
+    message:err.message
+  })
+  }
+  
+}
