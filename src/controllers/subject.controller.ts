@@ -18,6 +18,7 @@ import { NotificationSchemaTeacher } from "../schema/notificationSchema";
 import { createMeetingApi } from "../services/zoommeeting";
 import { Meeting } from "../entity/Meeting";
 import { Repository } from "typeorm";
+import { clouddebugger } from "googleapis/build/src/apis/clouddebugger";
 
 const meetingRepo: Repository<Meeting> = AppDataSource.getRepository(Meeting);
 const subjectRepo: Repository<Subjects> = AppDataSource.getRepository(Subjects);
@@ -337,3 +338,27 @@ export const joinMeeting = async (req: Request, res: Response) => {
     res.json(err);
   }
 };
+
+
+export const getAllMeetingList =async (req:Request,res:Response) => {
+  try{
+    const {subjectId} = req.params;
+    const meetingUrl = await meetingRepo.find({
+      where: {
+        subjectId: {
+          id:+ subjectId,
+        },
+      },
+      order: {
+        updatedAt: "DESC",
+      },
+    });
+    res.json(meetingUrl)
+  }
+  catch(err:any){
+  res.sendStatus(500).json({
+    message:err.message
+  })
+  }
+  
+}

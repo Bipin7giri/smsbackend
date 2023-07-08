@@ -3,6 +3,7 @@ import {
   createMeeting,
   deleteById,
   get,
+  getAllMeetingList,
   getAssignSubject,
   getByID,
   joinMeeting,
@@ -46,5 +47,5 @@ router.post("/class/notification", pushNotification);
 // create meeting
 router.post("/createmeeting", tokenValidation, createMeeting);
 router.get("/joinmeeting/:subjectId", tokenValidation, joinMeeting);
-
+router.get("/all/meetinglist/:subjectId",tokenValidation,getAllMeetingList)
 export default router;
