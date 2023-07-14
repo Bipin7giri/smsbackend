@@ -4,13 +4,9 @@ import { AppDataSource } from "../PGDB/data-source";
 import { Repository } from "typeorm";
 import {
   AddFinancialDetails,
-  FinancialSchema,
 } from "../schema/financialSchema";
-import Joi = require("joi");
 import { getCurrentUser } from "../helper/jwt";
-import * as xlsx from "xlsx";
 import { User } from "../entity/User";
-import { Role } from "../entity/Role";
 import { roles } from "../ENUMS/RoleEnum";
 import { FinancialHistory } from "../entity/FinancialHistory";
 const financialRepo = AppDataSource.getRepository(Financial);
@@ -18,18 +14,7 @@ const financialHistoryRepo = AppDataSource.getRepository(FinancialHistory);
 
 const userRepo: Repository<User> = AppDataSource.getRepository(User);
 export class FinancialController {
-  private finacialValidation: any;
-  private addFinancialDetailsValidation: any;
-  private getCurrentUser: any;
-  constructor() {
-    try {
-      // this.financialRepo = AppDataSource.getRepository(Financial);
-    } catch (error) {
-      console.error("Error initializing financial repository:", error);
-    }
-    this.finacialValidation = FinancialSchema;
-    this.addFinancialDetailsValidation = AddFinancialDetails;
-  }
+  constructor() {}
 
   // GET method
   public async get(req: Request, res: Response): Promise<Response> {

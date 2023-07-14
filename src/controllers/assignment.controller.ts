@@ -301,12 +301,14 @@ export const getAssigmnmentReportForTeacher = async (
     const rating: Number[] = getAssignemtSumbitedList.map((item: any) => {
       return parseFloat(item.rating);
     });
+    console.log(rating);
     let total = 0;
     let totalRating: any = 0;
     for (let i = 0; i < rating.length; i++) {
       totalRating = totalRating + rating[i];
       total = total + 5;
     }
+    console.log(totalRating)
     const percentage = (totalRating / total) * 100;
     res.json({ performance: percentage });
   } catch (err: any) {

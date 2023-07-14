@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { copyFileSync } from "fs";
 import { roles } from "../ENUMS/RoleEnum";
 
@@ -22,7 +22,7 @@ export async function generateToken(user: any, expire?: any): Promise<any> {
   }
 }
 
-export function tokenValidation(req: Request, res: Response, next: any) {
+export function tokenValidation(req: Request, res: Response, next: NextFunction) {
   let authHeader = req.headers["authorization"];
   if (authHeader && authHeader.startsWith("Bearer ")) {
     // Remove "Bearer " from the authHeader
@@ -57,7 +57,7 @@ export function getCurrentUser(token: string): any {
 export async function AdminAuthorization(
   req: Request,
   res: Response,
-  next: any
+  next: NextFunction
 ): Promise<void> {
   let authHeader: any = req.headers["authorization"];
   if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -83,7 +83,7 @@ export async function AdminAuthorization(
 export async function StudentAuthorization(
   req: Request,
   res: Response,
-  next: any
+  next: NextFunction
 ): Promise<void> {
   let authHeader: any = req.headers["authorization"];
   if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -109,7 +109,7 @@ export async function StudentAuthorization(
 export async function TeacherAuthorization(
   req: Request,
   res: Response,
-  next: any
+  next: NextFunction
 ): Promise<void> {
   let authHeader: any = req.headers["authorization"];
   if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -137,7 +137,7 @@ export async function TeacherAuthorization(
 export async function HODAuthorization(
   req: Request,
   res: Response,
-  next: any
+  next: NextFunction
 ): Promise<void> {
   let authHeader: any = req.headers["authorization"];
   if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -165,7 +165,7 @@ export async function HODAuthorization(
 export async function AccountAuthorization(
   req: Request,
   res: Response,
-  next: any
+  next: NextFunction
 ): Promise<void> {
   try {
     let authHeader: any = req.headers["authorization"];

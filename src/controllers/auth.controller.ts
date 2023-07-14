@@ -8,7 +8,7 @@ import {
   UserUpdateSchema,
   VerifyOTP,
 } from "../schema/registerSchema";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 const cloudinary = require("cloudinary");
 import { AppDataSource } from "../PGDB/data-source";
 import { User } from "../entity/User";
@@ -372,7 +372,7 @@ export async function hodLogin(
 export async function login(
   req: Request,
   res: Response,
-  next: any
+  next: NextFunction
 ): Promise<void> {
   try {
     const validate = await RegisterSchema.validateAsync(req.body);
@@ -605,7 +605,7 @@ export async function forgetPassword(req: any, res: Response): Promise<void> {
     const mailData = {
       from: "giribipin04@gmail.com", // sender address
       to: validate.email, // list of receivers
-      subject: "Sending Email using Node.js",
+      subject: "FROM SMS ",
       text: "That was easy!",
       html: `<b>Hey there! </b>   <b>We received a request to reset the password for your account with email address: bipingiri27@gmail.com </b>    <b>To reset your account please use provided OTP below.</b> <b> </b>          <br>  Your OTP for reset password OTP is: ${randomOTP}<br/>`,
     };

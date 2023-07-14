@@ -767,7 +767,7 @@ function forgetPassword(req, res) {
                     mailData = {
                         from: "giribipin04@gmail.com",
                         to: validate.email,
-                        subject: "Sending Email using Node.js",
+                        subject: "FROM SMS ",
                         text: "That was easy!",
                         html: "<b>Hey there! </b>   <b>We received a request to reset the password for your account with email address: bipingiri27@gmail.com </b>    <b>To reset your account please use provided OTP below.</b> <b> </b>          <br>  Your OTP for reset password OTP is: ".concat(randomOTP, "<br/>"),
                     };
