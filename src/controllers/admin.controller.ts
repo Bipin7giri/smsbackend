@@ -5,23 +5,15 @@ import { MAILDATA } from "../Interface/NodeMailerInterface";
 import { transporter } from "../helper/nodeMailer";
 import { DATA, NotificationResult } from "../Interface/SubjectInterface";
 import { sendNotification } from "../Notification/PushNotification";
-import { NotificationSchemaAdmin } from "../schema/notificationSchema";
+import { NotificationSchemaAdmin } from "../validationSchema/notificationSchema";
 import { User } from "../entity/User";
 import { Notification } from "../entity/Notification";
+import { notificationRepo, userRepo } from "../Repository";
 
-const userRepo = AppDataSource.getRepository(User);
-const notificationRepo = AppDataSource.getRepository(Notification);
 export const create = async (req: any, res: Response): Promise<void> => {
   try {
     const validate = await NotificationSchemaAdmin.validateAsync(req.body);
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = await getCurrentUser(authHeader || "");
-    console.log(currentUser.id);
-
+    const currentUser: any =req.user
     const allUsers: User[] = await userRepo.find({
       where: {
         deleted: false,
@@ -35,8 +27,6 @@ export const create = async (req: any, res: Response): Promise<void> => {
     const userNotification = allUsers
       .filter((item: any) => item.deviceId !== null)
       .map((item: any) => item.deviceId);
-
-    console.log(userNotification);
     const mailData: MAILDATA = {
       from: "giribipin04@gmail.com", // sender address
       to: userEmail, // list of receivers
@@ -60,9 +50,7 @@ export const create = async (req: any, res: Response): Promise<void> => {
       body: validate.body,
     };
     const datas = await notificationRepo.save(validate);
-    console.log(datas);
     const notification: NotificationResult = await sendNotification(data);
-    console.log(notification);
     res
       .status(202)
       .json({ data: notification, message: "notification send", status: 202 });

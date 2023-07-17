@@ -12,12 +12,10 @@ export const sendNotification = async (data: any): Promise<any> => {
   };
   const result = await axios(config)
     .then(function (response: any) {
-      console.log(response);
       return response.data;
-      console.table(JSON.stringify(response.data));
+
     })
     .catch(function (error: any) {
-      console.log(error.message);
     });
   return result;
 };

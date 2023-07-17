@@ -1,7 +1,7 @@
 import { FinancialController } from "../controllers/financial.controller";
 import * as express from "express";
 import { addBulkStudent } from "../controllers/semester.controller";
-import { AddFinancialDetails } from "../schema/financialSchema";
+import { AddFinancialDetails } from "../validationSchema/financialSchema";
 import {
   AccountAuthorization,
   StudentAuthorization,

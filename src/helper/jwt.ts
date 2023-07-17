@@ -22,7 +22,7 @@ export async function generateToken(user: any, expire?: any): Promise<any> {
   }
 }
 
-export function tokenValidation(req: Request, res: Response, next: NextFunction) {
+export function tokenValidation(req: any, res: Response, next: NextFunction) {
   let authHeader = req.headers["authorization"];
   if (authHeader && authHeader.startsWith("Bearer ")) {
     // Remove "Bearer " from the authHeader
@@ -33,13 +33,14 @@ export function tokenValidation(req: Request, res: Response, next: NextFunction)
       message: "No access_token found",
     });
   }
-  jwt.verify(authHeader, "json_web_token_pw", (err: any, user: any) => {
+  jwt.verify(authHeader, "json_web_token_pw", async(err: any, user: any) => {
     try {
       if (err)
         return res.status(401).json({
           message: "unauthorized access",
         });
-
+        const currentUser: any = await getCurrentUser(authHeader || "");
+        req.user = currentUser;
       next();
     } catch (err) {
       res.send(err);

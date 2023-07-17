@@ -56,7 +56,6 @@ function uploadFile(params) {
                         })];
                 case 1:
                     imageUrl = _a.sent();
-                    console.log(imageUrl);
                     return [2 /*return*/, imageUrl.secure_url];
                 case 2:
                     err_1 = _a.sent();

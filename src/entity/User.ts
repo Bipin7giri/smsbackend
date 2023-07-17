@@ -2,11 +2,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToOne,
   JoinColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  DeleteDateColumn,
   ManyToOne,
   OneToMany,
 } from "typeorm";
@@ -16,9 +12,7 @@ import { Department } from "./Department";
 import { Present } from "./Present";
 import { Reports } from "./Reports";
 import { Role } from "./Role";
-import { Semester } from "./Semester";
 import { SoftDelete } from "./SoftDelete";
-import { TimeStamp } from "./TimeStamp";
 import { Financial } from "./Financial";
 
 @Entity()

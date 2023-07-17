@@ -1,18 +1,12 @@
 import { Request, Response, ErrorRequestHandler } from "express";
 import { Financial } from "../entity/Financial";
 import { AppDataSource } from "../PGDB/data-source";
-import { Repository } from "typeorm";
 import {
   AddFinancialDetails,
-} from "../schema/financialSchema";
-import { getCurrentUser } from "../helper/jwt";
+} from "../validationSchema/financialSchema";
 import { User } from "../entity/User";
 import { roles } from "../ENUMS/RoleEnum";
-import { FinancialHistory } from "../entity/FinancialHistory";
-const financialRepo = AppDataSource.getRepository(Financial);
-const financialHistoryRepo = AppDataSource.getRepository(FinancialHistory);
-
-const userRepo: Repository<User> = AppDataSource.getRepository(User);
+import { financialHistoryRepo, financialRepo, userRepo } from "../Repository";
 export class FinancialController {
   constructor() {}
 
@@ -27,22 +21,15 @@ export class FinancialController {
         })
       );
     } catch (error: any) {
-      console.log(error);
       return res.status(500).json({
         error: error.message,
       });
     }
   }
-  public async getMe(req: Request, res: Response): Promise<Response> {
+  public async getMe(req: any, res: Response): Promise<Response> {
     // Logic for handling GET requests
     try {
-      let authHeader = req.headers["authorization"];
-      if (authHeader && authHeader.startsWith("Bearer ")) {
-        // Remove "Bearer " from the authHeader
-        authHeader = authHeader.slice(7, authHeader.length);
-      }
-      const currentUser: any = getCurrentUser(authHeader || "");
-
+      const currentUser: any =req.user
       return res.json(
         await financialRepo.find({
           where: { studentId: { id: currentUser.id } },
@@ -50,7 +37,6 @@ export class FinancialController {
         })
       );
     } catch (error: any) {
-      console.log(error);
       return res.status(500).json({
         error: error.message,
       });
@@ -62,8 +48,6 @@ export class FinancialController {
     try {
       // ...
       const validate = await AddFinancialDetails.validateAsync(req.body);
-      console.log(validate);
-
       const financial: any = await financialRepo.findOne({
         where: {
           studentId: {

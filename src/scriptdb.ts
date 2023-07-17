@@ -9,7 +9,7 @@ export const connectDb = () => {
 
       const repo = AppDataSource.getRepository(User);
       const countIfuser = await repo.count();
-      console.log(countIfuser);
+
       if (countIfuser === 0) {
         const admin = new Role();
         const student = new Role();

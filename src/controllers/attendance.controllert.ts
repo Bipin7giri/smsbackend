@@ -5,25 +5,21 @@ import { getCurrentUser } from "../helper/jwt";
 import { Absent } from "../entity/Absent";
 import { Present } from "../entity/Present";
 import { Reports } from "../entity/Reports";
-import { AttedanceByDate, AttendanceSchema } from "../schema/attendanceSchema";
+import { AttedanceByDate, AttendanceSchema } from "../validationSchema/attendanceSchema";
 import { Class } from "../entity/Classes";
 import { EntityManager, Repository } from "typeorm";
-const absentRepo: Repository<Absent> = AppDataSource.getRepository(Absent);
-const presentRepo: Repository<Present> = AppDataSource.getRepository(Present);
-const reportsRepo: Repository<Reports> = AppDataSource.getRepository(Reports);
-const subjectRepo: Repository<Subjects> = AppDataSource.getRepository(Subjects);
-const classRepo: Repository<Class> = AppDataSource.getRepository(Class);
+import {
+  absentRepo,
+  classRepo,
+  presentRepo,
+  reportsRepo,
+  subjectRepo,
+} from "../Repository";
 const manager: EntityManager = AppDataSource.manager;
 export const create = async (req: any, res: Response): Promise<any> => {
   try {
     const validate = await AttendanceSchema.validateAsync(req.body);
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = await getCurrentUser(authHeader || "");
-    console.log(currentUser);
+    const currentUser: any = req.user;
     const classId: any = await subjectRepo.findOne({
       where: {
         teacherId: {
@@ -37,7 +33,6 @@ export const create = async (req: any, res: Response): Promise<any> => {
     const month: string = String(today.getMonth() + 1).padStart(2, "0");
     const day: string = String(today.getDate()).padStart(2, "0");
     const formattedDate: any = `${year}-${month}-${day}`;
-    console.log(formattedDate); // outputs "2023-04-21"
     const totalNumberOfStudent = await classRepo.find({
       where: {
         subjectId: {
@@ -48,8 +43,6 @@ export const create = async (req: any, res: Response): Promise<any> => {
     const result = await manager.query(
       `SELECT * FROM reports WHERE date(created_at) = '${formattedDate}'`
     );
-    console.log(totalNumberOfStudent.length);
-    console.log(result.length);
     if (totalNumberOfStudent.length <= result.length) {
       return res.json({ message: "Already Attedndace added" });
     }
@@ -79,25 +72,18 @@ export const create = async (req: any, res: Response): Promise<any> => {
       });
       res.status(202).json({ result, status: 202 });
     }
-    console.log(currentUser.id);
   } catch (err: any) {
     res.status(422).json(err.message);
   }
 };
 
 export const getAttendanceReportByStudentId = async (
-  req: Request,
+  req: any,
   res: Response
 ) => {
   try {
     const studentId: any = req.params.studentId;
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = await getCurrentUser(authHeader || "");
-
+    const currentUser: any = req.user;
     const subjectId: any = await subjectRepo.findOne({
       where: {
         teacherId: {
@@ -141,13 +127,7 @@ export const getAttendanceReportByStudentId = async (
 
 export const get = async (req: any, res: Response): Promise<void> => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = await getCurrentUser(authHeader || "");
-
+    const currentUser: any = req.user;
     const subjectId: any = await subjectRepo.findOne({
       where: {
         teacherId: {
@@ -181,13 +161,9 @@ WHERE subject_id = ${subjectId.id} ORDER BY reports.created_at DESC`
 export const getByDate = async (req: any, res: Response): Promise<void> => {
   try {
     const validate = await AttedanceByDate.validateAsync(req.body);
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
+    const currentUser: any = req.user;
+
     const date = req.params.date;
-    const currentUser: any = await getCurrentUser(authHeader || "");
 
     const subjectId: any = await subjectRepo.findOne({
       where: {
@@ -196,7 +172,6 @@ export const getByDate = async (req: any, res: Response): Promise<void> => {
         },
       },
     });
-    console.log(date);
 
     // const result = await
     // const resul

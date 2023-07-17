@@ -2,8 +2,8 @@ import { Express, Request, Response } from "express";
 import { AppDataSource } from "../PGDB/data-source";
 import { Department } from "../entity/Department";
 import { getCurrentUser } from "../helper/jwt";
-import { DepartmentSchema } from "../schema/departmentSchema";
-import { AddTeacherSchema } from "../schema/registerSchema";
+import { DepartmentSchema } from "../validationSchema/departmentSchema";
+import { AddTeacherSchema } from "../validationSchema/registerSchema";
 import { Semester } from "../entity/Semester";
 import { Role } from "../entity/Role";
 import { generateHashPassword } from "../helper/hashpassword";
@@ -11,14 +11,11 @@ import { User } from "../entity/User";
 import * as xlsx from "xlsx";
 import { Like } from "typeorm";
 import { sendNotification } from "../Notification/PushNotification";
-import { NotificationSchemaAdmin } from "../schema/notificationSchema";
+import { NotificationSchemaAdmin } from "../validationSchema/notificationSchema";
 import { MAILDATA } from "../Interface/NodeMailerInterface";
 import { transporter } from "../helper/nodeMailer";
 import { DATA, NotificationResult } from "../Interface/SubjectInterface";
-import { Notification } from "../entity/Notification";
-const departmentRepo = AppDataSource.getRepository(Department);
-const userRepo = AppDataSource.getRepository(User);
-const notificationRepo = AppDataSource.getRepository(Notification);
+import { departmentRepo, notificationRepo, userRepo } from "../Repository";
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const validate = await DepartmentSchema.validateAsync(req.body);
@@ -28,7 +25,6 @@ export const create = async (req: Request, res: Response): Promise<void> => {
       password: await generateHashPassword(validate.password),
       isEmailVerified: true,
     });
-    console.log(hod);
     const department = new Department();
     const repo = AppDataSource.getRepository(Department);
     department.name = validate.name;
@@ -47,14 +43,9 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const get = async (req: Request, res: Response): Promise<void> => {
+export const get = async (req: any, res: Response): Promise<void> => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
+    const currentUser: any =req.user
     const repo = AppDataSource.getRepository(Department);
     const department = await repo.find({
       relations: ["hod"],
@@ -80,19 +71,12 @@ export const countDepartment = async (
   res: Response
 ): Promise<void> => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
     const repo = AppDataSource.getRepository(Department);
     const department = await repo.count({
       where: {
         deleted: false,
       },
     });
-    console.log(department);
     if (department) {
       res.json({
         department: department,
@@ -110,7 +94,6 @@ export const addTeacher = async (
   res: Response
 ): Promise<void> => {
   try {
-    console.log(req.params);
     const validate = await AddTeacherSchema.validateAsync(req.body);
     const { department } = req.params;
     const departmentId: number = parseInt(department);
@@ -127,7 +110,6 @@ export const addTeacher = async (
         name: "hod",
       },
     });
-    console.log(roles.id);
     const hashedPassword: any = await generateHashPassword(validate?.password);
     const user = new User();
     user.email = validate.name + departments?.name + "@kathford.com";
@@ -135,7 +117,6 @@ export const addTeacher = async (
     user.roleId = roles;
     const userRepo = AppDataSource.getRepository(User);
     const saveUser: any = await userRepo.save(user);
-    console.log(saveUser);
 
     if (saveUser) {
       res.status(202).send({ message: "successfully registered", saveUser });
@@ -146,17 +127,11 @@ export const addTeacher = async (
 };
 
 export const updateDepartment = async (
-  req: Request,
+  req: any,
   res: Response
 ): Promise<void> => {
   try {
-    // after exam
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
+    const currentUser: any =req.user
     const repo = AppDataSource.getRepository(Department);
     const department = await repo.find({
       relations: ["hod"],
@@ -177,16 +152,12 @@ export const updateDepartment = async (
 };
 
 export const getStudent = async (
-  req: Request,
+  req: any,
   res: Response
 ): Promise<void> => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
+    const currentUser: any =req.user
+
     const searchData: any = req.query?.search || null;
     const searchQuery: any = `%${searchData}%`;
 
@@ -207,7 +178,6 @@ export const getStudent = async (
           },
         },
       });
-      console.log(students);
       res.json(students);
     } else {
       const students = await departmentRepo.findOne({
@@ -224,7 +194,6 @@ export const getStudent = async (
           },
         },
       });
-      console.log(students);
       res.json(students);
     }
   } catch (err) {}
@@ -235,12 +204,6 @@ export const getAllDepartment = async (
   res: Response
 ): Promise<void> => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
     const repo = AppDataSource.getRepository(Department);
     const department = await repo.find({
       relations: ["semesterId", "hod"],
@@ -262,12 +225,7 @@ export const addBulkStudent = async (
   res: Response
 ): Promise<void> => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = await getCurrentUser(authHeader || "");
+    const currentUser: any =req.user
     const departmentId = await departmentRepo.findOne({
       where: {
         hod: {
@@ -298,18 +256,13 @@ export const addBulkStudent = async (
 };
 
 export const createNotification = async (
-  req: Request,
+  req: any,
   res: Response
 ): Promise<void> => {
   try {
     const validate = await NotificationSchemaAdmin.validateAsync(req.body);
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = await getCurrentUser(authHeader || "");
-    console.log(currentUser.id);
+    const currentUser: any =req.user
+
     const findDepartmentId: any = await departmentRepo.findOne({
       where: {
         userId: {
@@ -317,7 +270,6 @@ export const createNotification = async (
         },
       },
     });
-    console.log(findDepartmentId);
     const allUsers: User[] = await userRepo.find({
       where: {
         deleted: false,
@@ -333,8 +285,6 @@ export const createNotification = async (
       .filter((item: any) => item.deviceId !== null)
       .map((item: any) => item.deviceId);
 
-    console.log(userNotification);
-    console.log(userEmail);
     const mailData: MAILDATA = {
       from: "giribipin04@gmail.com", // sender address
       to: userEmail, // list of receivers
@@ -357,14 +307,11 @@ export const createNotification = async (
       title: validate.title,
       body: validate.body,
     };
-    console.log(validate);
     const datas = await notificationRepo.save({
       departmentId: findDepartmentId.id,
       ...validate,
     });
-    console.log(datas);
     const notification: any = await sendNotification(data);
-    console.log(notification);
     res
       .status(202)
       .json({ data: notification, message: "notification send", status: 202 });
@@ -373,16 +320,11 @@ export const createNotification = async (
   }
 };
 export const getNotification = async (
-  req: Request,
+  req: any,
   res: Response
 ): Promise<void> => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = await getCurrentUser(authHeader || "");
+    const currentUser: any =req.user
     const getDepartmentId: any = await departmentRepo.findOne({
       where: {
         userId: {

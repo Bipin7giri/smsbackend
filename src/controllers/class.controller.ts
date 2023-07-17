@@ -7,7 +7,7 @@ import {
   ClassPatchSchema,
   ClassSchema,
   JoinClassRoom,
-} from "../schema/classSchema";
+} from "../validationSchema/classSchema";
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const validate = await ClassSchema.validateAsync(req.body);
@@ -25,22 +25,14 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const addStudent = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const addStudent = async (req: any, res: Response): Promise<void> => {
   try {
     const validate = await ClassPatchSchema.validateAsync(req.body);
     const repo = AppDataSource.getRepository(Class);
     const subjectRepo = AppDataSource.getRepository(Subjects);
 
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
-    console.log(currentUser);
+    const currentUser: any = req.user;
+
     const subjects: any = await subjectRepo.findOne({
       where: {
         teacherId: {
@@ -49,7 +41,6 @@ export const addStudent = async (
       },
       relations: ["semesterId"],
     });
-    console.log(subjects);
 
     if (validate.studentId) {
       for (let i = 0; i < validate.studentId.length; i++) {
@@ -72,16 +63,10 @@ export const addStudent = async (
   }
 };
 
-export const get = async (req: Request, res: Response): Promise<void> => {
+export const get = async (req: any, res: Response): Promise<void> => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
+    const currentUser: any = req.user;
     const repo = AppDataSource.getRepository(Class);
-    console.log(currentUser);
     const subject = await repo.find({
       where: {
         subjectId: {
@@ -102,17 +87,9 @@ export const get = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const removeStudent = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const removeStudent = async (req: any, res: Response): Promise<void> => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
+    const currentUser: any = req.user;
     const repo = AppDataSource.getRepository(Subjects);
     const subject = await repo.find({
       where: {
@@ -122,7 +99,6 @@ export const removeStudent = async (
       },
       relations: ["classId", "classId.studentId"],
     });
-    console.table(subject);
     // user?.password = null;
     if (subject) {
       res.json(subject);
@@ -134,29 +110,19 @@ export const removeStudent = async (
   }
 };
 
-export const joinClassRoom = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const joinClassRoom = async (req: any, res: Response): Promise<void> => {
   try {
     const validate = await JoinClassRoom.validateAsync(req.body);
     const repo = AppDataSource.getRepository(Class);
     const subjectRepo = AppDataSource.getRepository(Subjects);
 
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
-    console.log(currentUser);
+    const currentUser: any = req.user;
     const subjects: any = await subjectRepo.findOne({
       where: {
         classCode: validate.classCode,
       },
       relations: ["semesterId"],
     });
-    console.log(subjects);
 
     await repo
       .insert({

@@ -7,7 +7,7 @@ import {
   ResetPassword,
   UserUpdateSchema,
   VerifyOTP,
-} from "../schema/registerSchema";
+} from "../validationSchema/registerSchema";
 import { NextFunction, Request, Response } from "express";
 const cloudinary = require("cloudinary");
 import { AppDataSource } from "../PGDB/data-source";
@@ -16,15 +16,15 @@ import { Role } from "../entity/Role";
 import { generateOTP } from "../helper/generateRandomOTP";
 import { transporter } from "../helper/nodeMailer";
 import { Like } from "typeorm";
-import { UpdateUserRole } from "../schema/roleSchema";
+import { UpdateUserRole } from "../validationSchema/roleSchema";
 import { MAILDATA } from "../Interface/NodeMailerInterface";
 import { roles } from "../ENUMS/RoleEnum";
+import { userRepo } from "../Repository";
 
 const userModel = require("../MongoDB/Schema/UserSchema");
 type CurrentUser = {
   id: number;
 };
-const userRepo = AppDataSource.getRepository(User);
 
 export async function register(
   req: Request,
@@ -68,11 +68,9 @@ export async function register(
       mailData,
       function (err: any, info: any) {
         if (err) console.log(err);
-        else console.log("ok");
       }
     );
 
-    console.log(saveUser);
     if (saveUser) {
       res.status(202).send({ message: "successfully registered" });
     }
@@ -98,7 +96,6 @@ export async function StudentRegister(
       },
     });
     const randomOTP = generateOTP();
-    console.log(randomOTP);
     const user = new User();
     user.email = validate.email;
     user.password = hashedPassword;
@@ -106,8 +103,6 @@ export async function StudentRegister(
     user.emailOtp = randomOTP;
     const userRepo = AppDataSource.getRepository(User);
     const saveUser = await userRepo.save(user);
-
-    console.log(saveUser);
     if (saveUser) {
       res.status(202).send({ message: "successfully registered", status: 202 });
     }
@@ -165,16 +160,13 @@ export async function adminlogin(
           const checkIfAlreadyExist = await userModel.findOne({
             username: user.email,
           });
-          console.log(checkIfAlreadyExist);
           if (validate.deviceId) {
-            console.log(validate.deviceId);
             if (!checkIfAlreadyExist) {
               const chatUser = await userModel.create({
                 username: user.email,
                 displayName: user.firstName,
                 deviceId: validate.deviceId,
               });
-              console.log(chatUser);
             }
           }
 
@@ -247,16 +239,13 @@ export async function accountantlogin(
           const checkIfAlreadyExist = await userModel.findOne({
             username: user.email,
           });
-          console.log(checkIfAlreadyExist);
           if (validate.deviceId) {
-            console.log(validate.deviceId);
             if (!checkIfAlreadyExist) {
               const chatUser = await userModel.create({
                 username: user.email,
                 displayName: user.firstName,
                 deviceId: validate.deviceId,
               });
-              console.log(chatUser);
             }
           }
 
@@ -330,16 +319,13 @@ export async function hodLogin(
           const checkIfAlreadyExist = await userModel.findOne({
             username: user.email,
           });
-          console.log(checkIfAlreadyExist);
           if (validate.deviceId) {
-            console.log(validate.deviceId);
             if (!checkIfAlreadyExist) {
               const chatUser = await userModel.create({
                 username: user.email,
                 displayName: user.firstName,
                 deviceId: validate.deviceId,
               });
-              console.log(chatUser);
             }
           }
 
@@ -410,16 +396,13 @@ export async function login(
           const checkIfAlreadyExist = await userModel.findOne({
             username: user.email,
           });
-          console.log(checkIfAlreadyExist);
           if (validate.deviceId) {
-            console.log(validate.deviceId);
             if (!checkIfAlreadyExist) {
               const chatUser = await userModel.create({
                 username: user.email,
                 displayName: user.firstName,
                 deviceId: validate.deviceId,
               });
-              console.log(chatUser);
             }
           }
 
@@ -494,16 +477,13 @@ export async function studentLogin(
           const checkIfAlreadyExist = await userModel.findOne({
             username: user.email,
           });
-          console.log(checkIfAlreadyExist);
           if (validate.deviceId) {
-            console.log(validate.deviceId);
             if (!checkIfAlreadyExist) {
               const chatUser = await userModel.create({
                 username: user.email,
                 displayName: user.firstName,
                 deviceId: validate.deviceId,
               });
-              console.log(chatUser);
             }
           }
 
@@ -533,14 +513,9 @@ export async function studentLogin(
   }
 }
 
-export async function getUser(req: Request, res: Response): Promise<void> {
+export async function getUser(req: any, res: Response): Promise<void> {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: CurrentUser = getCurrentUser(authHeader || "");
+    const currentUser: any = req.user;
     const repo = AppDataSource.getRepository(User);
     const user = await repo.findOneOrFail({
       where: {
@@ -554,7 +529,6 @@ export async function getUser(req: Request, res: Response): Promise<void> {
     });
     // user?.password = null;
     if (user) {
-      console.log(user);
       res.json(user);
     } else {
       res.status(404).send("No use found");
@@ -567,18 +541,13 @@ export async function getUser(req: Request, res: Response): Promise<void> {
 export async function updateUser(req: any, res: Response): Promise<void> {
   try {
     const validate = await UserUpdateSchema.validateAsync(req.body);
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: CurrentUser = getCurrentUser(authHeader || "");
+    const currentUser: any = req.user;
+
     const repo = AppDataSource.getRepository(User);
     if (req?.file) {
       const imageUrl = await cloudinary.uploader.upload(req?.file?.path);
       validate.avatar = imageUrl?.secure_url;
     }
-    console.log(validate);
     const user = await repo.update(currentUser.id, validate);
     if (user) {
       res.json("user successfully updated");
@@ -632,7 +601,6 @@ export async function resetPassword(req: any, res: Response): Promise<void> {
         forgetPassword: validate.otp,
       },
     });
-    console.log(verifyOTP);
     if (verifyOTP) {
       await repo
         .update(
@@ -665,7 +633,6 @@ export async function resetPassword(req: any, res: Response): Promise<void> {
 }
 
 export async function verifyEmail(req: any, res: Response): Promise<void> {
-  console.log(req.body);
   try {
     const validate = await VerifyOTP.validateAsync(req.body);
     const repo = AppDataSource.getRepository(User);
@@ -674,7 +641,6 @@ export async function verifyEmail(req: any, res: Response): Promise<void> {
         emailOtp: validate.otp,
       },
     });
-    console.log(verifyOTP);
     if (verifyOTP) {
       await repo.update(
         { emailOtp: validate.otp },
@@ -705,7 +671,6 @@ export const getAllUsers = async (
     const take: any = req.query?.take || totalUser + 1;
     const searchData: any = req.query?.search || null;
     const repo = AppDataSource.getRepository(User);
-    console.log(searchData);
     const searchQuery: any = `%${searchData}%`;
     if (
       searchData === "null" ||

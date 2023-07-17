@@ -39,7 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.viewBlockUser = exports.unBlockUser = exports.blockUser = exports.updateUserRole = exports.countAllusers = exports.getAllUsers = exports.verifyEmail = exports.resetPassword = exports.forgetPassword = exports.updateUser = exports.getUser = exports.studentLogin = exports.login = exports.hodLogin = exports.accountantlogin = exports.adminlogin = exports.StudentRegister = exports.register = void 0;
 var hashpassword_1 = require("../helper/hashpassword");
 var jwt_1 = require("../helper/jwt");
-var registerSchema_1 = require("../schema/registerSchema");
+var registerSchema_1 = require("../validationSchema/registerSchema");
 var cloudinary = require("cloudinary");
 var data_source_1 = require("../PGDB/data-source");
 var User_1 = require("../entity/User");
@@ -47,10 +47,10 @@ var Role_1 = require("../entity/Role");
 var generateRandomOTP_1 = require("../helper/generateRandomOTP");
 var nodeMailer_1 = require("../helper/nodeMailer");
 var typeorm_1 = require("typeorm");
-var roleSchema_1 = require("../schema/roleSchema");
+var roleSchema_1 = require("../validationSchema/roleSchema");
 var RoleEnum_1 = require("../ENUMS/RoleEnum");
+var Repository_1 = require("../Repository");
 var userModel = require("../MongoDB/Schema/UserSchema");
-var userRepo = data_source_1.AppDataSource.getRepository(User_1.User);
 function register(req, res, next) {
     return __awaiter(this, void 0, void 0, function () {
         var validate, hashedPassword, repo, roles_1, user, userRepo_1, saveUser, mailData, email, err_1;
@@ -91,12 +91,9 @@ function register(req, res, next) {
                     return [4 /*yield*/, nodeMailer_1.transporter.sendMail(mailData, function (err, info) {
                             if (err)
                                 console.log(err);
-                            else
-                                console.log("ok");
                         })];
                 case 5:
                     email = _a.sent();
-                    console.log(saveUser);
                     if (saveUser) {
                         res.status(202).send({ message: "successfully registered" });
                     }
@@ -133,7 +130,6 @@ function StudentRegister(req, res, next) {
                 case 3:
                     roles_2 = _a.sent();
                     randomOTP = (0, generateRandomOTP_1.generateOTP)();
-                    console.log(randomOTP);
                     user = new User_1.User();
                     user.email = validate.email;
                     user.password = hashedPassword;
@@ -143,7 +139,6 @@ function StudentRegister(req, res, next) {
                     return [4 /*yield*/, userRepo_2.save(user)];
                 case 4:
                     saveUser = _a.sent();
-                    console.log(saveUser);
                     if (saveUser) {
                         res.status(202).send({ message: "successfully registered", status: 202 });
                     }
@@ -209,9 +204,7 @@ function adminlogin(req, res, next) {
                         })];
                 case 7:
                     checkIfAlreadyExist = _a.sent();
-                    console.log(checkIfAlreadyExist);
                     if (!validate.deviceId) return [3 /*break*/, 9];
-                    console.log(validate.deviceId);
                     if (!!checkIfAlreadyExist) return [3 /*break*/, 9];
                     return [4 /*yield*/, userModel.create({
                             username: user.email,
@@ -220,7 +213,6 @@ function adminlogin(req, res, next) {
                         })];
                 case 8:
                     chatUser = _a.sent();
-                    console.log(chatUser);
                     _a.label = 9;
                 case 9:
                     res.json({
@@ -309,9 +301,7 @@ function accountantlogin(req, res, next) {
                         })];
                 case 7:
                     checkIfAlreadyExist = _a.sent();
-                    console.log(checkIfAlreadyExist);
                     if (!validate.deviceId) return [3 /*break*/, 9];
-                    console.log(validate.deviceId);
                     if (!!checkIfAlreadyExist) return [3 /*break*/, 9];
                     return [4 /*yield*/, userModel.create({
                             username: user.email,
@@ -320,7 +310,6 @@ function accountantlogin(req, res, next) {
                         })];
                 case 8:
                     chatUser = _a.sent();
-                    console.log(chatUser);
                     _a.label = 9;
                 case 9:
                     res.json({
@@ -409,9 +398,7 @@ function hodLogin(req, res, next) {
                         })];
                 case 7:
                     checkIfAlreadyExist = _a.sent();
-                    console.log(checkIfAlreadyExist);
                     if (!validate.deviceId) return [3 /*break*/, 9];
-                    console.log(validate.deviceId);
                     if (!!checkIfAlreadyExist) return [3 /*break*/, 9];
                     return [4 /*yield*/, userModel.create({
                             username: user.email,
@@ -420,7 +407,6 @@ function hodLogin(req, res, next) {
                         })];
                 case 8:
                     chatUser = _a.sent();
-                    console.log(chatUser);
                     _a.label = 9;
                 case 9:
                     res.json({
@@ -507,9 +493,7 @@ function login(req, res, next) {
                         })];
                 case 7:
                     checkIfAlreadyExist = _b.sent();
-                    console.log(checkIfAlreadyExist);
                     if (!validate.deviceId) return [3 /*break*/, 9];
-                    console.log(validate.deviceId);
                     if (!!checkIfAlreadyExist) return [3 /*break*/, 9];
                     return [4 /*yield*/, userModel.create({
                             username: user.email,
@@ -518,7 +502,6 @@ function login(req, res, next) {
                         })];
                 case 8:
                     chatUser = _b.sent();
-                    console.log(chatUser);
                     _b.label = 9;
                 case 9:
                     res.json({
@@ -608,9 +591,7 @@ function studentLogin(req, res, next) {
                         })];
                 case 7:
                     checkIfAlreadyExist = _a.sent();
-                    console.log(checkIfAlreadyExist);
                     if (!validate.deviceId) return [3 /*break*/, 9];
-                    console.log(validate.deviceId);
                     if (!!checkIfAlreadyExist) return [3 /*break*/, 9];
                     return [4 /*yield*/, userModel.create({
                             username: user.email,
@@ -619,7 +600,6 @@ function studentLogin(req, res, next) {
                         })];
                 case 8:
                     chatUser = _a.sent();
-                    console.log(chatUser);
                     _a.label = 9;
                 case 9:
                     res.json({
@@ -658,17 +638,12 @@ function studentLogin(req, res, next) {
 exports.studentLogin = studentLogin;
 function getUser(req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var authHeader, currentUser, repo, user, err_13;
+        var currentUser, repo, user, err_13;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
-                    authHeader = req.headers["authorization"];
-                    if (authHeader && authHeader.startsWith("Bearer ")) {
-                        // Remove "Bearer " from the authHeader
-                        authHeader = authHeader.slice(7, authHeader.length);
-                    }
-                    currentUser = (0, jwt_1.getCurrentUser)(authHeader || "");
+                    currentUser = req.user;
                     repo = data_source_1.AppDataSource.getRepository(User_1.User);
                     return [4 /*yield*/, repo.findOneOrFail({
                             where: {
@@ -684,7 +659,6 @@ function getUser(req, res) {
                     user = _a.sent();
                     // user?.password = null;
                     if (user) {
-                        console.log(user);
                         res.json(user);
                     }
                     else {
@@ -704,7 +678,7 @@ exports.getUser = getUser;
 function updateUser(req, res) {
     var _a;
     return __awaiter(this, void 0, void 0, function () {
-        var validate, authHeader, currentUser, repo, imageUrl, user, err_14;
+        var validate, currentUser, repo, imageUrl, user, err_14;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -712,12 +686,7 @@ function updateUser(req, res) {
                     return [4 /*yield*/, registerSchema_1.UserUpdateSchema.validateAsync(req.body)];
                 case 1:
                     validate = _b.sent();
-                    authHeader = req.headers["authorization"];
-                    if (authHeader && authHeader.startsWith("Bearer ")) {
-                        // Remove "Bearer " from the authHeader
-                        authHeader = authHeader.slice(7, authHeader.length);
-                    }
-                    currentUser = (0, jwt_1.getCurrentUser)(authHeader || "");
+                    currentUser = req.user;
                     repo = data_source_1.AppDataSource.getRepository(User_1.User);
                     if (!(req === null || req === void 0 ? void 0 : req.file)) return [3 /*break*/, 3];
                     return [4 /*yield*/, cloudinary.uploader.upload((_a = req === null || req === void 0 ? void 0 : req.file) === null || _a === void 0 ? void 0 : _a.path)];
@@ -725,9 +694,7 @@ function updateUser(req, res) {
                     imageUrl = _b.sent();
                     validate.avatar = imageUrl === null || imageUrl === void 0 ? void 0 : imageUrl.secure_url;
                     _b.label = 3;
-                case 3:
-                    console.log(validate);
-                    return [4 /*yield*/, repo.update(currentUser.id, validate)];
+                case 3: return [4 /*yield*/, repo.update(currentUser.id, validate)];
                 case 4:
                     user = _b.sent();
                     if (user) {
@@ -813,7 +780,6 @@ function resetPassword(req, res) {
                         })];
                 case 3:
                     verifyOTP = _a.sent();
-                    console.log(verifyOTP);
                     if (!verifyOTP) return [3 /*break*/, 5];
                     return [4 /*yield*/, repo_1
                             .update({ forgetPassword: validate_1.otp }, {
@@ -861,12 +827,9 @@ function verifyEmail(req, res) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    console.log(req.body);
-                    _a.label = 1;
-                case 1:
-                    _a.trys.push([1, 7, , 8]);
+                    _a.trys.push([0, 6, , 7]);
                     return [4 /*yield*/, registerSchema_1.VerifyOTP.validateAsync(req.body)];
-                case 2:
+                case 1:
                     validate = _a.sent();
                     repo = data_source_1.AppDataSource.getRepository(User_1.User);
                     return [4 /*yield*/, repo.findOne({
@@ -874,30 +837,29 @@ function verifyEmail(req, res) {
                                 emailOtp: validate.otp,
                             },
                         })];
-                case 3:
+                case 2:
                     verifyOTP = _a.sent();
-                    console.log(verifyOTP);
-                    if (!verifyOTP) return [3 /*break*/, 5];
+                    if (!verifyOTP) return [3 /*break*/, 4];
                     return [4 /*yield*/, repo.update({ emailOtp: validate.otp }, {
                             isEmailVerified: true,
                         })];
-                case 4:
+                case 3:
                     _a.sent();
                     res.status(202).json({
                         message: "Successfully verified",
                     });
-                    return [3 /*break*/, 6];
-                case 5:
+                    return [3 /*break*/, 5];
+                case 4:
                     res.status(401).json({
                         message: "invalid opt",
                     });
-                    _a.label = 6;
-                case 6: return [3 /*break*/, 8];
-                case 7:
+                    _a.label = 5;
+                case 5: return [3 /*break*/, 7];
+                case 6:
                     err_17 = _a.sent();
                     res.status(404).send({ error: true, message: err_17.message });
-                    return [3 /*break*/, 8];
-                case 8: return [2 /*return*/];
+                    return [3 /*break*/, 7];
+                case 7: return [2 /*return*/];
             }
         });
     });
@@ -917,7 +879,6 @@ var getAllUsers = function (req, res) { return __awaiter(void 0, void 0, void 0,
                 take = ((_b = req.query) === null || _b === void 0 ? void 0 : _b.take) || totalUser + 1;
                 searchData = ((_c = req.query) === null || _c === void 0 ? void 0 : _c.search) || null;
                 repo = data_source_1.AppDataSource.getRepository(User_1.User);
-                console.log(searchData);
                 searchQuery = "%".concat(searchData, "%");
                 if (!(searchData === "null" ||
                     searchData === null ||
@@ -987,7 +948,7 @@ var updateUserRole = function (req, res) { return __awaiter(void 0, void 0, void
                 return [4 /*yield*/, roleSchema_1.UpdateUserRole.validateAsync(req.body)];
             case 1:
                 validate = _a.sent();
-                return [4 /*yield*/, userRepo.update(validate.userId, {
+                return [4 /*yield*/, Repository_1.userRepo.update(validate.userId, {
                         roleId: validate.roleId,
                     })];
             case 2:
@@ -1015,7 +976,7 @@ var blockUser = function (req, res) { return __awaiter(void 0, void 0, void 0, f
                 return [4 /*yield*/, registerSchema_1.BlockUser.validateAsync(req.body)];
             case 1:
                 validate = _a.sent();
-                return [4 /*yield*/, userRepo.update(validate.userId, {
+                return [4 /*yield*/, Repository_1.userRepo.update(validate.userId, {
                         blocked: true,
                     })];
             case 2:
@@ -1043,7 +1004,7 @@ var unBlockUser = function (req, res) { return __awaiter(void 0, void 0, void 0,
                 return [4 /*yield*/, registerSchema_1.BlockUser.validateAsync(req.body)];
             case 1:
                 validate = _a.sent();
-                return [4 /*yield*/, userRepo.update(validate.userId, {
+                return [4 /*yield*/, Repository_1.userRepo.update(validate.userId, {
                         blocked: false,
                     })];
             case 2:
@@ -1068,7 +1029,7 @@ var viewBlockUser = function (req, res) { return __awaiter(void 0, void 0, void 
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, userRepo.find({
+                return [4 /*yield*/, Repository_1.userRepo.find({
                         where: {
                             blocked: true,
                         },

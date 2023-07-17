@@ -1,31 +1,15 @@
 import { Express, Request, Response } from "express";
-import { AppDataSource } from "../PGDB/data-source";
-import { Class } from "../entity/Classes";
-import { Subjects } from "../entity/Subject";
-import { getCurrentUser } from "../helper/jwt";
 import { MAILDATA } from "../Interface/NodeMailerInterface";
 import { transporter } from "../helper/nodeMailer";
 import { DATA, NotificationResult } from "../Interface/SubjectInterface";
 import { sendNotification } from "../Notification/PushNotification";
-import { CreateNotes } from "../schema/notesSchema";
-import { Notes } from "../entity/Notes";
+import { CreateNotes } from "../validationSchema/notesSchema";
 import { uploadFile } from "../helper/imageupload";
-import { copyFileSync } from "fs";
-const noteRepo = AppDataSource.getRepository(Notes);
-const subjectRepo = AppDataSource.getRepository(Subjects);
-const classRepo = AppDataSource.getRepository(Class);
-const Mega = require("mega");
+import { classRepo, noteRepo, subjectRepo } from "../Repository";
 export const create = async (req: any, res: Response): Promise<void> => {
   try {
-    console.log(req.file);
     const validate = await CreateNotes.validateAsync(req.body);
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = await getCurrentUser(authHeader || "");
-    console.log(currentUser.id);
+    const currentUser: any =req.user
     const subjectId: any = await subjectRepo.findOne({
       where: {
         teacherId: {
@@ -33,14 +17,10 @@ export const create = async (req: any, res: Response): Promise<void> => {
         },
       },
     });
-    console.log(subjectId);
     validate.subjectId = subjectId.id;
-
-    console.log(req.file);
     if (req?.file) {
       const imageUrl = await uploadFile(req.file.path);
       validate.pdf = imageUrl;
-      console.log(req.file);
     }
     const result = await noteRepo.insert(validate);
 
@@ -95,12 +75,6 @@ export const create = async (req: any, res: Response): Promise<void> => {
 
 export const get = async (req: Request, res: Response): Promise<void> => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
     const { subjectId } = req.params;
     const assignment = await noteRepo.find({
       where: {
@@ -119,14 +93,10 @@ export const get = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const getAllNotes = async (req: Request, res: Response) => {
+export const getAllNotes = async (req: any, res: Response) => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = await getCurrentUser(authHeader || "");
+    const currentUser: any =req.user
+
     const notes = await noteRepo.find({
       where: {
         deleted: false,
@@ -145,7 +115,6 @@ export const getAllNotes = async (req: Request, res: Response) => {
         subjectId: true,
       },
     });
-    console.log(notes);
     res.json(notes);
   } catch (err: any) {
     res.json(err.message);

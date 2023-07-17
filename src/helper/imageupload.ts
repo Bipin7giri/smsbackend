@@ -11,7 +11,6 @@ export async function uploadFile(params: any) {
     const imageUrl = await cloudinary.uploader.upload(params, {
       resource_type: "auto",
     });
-    console.log(imageUrl);
     return imageUrl.secure_url;
   } catch (err) {
     throw err;

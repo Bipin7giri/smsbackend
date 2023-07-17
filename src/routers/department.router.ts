@@ -118,7 +118,7 @@ router.get("/department", AdminAuthorization, getAllDepartment);
  *         description: Some server error
  */
 router.post("/department/notification", HODAuthorization, createNotification);
-router.get("/department/notification", HODAuthorization, getNotification);
+router.get("/department/notification", getNotification);
 /**
  * @swagger
  * /department/notification:

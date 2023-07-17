@@ -66,6 +66,7 @@ function generateToken(user, expire) {
 }
 exports.generateToken = generateToken;
 function tokenValidation(req, res, next) {
+    var _this = this;
     var authHeader = req.headers["authorization"];
     if (authHeader && authHeader.startsWith("Bearer ")) {
         // Remove "Bearer " from the authHeader
@@ -76,18 +77,30 @@ function tokenValidation(req, res, next) {
             message: "No access_token found",
         });
     }
-    jwt.verify(authHeader, "json_web_token_pw", function (err, user) {
-        try {
-            if (err)
-                return res.status(401).json({
-                    message: "unauthorized access",
-                });
-            next();
-        }
-        catch (err) {
-            res.send(err);
-        }
-    });
+    jwt.verify(authHeader, "json_web_token_pw", function (err, user) { return __awaiter(_this, void 0, void 0, function () {
+        var currentUser, err_2;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    if (err)
+                        return [2 /*return*/, res.status(401).json({
+                                message: "unauthorized access",
+                            })];
+                    return [4 /*yield*/, getCurrentUser(authHeader || "")];
+                case 1:
+                    currentUser = _a.sent();
+                    req.user = currentUser;
+                    next();
+                    return [3 /*break*/, 3];
+                case 2:
+                    err_2 = _a.sent();
+                    res.send(err_2);
+                    return [3 /*break*/, 3];
+                case 3: return [2 /*return*/];
+            }
+        });
+    }); });
 }
 exports.tokenValidation = tokenValidation;
 function getCurrentUser(token) {

@@ -6,23 +6,16 @@ import { Subjects } from "../entity/Subject";
 import { User } from "../entity/User";
 import { generateHashPassword } from "../helper/hashpassword";
 import { getCurrentUser } from "../helper/jwt";
-import { AddTeacherSchema, RegisterSchema } from "../schema/registerSchema";
-import {SemesterPatchSchema, SemesterSchema} from "../schema/semesterSchema";
+import { AddTeacherSchema, RegisterSchema } from "../validationSchema/registerSchema";
+import {SemesterPatchSchema, SemesterSchema} from "../validationSchema/semesterSchema";
 import * as xlsx from "xlsx";
 import {Department} from "../entity/Department";
 import {getUserById} from "../helper/getUserById";
-const semseterRepo = AppDataSource.getRepository(Semester);
-const userRepo = AppDataSource.getRepository(User);
-export const create = async (req: Request, res: Response): Promise<void> => {
+import { semseterRepo, userRepo } from "../Repository";
+export const create = async (req: any, res: Response): Promise<void> => {
   try {
     const validate = await SemesterSchema.validateAsync(req.body);
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = await getCurrentUser(authHeader || "");
-    console.log(currentUser.id);
+    const currentUser: any =req?.user
     const repo = AppDataSource.getRepository(Semester);
     const deaprtmentRepo = AppDataSource.getRepository(Department);
 
@@ -43,16 +36,9 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const get = async (req: Request, res: Response): Promise<void> => {
+export const get = async (req: any, res: Response): Promise<void> => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-
-    const currentUser: any = getCurrentUser(authHeader || "");
-    console.log(currentUser)
+    const currentUser: any =req.user
     const repo = AppDataSource.getRepository(Semester);
     const semester = await repo.find({
       relations: ["subjects", "subjects.teacherId"],
@@ -77,14 +63,10 @@ export const get = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const getSemesterStudent = async (req: Request, res: Response): Promise<void> => {
+export const getSemesterStudent = async (req: any, res: Response): Promise<void> => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
+    const currentUser: any =req.user
+
     const repo = AppDataSource.getRepository(Semester);
     const semester = await repo.find({
       relations: [ "departmentId", "subjects", "subjects.teacherId"],
@@ -114,7 +96,6 @@ export const addTeacher = async (
   res: Response
 ): Promise<void> => {
   try {
-    console.log(req.params);
     const validate = await AddTeacherSchema.validateAsync(req.body);
     const { semester } = req.params;
     const semesterId: number = parseInt(semester);
@@ -132,7 +113,6 @@ export const addTeacher = async (
         id: 3,
       },
     });
-    console.log(roles.id);
     const hashedPassword: any = await generateHashPassword(validate?.password);
     const user = new User();
     user.email = validate.name + semesters?.name + "@kathford.com";
@@ -140,8 +120,6 @@ export const addTeacher = async (
     user.roleId = roles;
     const userRepo = AppDataSource.getRepository(User);
     const saveUser: any = await userRepo.save(user);
-    console.log(saveUser);
-
     const subjects = new Subjects();
     subjects.semesterId = semesters.id;
     subjects.subject_name = validate.subjectName;
@@ -192,7 +170,6 @@ export const updateSemester = async (req:Request,res:Response): Promise<void> =>
   try{
     const validate = await SemesterPatchSchema.validateAsync(req.body);
     const id:any = req?.params?.id;
-    console.log(validate)
     const updateSemester = await semseterRepo.update(id,{
       name:validate.name
     })
@@ -203,15 +180,11 @@ export const updateSemester = async (req:Request,res:Response): Promise<void> =>
   }
 }
 
-export const removeSemester = async (req:Request,res:Response): Promise<void> =>{
+export const removeSemester = async (req:any,res:Response): Promise<void> =>{
   try{
     const id:any = req.params.id;
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
+    const currentUser: any =req.user
+
     // res.send(currentUser)
 const userDetails =  await userRepo.findOne({
   where:{
@@ -223,7 +196,6 @@ const userDetails =  await userRepo.findOne({
       deletedAt:new Date(),
       deletedBy:userDetails?.email
     })
-    console.log(result)
     res.json({
       result,
       message:"Successfully Removed"

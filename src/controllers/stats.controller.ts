@@ -1,21 +1,9 @@
-import { Express, Request, Response } from "express";
+import  {Request, Response } from "express";
 import { AppDataSource } from "../PGDB/data-source";
-import { User } from "../entity/User";
-import { Department } from "../entity/Department";
 import { roles } from "../ENUMS/RoleEnum";
-import { Subject } from "typeorm/persistence/Subject";
-import { Assignment } from "../entity/Assignment";
-import { AssignmentSubmission } from "../entity/AssignmentSubmission";
 import { getCurrentUser } from "../helper/jwt";
-import { Subjects } from "../entity/Subject";
-import { time } from "console";
 import { IsNull, Not } from "typeorm";
-import { Reports } from "../entity/Reports";
-const subjectRepo = AppDataSource.getRepository(Subjects);
-const assigmnmentSubmitRepo = AppDataSource.getRepository(AssignmentSubmission);
-const userRepo = AppDataSource.getRepository(User);
-const departmentRepo = AppDataSource.getRepository(Department);
-const reportsRepo = AppDataSource.getRepository(Reports);
+import { assigmnmentSubmitRepo, departmentRepo, subjectRepo, userRepo } from "../Repository";
 // stats for admin
 export const studentAccDepartment = async (
   req: Request,
@@ -67,17 +55,12 @@ export const countStatus = async (req: Request, res: Response) => {
 };
 
 export const getAssigmnmentReportAndAttendanceReports = async (
-  req: Request,
+  req: any,
   res: Response
 ) => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = await getCurrentUser(authHeader || "");
-
+    
+    const currentUser: any =req.user
     const subjectId: any = await subjectRepo.findOne({
       where: {
         teacherId: {
@@ -133,7 +116,6 @@ export const getAssigmnmentReportAndAttendanceReports = async (
     let totalRating = 0;
     let finalData: any = [];
     output.forEach((item: any, id: number) => {
-      console.log(item.key);
       total = item.Count * 5;
       totalRating = (item.value / total) * 100;
       finalData.push({

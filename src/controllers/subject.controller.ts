@@ -10,19 +10,13 @@ import { transporter } from "../helper/nodeMailer";
 import {
   SubjectAndClassShcema,
   SubjectPathSchema,
-} from "../schema/subjectSchema";
+} from "../validationSchema/subjectSchema";
 import { sendNotification } from "../Notification/PushNotification";
 import { DATA, NotificationResult } from "../Interface/SubjectInterface";
 import { MAILDATA } from "../Interface/NodeMailerInterface";
-import { NotificationSchemaTeacher } from "../schema/notificationSchema";
+import { NotificationSchemaTeacher } from "../validationSchema/notificationSchema";
 import { createMeetingApi } from "../services/zoommeeting";
-import { Meeting } from "../entity/Meeting";
-import { Repository } from "typeorm";
-import { clouddebugger } from "googleapis/build/src/apis/clouddebugger";
-
-const meetingRepo: Repository<Meeting> = AppDataSource.getRepository(Meeting);
-const subjectRepo: Repository<Subjects> = AppDataSource.getRepository(Subjects);
-const classRepo: Repository<Class> = AppDataSource.getRepository(Class);
+import { classRepo, meetingRepo, subjectRepo } from "../Repository";
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const validate = await SubjectAndClassShcema.validateAsync(req.body);
@@ -61,14 +55,9 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const get = async (req: Request, res: Response): Promise<void> => {
+export const get = async (req: any, res: Response): Promise<void> => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
+    const currentUser: any =req.user
     const repo = AppDataSource.getRepository(Department);
     const subjects: any = await repo.find({
       where: {
@@ -81,8 +70,6 @@ export const get = async (req: Request, res: Response): Promise<void> => {
       },
       relations: ["semesterId", "semesterId.subjects"],
     });
-    console.log(subjects);
-    // user?.password = null;
     if (subjects) {
       res.json(subjects);
     } else {
@@ -93,14 +80,9 @@ export const get = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const getByID = async (req: Request, res: Response): Promise<void> => {
+export const getByID = async (req: any, res: Response): Promise<void> => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
+    const currentUser: any =req.user
     const repo = AppDataSource.getRepository(Subjects);
     const subjectId: any = req.params.subjectId;
     const subjects = await repo.findOne({
@@ -109,7 +91,6 @@ export const getByID = async (req: Request, res: Response): Promise<void> => {
       },
       relations: ["classId", "classId.studentId", "teacherId"],
     });
-    console.log(subjects);
     // user?.password = null;
     if (subjects) {
       res.json(subjects);
@@ -122,14 +103,9 @@ export const getByID = async (req: Request, res: Response): Promise<void> => {
 };
 
 // get all the subject that is assgin by teacher
-export const getAssignSubject = async (req: Request, res: Response) => {
+export const getAssignSubject = async (req: any, res: Response) => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
+    const currentUser: any =req.user
     const repo = AppDataSource.getRepository(Subjects);
     const subjects = await repo.find({
       where: {
@@ -154,20 +130,13 @@ export const getAssignSubject = async (req: Request, res: Response) => {
     res.status(404).send({ error: true, message: err.message });
   }
 };
-export const update = async (req: Request, res: Response): Promise<void> => {
+export const update = async (req: any, res: Response): Promise<void> => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
+    const currentUser: any =req.user
     const subjectId: any = req.params.subjectId;
     const validate = await SubjectPathSchema.validateAsync(req.body);
     const repo = AppDataSource.getRepository(Subjects);
     console.table(validate);
-    const test = await repo.find(subjectId);
-    console.log(test);
     const updateSubject = await repo.update(subjectId, validate);
     if (updateSubject) {
       res.json(updateSubject);
@@ -181,16 +150,11 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const deleteById = async (
-  req: Request,
+  req: any,
   res: Response
 ): Promise<void> => {
   try {
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
+    const currentUser: any =req.user
     const { subjectId } = req.params;
     const repo = AppDataSource.getRepository(Subjects);
     const deleteSubject = await repo.update(subjectId, {
@@ -209,17 +173,13 @@ export const deleteById = async (
 };
 
 export const pushNotification = async (
-  req: Request,
+  req: any,
   res: Response
 ): Promise<void> => {
   try {
     const validate = await NotificationSchemaTeacher.validateAsync(req.body);
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
+    const currentUser: any =req.user
+
     const classRepo = AppDataSource.getRepository(Class);
 
     const getAllStudent: any = await classRepo.find({
@@ -232,15 +192,9 @@ export const pushNotification = async (
         },
       },
     });
-    console.log(getAllStudent);
     const deviceIDs: string[] = getAllStudent.map((item: any, id: any) => {
       return item.studentId.deviceId;
     });
-    console.log(deviceIDs);
-
-    // const token: string = req?.headers["authorization"]?.split(" ")[1] || "";
-    // const currentUser: any = getCurrentUser(token || "");
-    //   after exam
 
     // get all device id from database of the student that are in this class
     const deviceID: String[] = deviceIDs;
@@ -256,7 +210,6 @@ export const pushNotification = async (
     };
 
     const result: NotificationResult = await sendNotification(data);
-    console.log(result);
     res.status(202).send({ result });
   } catch (err: any) {
     res.status(404).send({ error: true, message: err.message });
@@ -363,14 +316,9 @@ export const getAllMeetingList =async (req:Request,res:Response) => {
   
 }
 
-export const getAllMeetingListTeacher =async (req:Request,res:Response) => {
+export const getAllMeetingListTeacher =async (req:any,res:Response) => {
   try{
-    let authHeader = req.headers["authorization"];
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Remove "Bearer " from the authHeader
-      authHeader = authHeader.slice(7, authHeader.length);
-    }
-    const currentUser: any = getCurrentUser(authHeader || "");
+    const currentUser: any =req.user
     const subjectId: any = await subjectRepo.findOne({
       where: {
         teacherId: {

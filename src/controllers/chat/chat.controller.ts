@@ -55,7 +55,6 @@ export const JoinRoom = async (
   try {
     // const currentUser: any = await getCurrentUser(receiver || "");
 
-    console.log(receiver, room, sender);
     const result = await RoomModel.findOne({
       $and: [{ sender: "bipingiri27@gmail.com" }, { receiver: receiver }],
     });

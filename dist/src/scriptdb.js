@@ -51,7 +51,6 @@ var connectDb = function () {
                     return [4 /*yield*/, repo.count()];
                 case 1:
                     countIfuser = _a.sent();
-                    console.log(countIfuser);
                     if (!(countIfuser === 0)) return [3 /*break*/, 7];
                     admin = new Role_1.Role();
                     student = new Role_1.Role();

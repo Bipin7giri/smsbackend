@@ -39,34 +39,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.get = exports.remove = exports.create = void 0;
 var data_source_1 = require("../PGDB/data-source");
 var Role_1 = require("../entity/Role");
-var jwt_1 = require("../helper/jwt");
-var roleSchema_1 = require("../schema/roleSchema");
-var repo = data_source_1.AppDataSource.getRepository(Role_1.Role);
+var roleSchema_1 = require("../validationSchema/roleSchema");
+var Repository_1 = require("../Repository");
 var create = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var token, currentUser, validate, role, repo_1, saveRole, err_1;
-    var _a;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+    var validate, role, repo_1, saveRole, err_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0:
-                _b.trys.push([0, 3, , 4]);
-                token = ((_a = req === null || req === void 0 ? void 0 : req.headers["authorization"]) === null || _a === void 0 ? void 0 : _a.split(" ")[1]) || "";
-                currentUser = (0, jwt_1.getCurrentUser)(token || "");
+                _a.trys.push([0, 3, , 4]);
                 return [4 /*yield*/, roleSchema_1.RoleSchema.validateAsync(req.body)];
             case 1:
-                validate = _b.sent();
+                validate = _a.sent();
                 role = new Role_1.Role();
                 repo_1 = data_source_1.AppDataSource.getRepository(Role_1.Role);
                 role.name = validate.name;
                 role.roles = validate.roles;
                 return [4 /*yield*/, repo_1.save(role)];
             case 2:
-                saveRole = _b.sent();
+                saveRole = _a.sent();
                 if (saveRole) {
                     res.status(202).json({ saveRole: saveRole });
                 }
                 return [3 /*break*/, 4];
             case 3:
-                err_1 = _b.sent();
+                err_1 = _a.sent();
                 res.status(422).json(err_1);
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
@@ -81,7 +77,7 @@ var remove = function (req, res) { return __awaiter(void 0, void 0, void 0, func
             case 0:
                 _a.trys.push([0, 2, , 3]);
                 roleId = req.params.roleId;
-                return [4 /*yield*/, repo.update(+roleId, {
+                return [4 /*yield*/, Repository_1.repo.update(+roleId, {
                         deleted: true,
                         deletedAt: new Date(),
                     })];
