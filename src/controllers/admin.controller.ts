@@ -1,6 +1,4 @@
 import { Express, Request, Response } from "express";
-import { AppDataSource } from "../PGDB/data-source";
-import { getCurrentUser } from "../helper/jwt";
 import { MAILDATA } from "../Interface/NodeMailerInterface";
 import { transporter } from "../helper/nodeMailer";
 import { DATA, NotificationResult } from "../Interface/SubjectInterface";

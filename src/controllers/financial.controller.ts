@@ -11,7 +11,7 @@ export class FinancialController {
   constructor() {}
 
   // GET method
-  public async get(req: Request, res: Response): Promise<Response> {
+  public static async get(req: Request, res: Response): Promise<Response> {
     // Logic for handling GET requests
     try {
       return res.json(

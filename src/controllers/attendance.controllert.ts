@@ -1,13 +1,8 @@
 import { Express, Request, Response } from "express";
 import { AppDataSource } from "../PGDB/data-source";
-import { Subjects } from "../entity/Subject";
-import { getCurrentUser } from "../helper/jwt";
-import { Absent } from "../entity/Absent";
-import { Present } from "../entity/Present";
 import { Reports } from "../entity/Reports";
 import { AttedanceByDate, AttendanceSchema } from "../validationSchema/attendanceSchema";
-import { Class } from "../entity/Classes";
-import { EntityManager, Repository } from "typeorm";
+import { EntityManager } from "typeorm";
 import {
   absentRepo,
   classRepo,
@@ -172,10 +167,6 @@ export const getByDate = async (req: any, res: Response): Promise<void> => {
         },
       },
     });
-
-    // const result = await
-    // const resul
-    let startDate: string = "Wed Apr 26 2023 00:00:00 GMT+0545 (Nepal Time)";
 
     const formattedStartDate: any = new Date(validate.startDate)
       .toISOString()

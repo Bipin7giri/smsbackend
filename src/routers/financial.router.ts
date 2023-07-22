@@ -16,7 +16,7 @@ router.get(
   "/get",
   tokenValidation,
   AccountAuthorization,
-  FinancialController.prototype.get.bind(FinancialController)
+  FinancialController.get
 );
 
 router.post(

@@ -2,7 +2,6 @@ import { Express, Request, Response } from "express";
 import { AppDataSource } from "../PGDB/data-source";
 import { Class } from "../entity/Classes";
 import { Subjects } from "../entity/Subject";
-import { getCurrentUser } from "../helper/jwt";
 import {
   ClassPatchSchema,
   ClassSchema,
