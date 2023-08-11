@@ -4,15 +4,14 @@
          "es5",
          "es6"
       ],
-      "target": "es6",
+      "target": "es5",
       "module": "commonjs",
       "moduleResolution": "node",
-      "types": ["node"],
       "outDir": "./dist",
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
       "sourceMap": true,
       "strict": true,
       "strictPropertyInitialization": false,
-   }
+   },
 }
