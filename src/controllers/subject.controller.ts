@@ -273,7 +273,6 @@ export const createMeeting = async (req: Request, res: Response) => {
       from: "giribipin04@gmail.com",
       text: "Online classroom link",
     };
-    // console.log(mailData)
     await transporter.sendMail(mailData, function (err: any, info: any) {
       if (err) console.log(err);
       else console.log("ok");
