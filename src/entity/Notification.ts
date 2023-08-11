@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, OneToOne, ManyToOne
 import { SoftDelete } from "./SoftDelete"
 import {Role} from "./Role";
 import {Department} from "./Department";
+import { Subjects } from "./Subject";
 
 @Entity()
 export class Notification extends SoftDelete {
@@ -18,5 +19,8 @@ export class Notification extends SoftDelete {
     @ManyToOne(() => Department, (department) => department.notificationID)
     @JoinColumn({ name: "department_id" })
     departmentId: Department;
-
+    
+    @ManyToOne(()=>Subjects,(subject)=>subject.notification)
+    @JoinColumn({ name: "subject_id" })
+    subjectId: Subjects;
 }

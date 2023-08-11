@@ -14,9 +14,23 @@ import {
 import { sendNotification } from "../Notification/PushNotification";
 import { DATA, NotificationResult } from "../Interface/SubjectInterface";
 import { MAILDATA } from "../Interface/NodeMailerInterface";
-import { NotificationSchemaTeacher } from "../validationSchema/notificationSchema";
+import {
+  NotificationSchemaAdmin,
+  NotificationSchemaTeacher,
+} from "../validationSchema/notificationSchema";
 import { createMeetingApi } from "../services/zoommeeting";
-import { classRepo, meetingRepo, subjectRepo } from "../Repository";
+import {
+  classRepo,
+  departmentRepo,
+  meetingRepo,
+  notificationRepo,
+  subjectRepo,
+  userRepo,
+} from "../Repository";
+import { Notification } from "../entity/Notification";
+import { type } from "os";
+import { Subject } from "typeorm/persistence/Subject";
+import { In } from "typeorm";
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const validate = await SubjectAndClassShcema.validateAsync(req.body);
@@ -57,7 +71,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 
 export const get = async (req: any, res: Response): Promise<void> => {
   try {
-    const currentUser: any =req.user
+    const currentUser: any = req.user;
     const repo = AppDataSource.getRepository(Department);
     const subjects: any = await repo.find({
       where: {
@@ -82,7 +96,7 @@ export const get = async (req: any, res: Response): Promise<void> => {
 
 export const getByID = async (req: any, res: Response): Promise<void> => {
   try {
-    const currentUser: any =req.user
+    const currentUser: any = req.user;
     const repo = AppDataSource.getRepository(Subjects);
     const subjectId: any = req.params.subjectId;
     const subjects = await repo.findOne({
@@ -105,7 +119,7 @@ export const getByID = async (req: any, res: Response): Promise<void> => {
 // get all the subject that is assgin by teacher
 export const getAssignSubject = async (req: any, res: Response) => {
   try {
-    const currentUser: any =req.user
+    const currentUser: any = req.user;
     const repo = AppDataSource.getRepository(Subjects);
     const subjects = await repo.find({
       where: {
@@ -132,7 +146,7 @@ export const getAssignSubject = async (req: any, res: Response) => {
 };
 export const update = async (req: any, res: Response): Promise<void> => {
   try {
-    const currentUser: any =req.user
+    const currentUser: any = req.user;
     const subjectId: any = req.params.subjectId;
     const validate = await SubjectPathSchema.validateAsync(req.body);
     const repo = AppDataSource.getRepository(Subjects);
@@ -149,12 +163,9 @@ export const update = async (req: any, res: Response): Promise<void> => {
   }
 };
 
-export const deleteById = async (
-  req: any,
-  res: Response
-): Promise<void> => {
+export const deleteById = async (req: any, res: Response): Promise<void> => {
   try {
-    const currentUser: any =req.user
+    const currentUser: any = req.user;
     const { subjectId } = req.params;
     const repo = AppDataSource.getRepository(Subjects);
     const deleteSubject = await repo.update(subjectId, {
@@ -178,7 +189,7 @@ export const pushNotification = async (
 ): Promise<void> => {
   try {
     const validate = await NotificationSchemaTeacher.validateAsync(req.body);
-    const currentUser: any =req.user
+    const currentUser: any = req.user;
 
     const classRepo = AppDataSource.getRepository(Class);
 
@@ -258,7 +269,7 @@ export const createMeeting = async (req: Request, res: Response) => {
             <p>Hello,</p>
             <p style="color: green;">Please join the meeting link: ${meetingUrl.join_url}</p>
             <p>and here is meeting code: ${meetingUrl.password}</p>
-      </div>`,
+             </div>`,
       from: "giribipin04@gmail.com",
       text: "Online classroom link",
     };
@@ -292,33 +303,30 @@ export const joinMeeting = async (req: Request, res: Response) => {
   }
 };
 
-
-export const getAllMeetingList =async (req:Request,res:Response) => {
-  try{
-    const {subjectId} = req.params;
+export const getAllMeetingList = async (req: Request, res: Response) => {
+  try {
+    const { subjectId } = req.params;
     const meetingUrl = await meetingRepo.find({
       where: {
         subjectId: {
-          id:+ subjectId,
+          id: +subjectId,
         },
       },
       order: {
         updatedAt: "DESC",
       },
     });
-    res.json(meetingUrl)
+    res.json(meetingUrl);
+  } catch (err: any) {
+    res.sendStatus(500).json({
+      message: err.message,
+    });
   }
-  catch(err:any){
-  res.sendStatus(500).json({
-    message:err.message
-  })
-  }
-  
-}
+};
 
-export const getAllMeetingListTeacher =async (req:any,res:Response) => {
-  try{
-    const currentUser: any =req.user
+export const getAllMeetingListTeacher = async (req: any, res: Response) => {
+  try {
+    const currentUser: any = req.user;
     const subjectId: any = await subjectRepo.findOne({
       where: {
         teacherId: {
@@ -330,19 +338,122 @@ export const getAllMeetingListTeacher =async (req:any,res:Response) => {
     const meetingUrl = await meetingRepo.find({
       where: {
         subjectId: {
-          id:+ subjectId.id,
+          id: +subjectId.id,
         },
       },
       order: {
         updatedAt: "DESC",
       },
     });
-    res.json(meetingUrl)
+    res.json(meetingUrl);
+  } catch (err: any) {
+    res.sendStatus(500).json({
+      message: err.message,
+    });
   }
-  catch(err:any){
-  res.sendStatus(500).json({
-    message:err.message
-  })
+};
+export const createNotification = async (
+  req: any,
+  res: Response
+): Promise<void> => {
+  try {
+    const validate = await NotificationSchemaAdmin.validateAsync(req.body);
+    const currentUser: any = req.user;
+
+    const subjectId: any = await subjectRepo.findOne({
+      where: {
+        teacherId: {
+          id: currentUser.id,
+        },
+      },
+    });
+    const allUsers: User[] = await userRepo.find({
+      where: {
+        deleted: false,
+        blocked: false,
+        departmentId: {
+          semesterId: {
+            subjects: {
+              id: subjectId.id,
+            },
+          },
+        },
+      },
+    });
+
+    const userEmail: any = allUsers.map((item: any) => {
+      return item.email;
+    });
+    const userNotification = allUsers
+      .filter((item: any) => item.deviceId !== null)
+      .map((item: any) => item.deviceId);
+
+    const mailData: MAILDATA = {
+      from: "giribipin04@gmail.com", // sender address
+      to: userEmail, // list of receivers
+      subject: validate.title,
+      text: "Alert!!!",
+      html: `<br>${validate.body} </br>`,
+    };
+    const email = await transporter.sendMail(
+      mailData,
+      function (err: any, info: any) {
+        if (err) console.log(err);
+        else console.log("ok");
+      }
+    );
+
+    const deviceID: any = userNotification;
+    let data: DATA = {
+      to: deviceID,
+      sound: "default",
+      title: validate.title,
+      body: validate.body,
+    };
+    const datas = await notificationRepo.save({
+      subjectId: subjectId.id,
+      ...validate,
+    });
+    const notification: any = await sendNotification(data);
+    res
+      .status(202)
+      .json({ data: notification, message: "notification send", status: 202 });
+  } catch (err: any) {
+    res.status(422).json(err.message);
   }
-  
-}
+};
+export const getClassNotificationForStudent = async (
+  req: any,
+  res: Response
+): Promise<void> => {
+  try {
+    const currentUser: any = req.user;
+    const subjects: any = await subjectRepo.find({
+      where: {
+        classId: {
+          studentId: currentUser?.id,
+        },
+      },
+    });
+    const subjectsId = subjects.map((item: Subjects, id: number) => {
+      return item.id;
+    });
+    const notifications: Notification[] = await notificationRepo.find({
+      relations:{
+        subjectId:true
+      },
+      select:{body:true,title:true,subjectId:{subject_name:true}},
+      where: {
+        subjectId: {
+          id: In(subjectsId),
+        },
+      },
+    });
+    res
+      .status(202)
+      .json({ data: notifications, status: 202 });
+  } catch (err: any) {
+    throw err;
+    res.status(422).json(err.message);
+  }
+};

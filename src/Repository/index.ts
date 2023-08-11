@@ -31,6 +31,5 @@ export const repo = AppDataSource.getRepository(Role);
 export const noteRepo = AppDataSource.getRepository(Notes);
 export const financialRepo = AppDataSource.getRepository(Financial);
 export const financialHistoryRepo = AppDataSource.getRepository(FinancialHistory);
-
 export const absentRepo: Repository<Absent> = AppDataSource.getRepository(Absent);
 export const presentRepo: Repository<Present> = AppDataSource.getRepository(Present);

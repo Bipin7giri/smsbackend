@@ -45,7 +45,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 
 export const get = async (req: any, res: Response): Promise<void> => {
   try {
-    const currentUser: any =req.user
+    const currentUser: any = req.user
     const repo = AppDataSource.getRepository(Department);
     const department = await repo.find({
       relations: ["hod"],
@@ -131,7 +131,7 @@ export const updateDepartment = async (
   res: Response
 ): Promise<void> => {
   try {
-    const currentUser: any =req.user
+    const currentUser: any = req.user
     const repo = AppDataSource.getRepository(Department);
     const department = await repo.find({
       relations: ["hod"],
@@ -156,7 +156,7 @@ export const getStudent = async (
   res: Response
 ): Promise<void> => {
   try {
-    const currentUser: any =req.user
+    const currentUser: any = req.user
 
     const searchData: any = req.query?.search || null;
     const searchQuery: any = `%${searchData}%`;
@@ -196,7 +196,7 @@ export const getStudent = async (
       });
       res.json(students);
     }
-  } catch (err) {}
+  } catch (err) { }
 };
 
 export const getAllDepartment = async (
@@ -225,7 +225,7 @@ export const addBulkStudent = async (
   res: Response
 ): Promise<void> => {
   try {
-    const currentUser: any =req.user
+    const currentUser: any = req.user
     const departmentId = await departmentRepo.findOne({
       where: {
         hod: {
@@ -261,7 +261,7 @@ export const createNotification = async (
 ): Promise<void> => {
   try {
     const validate = await NotificationSchemaAdmin.validateAsync(req.body);
-    const currentUser: any =req.user
+    const currentUser: any = req.user
 
     const findDepartmentId: any = await departmentRepo.findOne({
       where: {
@@ -324,7 +324,7 @@ export const getNotification = async (
   res: Response
 ): Promise<void> => {
   try {
-    const currentUser: any =req.user
+    const currentUser: any = req.user
     const getDepartmentId: any = await departmentRepo.findOne({
       where: {
         userId: {
