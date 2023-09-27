@@ -6,13 +6,13 @@ import {
 } from "../controllers/semester.controller";
 import * as express from "express";
 import {
-  AdminAuthorization,
   HODAuthorization,
   StudentAuthorization,
   TeacherAuthorization,
   tokenValidation,
 } from "../helper/jwt";
 import { addTeacher } from "../controllers/semester.controller";
+import { binarySearchAlgo } from "../controllers/stats.controller";
 const router = express.Router();
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });

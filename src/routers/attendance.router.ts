@@ -6,9 +6,6 @@ import {
 } from "../controllers/attendance.controllert";
 import * as express from "express";
 import {
-  AdminAuthorization,
-  HODAuthorization,
-  StudentAuthorization,
   TeacherAuthorization,
   tokenValidation,
 } from "../helper/jwt";

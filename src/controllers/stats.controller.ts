@@ -1,9 +1,15 @@
-import  {Request, Response } from "express";
+import { Request, Response } from "express";
 import { AppDataSource } from "../PGDB/data-source";
 import { roles } from "../ENUMS/RoleEnum";
 import { getCurrentUser } from "../helper/jwt";
 import { IsNull, Not } from "typeorm";
-import { assigmnmentSubmitRepo, departmentRepo, subjectRepo, userRepo } from "../Repository";
+import {
+  assigmnmentSubmitRepo,
+  departmentRepo,
+  subjectRepo,
+  userRepo,
+} from "../Repository";
+import { User } from "../entity/User";
 // stats for admin
 export const studentAccDepartment = async (
   req: Request,
@@ -53,14 +59,67 @@ export const countStatus = async (req: Request, res: Response) => {
     res.json(err.message);
   }
 };
+function binarySearchByEmailSubstring(
+  users: User[],
+  substring: string
+): User[] {
+  const results: User[] = [];
+  let left = 0;
+  let right = users.length - 1;
+
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    const midEmail = users[mid].email;
+
+    if (midEmail.includes(substring)) {
+      // Add matching users to the results array
+      results.push(users[mid]);
+    }
+
+    if (midEmail < substring) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+
+  return results;
+}
+export const binarySearchAlgo = async (req: Request, res: Response) => {
+  try {
+    const getAllUser = await userRepo.find();
+
+    // Extract the search query from the request
+    const search = req.query.search as string;
+
+    // Sort the users by email addresses
+    getAllUser.sort((a, b) => a.email.localeCompare(b.email));
+
+    // Perform the binary search
+    const foundUsers = binarySearchByEmailSubstring(getAllUser, search);
+    let response: User[] = [];
+    if (foundUsers.length > 0) {
+      console.log(`Names found:`);
+      foundUsers.forEach((user) => {
+        response.push(user);
+      });
+    } else {
+      console.log("first")
+      response.push();
+    }
+
+    return res.json(response);
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const getAssigmnmentReportAndAttendanceReports = async (
   req: any,
   res: Response
 ) => {
   try {
-    
-    const currentUser: any =req.user
+    const currentUser: any = req.user;
     const subjectId: any = await subjectRepo.findOne({
       where: {
         teacherId: {
@@ -175,7 +234,7 @@ FROM
       return { [key]: overallPercentage };
     });
 
-    res.status(200).json({reports:sum});
+    res.status(200).json({ reports: sum });
 
     // res.json({ performance: finalData });
   } catch (err: any) {
@@ -185,9 +244,12 @@ FROM
   }
 };
 
-export const getAttendanceReportByStudentIdForHod =async (req:Request,res:Response) => {
-  try{
-    const {subjectId} = req.params;
+export const getAttendanceReportByStudentIdForHod = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { subjectId } = req.params;
     const query = `SELECT
   json_agg(row_to_json(t)) AS result
 FROM
@@ -206,10 +268,7 @@ FROM
 `;
     let attendanceReports = await AppDataSource.query(query);
     res.json({
-      reports: attendanceReports[0].result
-    })
-  }
-  catch(err){
-
-  }
-}
+      reports: attendanceReports[0].result,
+    });
+  } catch (err) {}
+};

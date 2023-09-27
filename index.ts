@@ -31,7 +31,7 @@ const swaggerUi = require("swagger-ui-express");
 const app: Express = express();
 app.use(logger("dev"));
 app.use(bodyParser.json());
-app.use(cors());
+  app.use(cors());
 
 const server = http.createServer(app);
 const io = new Server(server, {

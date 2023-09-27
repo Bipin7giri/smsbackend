@@ -1,13 +1,9 @@
-import { countStatus, getAssigmnmentReportAndAttendanceReports, studentAccDepartment, studentAccSemester } from "../controllers/stats.controller";
+import { binarySearchAlgo, countStatus, getAssigmnmentReportAndAttendanceReports, studentAccDepartment, studentAccSemester } from "../controllers/stats.controller";
 import * as express from "express";
 import {
-    StudentAuthorization,
-    TeacherAuthorization,
     tokenValidation,
 } from "../helper/jwt";
 const router = express.Router();
-const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
 
 router.get(
     "/department/users",
@@ -18,6 +14,7 @@ router.get(
     studentAccSemester
 );
 router.get("/count",countStatus)
+router.get("/binarySearch",binarySearchAlgo)
 
 router.get("/average_reports",tokenValidation,getAssigmnmentReportAndAttendanceReports)
 export default router;

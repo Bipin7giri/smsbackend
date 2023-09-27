@@ -15,9 +15,7 @@ import {
 } from "../controllers/subject.controller";
 import * as express from "express";
 import {
-  AdminAuthorization,
   HODAuthorization,
-  StudentAuthorization,
   TeacherAuthorization,
   tokenValidation,
 } from "../helper/jwt";

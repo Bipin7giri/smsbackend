@@ -12,8 +12,6 @@ import {
 } from "../controllers/assignment.controller";
 import * as express from "express";
 import {
-  AdminAuthorization,
-  HODAuthorization,
   StudentAuthorization,
   TeacherAuthorization,
   tokenValidation,
