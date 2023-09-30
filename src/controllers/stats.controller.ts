@@ -10,6 +10,7 @@ import {
   userRepo,
 } from "../Repository";
 import { User } from "../entity/User";
+import { Subjects } from "../entity/Subject";
 // stats for admin
 export const studentAccDepartment = async (
   req: Request,
@@ -99,12 +100,52 @@ export const binarySearchAlgo = async (req: Request, res: Response) => {
     const foundUsers = binarySearchByEmailSubstring(getAllUser, search);
     let response: User[] = [];
     if (foundUsers.length > 0) {
-      console.log(`Names found:`);
       foundUsers.forEach((user) => {
         response.push(user);
       });
     } else {
       console.log("first")
+      response.push();
+    }
+
+    return res.json(response);
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+export const binarySearchAlgoForTeacher = async (req: any, res: Response) => {
+  try {
+    const currentUser: any = req?.user;
+    const subjectId: any = await subjectRepo.findOne({
+      where: {
+        teacherId: {
+          id: currentUser?.id,
+        },
+      },
+      relations:{classId:{studentId:true}}
+    });
+
+    const students:any[] = subjectId?.classId.map((item:any,id:number)=>{
+      return item?.studentId
+    })
+    // Extract the search query from the request
+    const search = req.query.search as string;
+    // Sort the users by email addresses
+    students.sort((a, b) => a.email.localeCompare(b.email));
+
+    if(!search||search === undefined||search === "" || search === null){
+         return res.json(students)
+    }
+    // Perform the binary search
+    const foundUsers = binarySearchByEmailSubstring(students, search);
+    let response: User[] = [];
+    if (foundUsers.length > 0) {
+      foundUsers.forEach((user) => {
+        response.push(user);
+      });
+    } else {
       response.push();
     }
 
