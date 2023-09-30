@@ -9,6 +9,7 @@ import {
   getAssignSubject,
   getByID,
   getClassNotificationForStudent,
+  getStudentById,
   joinMeeting,
   pushNotification,
   update,
@@ -48,12 +49,20 @@ router.post("/class/notification", pushNotification);
 // create meeting
 router.post("/createmeeting", tokenValidation, createMeeting);
 router.get("/joinmeeting/:subjectId", tokenValidation, joinMeeting);
-router.get("/all/meetinglist/:subjectId",tokenValidation,getAllMeetingList)
-router.get("/all/teacher/meetinglist/",tokenValidation,getAllMeetingListTeacher)
-
+router.get("/all/meetinglist/:subjectId", tokenValidation, getAllMeetingList);
+router.get(
+  "/all/teacher/meetinglist/",
+  tokenValidation,
+  getAllMeetingListTeacher
+);
 
 // notification
-router.post("/teacher/notification",tokenValidation,createNotification)
-router.get("/student/notification",tokenValidation,getClassNotificationForStudent)
+router.post("/teacher/notification", tokenValidation, createNotification);
+router.get(
+  "/student/notification",
+  tokenValidation,
+  getClassNotificationForStudent
+);
+router.get("/student/:id", getStudentById);
 
 export default router;

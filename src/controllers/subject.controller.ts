@@ -439,21 +439,32 @@ export const getClassNotificationForStudent = async (
       return item.id;
     });
     const notifications: Notification[] = await notificationRepo.find({
-      relations:{
-        subjectId:true
+      relations: {
+        subjectId: true,
       },
-      select:{body:true,title:true,subjectId:{subject_name:true}},
+      select: { body: true, title: true, subjectId: { subject_name: true } },
       where: {
         subjectId: {
           id: In(subjectsId),
         },
       },
     });
-    res
-      .status(202)
-      .json({ data: notifications, status: 202 });
+    res.status(202).json({ data: notifications, status: 202 });
   } catch (err: any) {
     throw err;
+    res.status(422).json(err.message);
+  }
+};
+
+export const getStudentById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const id: string = req?.params?.id;
+    const student: User = await userRepo.findOneOrFail({ where: { id: +id } });
+    res.status(202).json({ data: student, status: 202 });
+  } catch (err: any) {
     res.status(422).json(err.message);
   }
 };
